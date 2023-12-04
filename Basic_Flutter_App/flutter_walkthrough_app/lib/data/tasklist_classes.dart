@@ -49,7 +49,7 @@ class Task {
       []; // intended as mutable list of mutable [DateTime, DateTime?]
 
   @HiveField(7)
-  Duration totalTime = Duration(); // 0
+  int totalTime_minutes = 0; // 0
 
   void clockIn() {
     assert(_clockList.isEmpty ||
@@ -63,8 +63,8 @@ class Task {
     assert(_clockList.last[1] == null);
     _clockList.last[1] = DateTime.now();
     print("Clocked out at ${_clockList.last[1]}");
-    totalTime += _clockList.last[1]!.difference(_clockList.last[0]!);
-    print("totalTime = $totalTime");
+    totalTime_minutes += (_clockList.last[1]!.difference(_clockList.last[0]!)).inMinutes;
+    print("totalTime = $totalTime_minutes");
   }
 
   Task({
