@@ -1,4 +1,3 @@
-// TODO annotate these so hive can store the fields
 import 'package:hive/hive.dart';
 
 part 'tasklist_classes.g.dart';
@@ -42,10 +41,31 @@ class Task {
   @HiveField(4)
   String? taskDescription;
 
-  // timestamp deadline;
-  // @HiveField(5)
-  // also need time clock entries and total
-  // @HiveField 6, 7, 8
+  @HiveField(5)
+  DateTime? taskDeadline;
+
+  @HiveField(6)
+  List<List<DateTime?>> _clockList =
+      []; // intended as mutable list of mutable [DateTime, DateTime?]
+
+  @HiveField(7)
+  Duration totalTime = Duration(); // 0
+
+  void clockIn() {
+    assert(_clockList.isEmpty ||
+        (_clockList.last[0] != null &&
+            _clockList.last[1] != null)); // No previously open timeclock
+    _clockList.add([DateTime.now(), null]);
+    print("Clocked in at ${_clockList.last[0]}");
+  }
+
+  void clockOut() {
+    assert(_clockList.last[1] == null);
+    _clockList.last[1] = DateTime.now();
+    print("Clocked out at ${_clockList.last[1]}");
+    totalTime += _clockList.last[1]!.difference(_clockList.last[0]!);
+    print("totalTime = $totalTime");
+  }
 
   Task({
     required this.taskID,
@@ -53,8 +73,8 @@ class Task {
     this.taskStatus,
     this.taskLabel,
     this.taskDescription,
-    // TODO timeclock stuff
+    // timeclocks not set in constructor
   });
 }
 
-// TODO timestamp class: list of timestamp pairs
+// TODO instead of a list of lists, how about a timestamp pair class?
