@@ -6,6 +6,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ToDoTile extends StatelessWidget {
   final String taskName;
+  final String? taskStatus;
+  final String? taskDescription;
   final bool taskCompleted;
   Function(bool?)? onChanged;
   Function(BuildContext)? deleteFunction;
@@ -13,6 +15,8 @@ class ToDoTile extends StatelessWidget {
   ToDoTile({
     super.key,
     required this.taskName,
+    this.taskStatus,
+    this.taskDescription,
     required this.taskCompleted,
     required this.onChanged,
     required this.deleteFunction,
@@ -41,12 +45,27 @@ class ToDoTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               //Checkbox
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
                 activeColor: Colors.black,
+              ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 2.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 2.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  child: Text(taskStatus?? "-"),
+                ),
               ),
 
               //Task Name
@@ -57,6 +76,14 @@ class ToDoTile extends StatelessWidget {
                       ? TextDecoration.lineThrough
                       : TextDecoration.none,
                 ),
+              ),
+
+              Spacer(),
+
+              ElevatedButton(
+                onPressed:
+                    () => deleteFunction != null ? deleteFunction!(context) : null,
+                child: Icon(Icons.delete),
               ),
             ],
           ),
