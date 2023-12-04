@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/database.dart';
 import 'package:test_app/utils/dialog_box.dart';
 import 'package:test_app/utils/todo_tile.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,13 +16,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   //Reference the Hive Box
-  final _myBox = Hive.box('mybox');
+  final _myBox = Hive.box('taskbox');
   TodoDatabase db = TodoDatabase();
+  final taskListIndex = 0; // hardcoded one tasklist for now
 
   @override
   void initState() {
     //First-Time Opening Function
-    if (_myBox.get("TODO_LIST") == null) {
+    if (_myBox.get("TASK_LIST") == null) {
       db.createInitialDatabase();
     } else {
       //Done when data already exists
@@ -37,7 +39,18 @@ class _HomePageState extends State<HomePage> {
   //Checkbox Checker (was it clicked?)
   void checkBoxChanged(bool? value, int index) {
     setState(() {
-      db.todoList[index][1] = !db.todoList[index][1];
+      final prevState =
+          db.listOfTaskLists[taskListIndex].list[index].taskStatus;
+      if (prevState !=
+          TaskStatus
+              .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      {
+        db.listOfTaskLists[taskListIndex].list[index].taskStatus =
+            TaskStatus.DONE;
+      } else {
+        db.listOfTaskLists[taskListIndex].list[index].taskStatus =
+            TaskStatus.TODO;
+      }
     });
     db.updateDatabase();
   }
@@ -45,7 +58,11 @@ class _HomePageState extends State<HomePage> {
   //Save a Task
   void saveNewTask() {
     setState(() {
-      db.todoList.add([_controller.text, false]);
+      db.listOfTaskLists[taskListIndex].list.add(Task(
+        taskID: 0,
+        taskName: _controller.text,
+        taskStatus: TaskStatus.TODO,
+      ));
       //Clears the textbox for the next task
       _controller.clear();
     });
@@ -70,7 +87,7 @@ class _HomePageState extends State<HomePage> {
   //Delete a Task
   void deleteTask(int index) {
     setState(() {
-      db.todoList.removeAt(index);
+      db.listOfTaskLists[taskListIndex].list.removeAt(index);
     });
     db.updateDatabase();
   }
@@ -88,11 +105,16 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: db.todoList.length,
+        itemCount: db.listOfTaskLists[taskListIndex].list.length,
         itemBuilder: (context, index) {
           return ToDoTile(
-            taskName: db.todoList[index][0],
-            taskCompleted: db.todoList[index][1],
+            taskName: db.listOfTaskLists[taskListIndex].list[index].taskName ??
+                "NoName",
+            taskCompleted:
+                db.listOfTaskLists[taskListIndex].list[index].taskStatus ==
+                        TaskStatus.DONE
+                    ? true
+                    : false,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
           );

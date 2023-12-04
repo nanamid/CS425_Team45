@@ -55,9 +55,10 @@ class TaskAdapter extends TypeAdapter<Task> {
     return Task(
       taskID: fields[0] as int,
       taskName: fields[1] as String?,
+      taskStatus: fields[2] as TaskStatus?,
       taskLabel: fields[3] as String?,
-      description: fields[4] as String?,
-    )..taskStatus = fields[2] as TaskStatus?;
+      taskDescription: fields[4] as String?,
+    );
   }
 
   @override
@@ -73,7 +74,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(3)
       ..write(obj.taskLabel)
       ..writeByte(4)
-      ..write(obj.description);
+      ..write(obj.taskDescription);
   }
 
   @override
