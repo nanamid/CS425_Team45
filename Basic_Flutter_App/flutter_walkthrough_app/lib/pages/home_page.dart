@@ -92,6 +92,23 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
+  void showTaskDetail(int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                // Text(db.listOfTaskLists[taskListIndex].list[index].taskStatus), // TODO make the enum printable
+                Text("-status-"),
+                Text(db.listOfTaskLists[taskListIndex].list[index].taskName),
+              ],
+            ),
+            
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,6 +134,7 @@ class _HomePageState extends State<HomePage> {
                     : false,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
+            detailDialogFunction: () => showTaskDetail(index),
           );
         },
       ),

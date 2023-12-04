@@ -11,6 +11,7 @@ class ToDoTile extends StatelessWidget {
   final bool taskCompleted;
   Function(bool?)? onChanged;
   Function(BuildContext)? deleteFunction;
+  Function()? detailDialogFunction;
 
   ToDoTile({
     super.key,
@@ -20,6 +21,7 @@ class ToDoTile extends StatelessWidget {
     required this.taskCompleted,
     required this.onChanged,
     required this.deleteFunction,
+    this.detailDialogFunction,
   });
 
   @override
@@ -38,54 +40,57 @@ class ToDoTile extends StatelessWidget {
             )
           ],
         ),
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: Colors.blue[100],
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //Checkbox
-              Checkbox(
-                value: taskCompleted,
-                onChanged: onChanged,
-                activeColor: Colors.black,
-              ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 2.0,
-                      color: Colors.grey,
+        child: GestureDetector(
+          onTap: detailDialogFunction,
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.blue[100],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //Checkbox
+                Checkbox(
+                  value: taskCompleted,
+                  onChanged: onChanged,
+                  activeColor: Colors.black,
+                ),
+          
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 2.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2.0,
+                        color: Colors.grey,
+                      ),
                     ),
+                    child: Text(taskStatus?? "-"),
                   ),
-                  child: Text(taskStatus?? "-"),
                 ),
-              ),
-
-              //Task Name
-              Text(
-                taskName,
-                style: TextStyle(
-                  decoration: taskCompleted
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
+          
+                //Task Name
+                Text(
+                  taskName,
+                  style: TextStyle(
+                    decoration: taskCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                  ),
                 ),
-              ),
-
-              Spacer(),
-
-              ElevatedButton(
-                onPressed:
-                    () => deleteFunction != null ? deleteFunction!(context) : null,
-                child: Icon(Icons.delete),
-              ),
-            ],
+          
+                Spacer(),
+          
+                ElevatedButton(
+                  onPressed:
+                      () => deleteFunction != null ? deleteFunction!(context) : null,
+                  child: Icon(Icons.delete),
+                ),
+              ],
+            ),
           ),
         ),
       ),
