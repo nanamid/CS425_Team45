@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/pages/home_page.dart';
+import 'package:test_app/pages/login_page.dart';
 
 void main() async {
   //Initialize the Hive
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: LoginPage(),
       theme: ThemeData(primarySwatch: Colors.blue),
     );
   }
