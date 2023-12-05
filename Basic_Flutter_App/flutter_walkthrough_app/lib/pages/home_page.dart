@@ -43,13 +43,13 @@ class _HomePageState extends State<HomePage> {
           db.listOfTaskLists[taskListIndex].list[index].taskStatus;
       if (prevState !=
           TaskStatus
-              .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+              .DONE()) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
         db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            TaskStatus.DONE;
+            TaskStatus.DONE();
       } else {
         db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            TaskStatus.TODO;
+            TaskStatus.TODO();
       }
     });
     db.updateDatabase();
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       db.listOfTaskLists[taskListIndex].list.add(Task(
         taskID: 0,
         taskName: _controller.text,
-        taskStatus: TaskStatus.TODO,
+        taskStatus: TaskStatus.TODO(),
       ));
       //Clears the textbox for the next task
       _controller.clear();
@@ -84,10 +84,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //Delete a Task
   void deleteTask(int index) {
     setState(() {
       db.listOfTaskLists[taskListIndex].list.removeAt(index);
+    });
+    db.updateDatabase();
+  }
+
+  void clockIn(int index) {
+    setState(() {
+      (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockIn();
+    });
+    db.updateDatabase();
+  }
+
+  void clockOut(int index) {
+    setState(() {
+      (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockOut();
     });
     db.updateDatabase();
   }
@@ -100,11 +113,35 @@ class _HomePageState extends State<HomePage> {
             title: Row(
               children: [
                 // Text(db.listOfTaskLists[taskListIndex].list[index].taskStatus), // TODO make the enum printable
-                Text("-status-"),
-                Text(db.listOfTaskLists[taskListIndex].list[index].taskName),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                      "${db.listOfTaskLists[taskListIndex].list[index].taskStatus}"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                      db.listOfTaskLists[taskListIndex].list[index].taskName),
+                ),
               ],
             ),
-            
+            content: Column(children: [
+              Text(db.listOfTaskLists[taskListIndex].list[index]
+                      .taskDescription ??
+                  "Description"),
+              Text(
+                  "Total Time: ${db.listOfTaskLists[taskListIndex].list[index].totalTime_minutes} mins"),
+            ]),
+            actions: [
+              TextButton(
+                onPressed: () => clockIn(index),
+                child: Text("Clock In"),
+              ),
+              TextButton(
+                onPressed: () => clockOut(index),
+                child: Text("Clock Out"),
+              ),
+            ],
           );
         });
   }
@@ -129,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                 "NoName",
             taskCompleted:
                 db.listOfTaskLists[taskListIndex].list[index].taskStatus ==
-                        TaskStatus.DONE
+                        TaskStatus.DONE()
                     ? true
                     : false,
             onChanged: (value) => checkBoxChanged(value, index),

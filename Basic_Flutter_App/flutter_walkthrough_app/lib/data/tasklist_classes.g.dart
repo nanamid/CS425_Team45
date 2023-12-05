@@ -42,6 +42,34 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
           typeId == other.typeId;
 }
 
+class TaskStatusAdapter extends TypeAdapter<TaskStatus> {
+  @override
+  final int typeId = 1;
+
+  @override
+  TaskStatus read(BinaryReader reader) {
+    return TaskStatus();
+  }
+
+  @override
+  void write(BinaryWriter writer, TaskStatus obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj._status);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TaskStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class TaskAdapter extends TypeAdapter<Task> {
   @override
   final int typeId = 2;
@@ -95,45 +123,6 @@ class TaskAdapter extends TypeAdapter<Task> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TaskAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class TaskStatusAdapter extends TypeAdapter<TaskStatus> {
-  @override
-  final int typeId = 1;
-
-  @override
-  TaskStatus read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return TaskStatus.TODO;
-      case 1:
-        return TaskStatus.DONE;
-      default:
-        return TaskStatus.TODO;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, TaskStatus obj) {
-    switch (obj) {
-      case TaskStatus.TODO:
-        writer.writeByte(0);
-        break;
-      case TaskStatus.DONE:
-        writer.writeByte(1);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TaskStatusAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

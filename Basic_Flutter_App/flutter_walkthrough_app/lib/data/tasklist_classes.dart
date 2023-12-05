@@ -15,13 +15,27 @@ class TaskList {
   });
 }
 
-@HiveType(typeId: 1)
-enum TaskStatus {
-  @HiveField(0)
-  TODO,
+// enum TaskStatus {
+//   @HiveField(0)
+//   TODO,
 
-  @HiveField(1)
-  DONE,
+//   @HiveField(1)
+//   DONE,
+// }
+
+@HiveType(typeId: 1)
+class TaskStatus {
+  @HiveField(0)
+  final String _status;
+  TaskStatus() : _status = "-"; // no status
+  TaskStatus.TODO() : _status = "TODO";
+  TaskStatus.DONE() : _status = "DONE";
+  TaskStatus.WAIT() : _status = "WAIT";
+  
+  @override
+  String toString() {
+    return _status;
+  }
 }
 
 @HiveType(typeId: 2)
@@ -50,6 +64,7 @@ class Task {
 
   @HiveField(7)
   int totalTime_minutes = 0; // 0
+  int totalTime_secs = 0; // for testing
 
   void clockIn() {
     assert(_clockList.isEmpty ||
@@ -63,8 +78,9 @@ class Task {
     assert(_clockList.last[1] == null);
     _clockList.last[1] = DateTime.now();
     print("Clocked out at ${_clockList.last[1]}");
-    totalTime_minutes += (_clockList.last[1]!.difference(_clockList.last[0]!)).inMinutes;
-    print("totalTime = $totalTime_minutes");
+    totalTime_minutes += (_clockList.last[1]!.difference(_clockList.last[0]!)).inSeconds; // TODO change this back to minutes
+    totalTime_secs += (_clockList.last[1]!.difference(_clockList.last[0]!)).inSeconds;
+    print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
   }
 
   Task({

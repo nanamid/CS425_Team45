@@ -17,7 +17,7 @@ class TodoDatabase {
     (listOfTaskLists[0] as TaskList).list.add(Task(
           taskID: 0,
           taskName: "Default Task",
-          taskStatus: TaskStatus.TODO,
+          taskStatus: TaskStatus.TODO(),
           taskDescription: "Initial task, feel free to delete",
         ));
     print("Created initial tasklist database");
