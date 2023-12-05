@@ -44,10 +44,10 @@ class _HomePageState extends State<HomePage> {
       if (prevState.toString() != "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
         db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            TaskStatus.DONE();
+            "DONE"; // TODO should be TaskStatus object
       } else {
         db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            TaskStatus.TODO();
+            "TODO"; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
       db.listOfTaskLists[taskListIndex].list.add(Task(
         taskID: 0,
         taskName: _controller.text,
-        taskStatus: TaskStatus.TODO(),
+        taskStatus: "TODO", // TODO should be TaskStatus object
       ));
       //Clears the textbox for the next task
       _controller.clear();
@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
               Text(
                   "Total Time: ${db.listOfTaskLists[taskListIndex].list[index].totalTime_minutes} mins"),
               for (List clockPair in (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockList)
-              Text("${clockPair[0] as DateTime} -- ${clockPair[1] as DateTime}")
+              Text("${clockPair[0]??DateTime(0) as DateTime} -- ${clockPair[1]??DateTime(0) as DateTime}")
             ]),
             actions: [
               TextButton(

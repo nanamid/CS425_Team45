@@ -11,7 +11,7 @@ void main() async {
   //Initialize the Hive
   await Hive.initFlutter();
   Hive.registerAdapter(TaskListAdapter());
-  Hive.registerAdapter(TaskStatusAdapter());
+  // Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(TaskAdapter());
 
   //Open a Box

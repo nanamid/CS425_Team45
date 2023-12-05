@@ -23,40 +23,42 @@ class TaskList {
 //   DONE,
 // }
 
-@HiveType(typeId: 1)
-class TaskStatus {
-  @HiveField(0)
-  final String _status;
-  TaskStatus() : _status = "-"; // no status
-  TaskStatus.TODO() : _status = "TODO";
-  TaskStatus.DONE() : _status = "DONE";
-  TaskStatus.WAIT() : _status = "WAIT";
+// This gave Hive trouble for some reason
+// @HiveType(typeId: 1)
+// class TaskStatus {
+//   @HiveField(0, defaultValue: "-")
+//   final String _status;
+
+//   const TaskStatus() : _status = "-"; // no status
+//   const TaskStatus.TODO() : _status = "TODO";
+//   const TaskStatus.DONE() : _status = "DONE";
+//   const TaskStatus.WAIT() : _status = "WAIT";
   
-  @override
-  String toString() {
-    return _status;
-  }
-}
+//   @override
+//   String toString() {
+//     return _status;
+//   }
+// }
 
 @HiveType(typeId: 2)
 class Task {
-  @HiveField(0)
+  @HiveField(0, defaultValue: -1)
   final int taskID; // TODO make this a uuid
 
-  @HiveField(1)
+  @HiveField(1, defaultValue: "none")
   String? taskName;
 
-  @HiveField(2)
-  TaskStatus? taskStatus;
+  @HiveField(2) // default is TODO, set in constructor
+  String taskStatus; // TODO should be TaskStatus object
 
-  @HiveField(3)
+  @HiveField(3, defaultValue: "none")
   String? taskLabel;
 
-  @HiveField(4)
+  @HiveField(4, defaultValue: "none")
   String? taskDescription;
 
-  @HiveField(5)
-  DateTime? taskDeadline;
+  // @HiveField(5, defaultValue: )
+  // DateTime? taskDeadline;
 
   @HiveField(6)
   List<List<DateTime?>> clockList = // TODO make private?
@@ -86,7 +88,7 @@ class Task {
   Task({
     required this.taskID,
     this.taskName,
-    this.taskStatus,
+    this.taskStatus = "TODO",
     this.taskLabel,
     this.taskDescription,
     // timeclocks not set in constructor
