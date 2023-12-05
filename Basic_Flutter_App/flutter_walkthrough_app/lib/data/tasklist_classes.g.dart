@@ -88,7 +88,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       taskDescription: fields[4] as String?,
     )
       ..taskDeadline = fields[5] as DateTime?
-      .._clockList = (fields[6] as List)
+      ..clockList = (fields[6] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
       ..totalTime_minutes = fields[7] as int;
@@ -111,7 +111,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(5)
       ..write(obj.taskDeadline)
       ..writeByte(6)
-      ..write(obj._clockList)
+      ..write(obj.clockList)
       ..writeByte(7)
       ..write(obj.totalTime_minutes);
   }

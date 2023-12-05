@@ -129,6 +129,8 @@ class _HomePageState extends State<HomePage> {
                   "Description"),
               Text(
                   "Total Time: ${db.listOfTaskLists[taskListIndex].list[index].totalTime_minutes} mins"),
+              for (List clockPair in (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockList)
+              Text("${clockPair[0] as DateTime} -- ${clockPair[1] as DateTime}")
             ]),
             actions: [
               TextButton(
@@ -162,6 +164,7 @@ class _HomePageState extends State<HomePage> {
           return ToDoTile(
             taskName: db.listOfTaskLists[taskListIndex].list[index].taskName ??
                 "NoName",
+            taskStatus: db.listOfTaskLists[taskListIndex].list[index].taskStatus.toString(),
             taskCompleted:
                 db.listOfTaskLists[taskListIndex].list[index].taskStatus.toString() == "DONE"
                     ? true

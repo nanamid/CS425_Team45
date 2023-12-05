@@ -59,7 +59,7 @@ class Task {
   DateTime? taskDeadline;
 
   @HiveField(6)
-  List<List<DateTime?>> _clockList =
+  List<List<DateTime?>> clockList = // TODO make private?
       []; // intended as mutable list of mutable [DateTime, DateTime?]
 
   @HiveField(7)
@@ -67,19 +67,19 @@ class Task {
   int totalTime_secs = 0; // for testing
 
   void clockIn() {
-    assert(_clockList.isEmpty ||
-        (_clockList.last[0] != null &&
-            _clockList.last[1] != null)); // No previously open timeclock
-    _clockList.add([DateTime.now(), null]);
-    print("Clocked in at ${_clockList.last[0]}");
+    assert(clockList.isEmpty ||
+        (clockList.last[0] != null &&
+            clockList.last[1] != null)); // No previously open timeclock
+    clockList.add([DateTime.now(), null]);
+    print("Clocked in at ${clockList.last[0]}");
   }
 
   void clockOut() {
-    assert(_clockList.last[1] == null);
-    _clockList.last[1] = DateTime.now();
-    print("Clocked out at ${_clockList.last[1]}");
-    totalTime_minutes += (_clockList.last[1]!.difference(_clockList.last[0]!)).inSeconds; // TODO change this back to minutes
-    totalTime_secs += (_clockList.last[1]!.difference(_clockList.last[0]!)).inSeconds;
+    assert(clockList.last[1] == null);
+    clockList.last[1] = DateTime.now();
+    print("Clocked out at ${clockList.last[1]}");
+    totalTime_minutes += (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds; // TODO change this back to minutes
+    totalTime_secs += (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
   }
 
