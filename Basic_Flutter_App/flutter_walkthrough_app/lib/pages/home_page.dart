@@ -41,9 +41,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       final prevState =
           db.listOfTaskLists[taskListIndex].list[index].taskStatus;
-      if (prevState !=
-          TaskStatus
-              .DONE()) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      if (prevState.toString() != "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
         db.listOfTaskLists[taskListIndex].list[index].taskStatus =
             TaskStatus.DONE();
@@ -165,8 +163,7 @@ class _HomePageState extends State<HomePage> {
             taskName: db.listOfTaskLists[taskListIndex].list[index].taskName ??
                 "NoName",
             taskCompleted:
-                db.listOfTaskLists[taskListIndex].list[index].taskStatus ==
-                        TaskStatus.DONE()
+                db.listOfTaskLists[taskListIndex].list[index].taskStatus.toString() == "DONE"
                     ? true
                     : false,
             onChanged: (value) => checkBoxChanged(value, index),
