@@ -1,5 +1,6 @@
-//CODE FROM Mitch Koko (YouTube)
+//CODE extended FROM Mitch Koko (YouTube)
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
+// At this point, it's just his function names and served as an example
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/tasklist_classes.dart';

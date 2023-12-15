@@ -1,5 +1,6 @@
-//CODE FROM Mitch Koko (YouTube)
+//CODE extended FROM Mitch Koko (YouTube)
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
+// Started with his stateful ListView, and built our class interface around it
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';

@@ -1,5 +1,6 @@
-//CODE FROM Mitch Koko (YouTube)
+//CODE extended FROM Mitch Koko (YouTube)
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
+// Modified almost entirely to fit our class structure
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
