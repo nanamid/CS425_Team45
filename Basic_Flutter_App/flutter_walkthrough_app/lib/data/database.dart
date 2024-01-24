@@ -5,12 +5,17 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 
+// A TodoDatabase object is the working copy of what is stored in hive
+// Remember to load and store back to hive before the object dies
 class TodoDatabase {
+  // Meant for multiple task lists, IE. 'home', 'work', 'family', etc.
   List listOfTaskLists =
       []; // Meant to be List<TaskList> but Hive requires this to be List<dynamic>
 
-  final _myTaskBox = Hive.box('taskbox');
+  final _myTaskBox =
+      Hive.box('taskbox'); // refers to box named 'taskbox' opened in main.dart
 
+  // Called in home_page.dart's state for empty databases
   void createInitialDatabase() {
     listOfTaskLists = [
       TaskList(listID: 0) // default
@@ -24,7 +29,7 @@ class TodoDatabase {
     print("Created initial tasklist database");
   }
 
-  //Load Data (from database)
+  //Load Data (from hive database)
   void loadData() {
     listOfTaskLists = _myTaskBox.get("TASK_LIST");
     print("Loaded ${listOfTaskLists.length} task lists:");
@@ -34,7 +39,7 @@ class TodoDatabase {
     // TODO check list was added to box correctly
   }
 
-  //Update Data (to database)
+  //Update Data (to hive database)
   void updateDatabase() {
     _myTaskBox.put("TASK_LIST", listOfTaskLists);
     print("Stored ${listOfTaskLists.length} task lists:");

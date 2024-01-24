@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   TodoDatabase db = TodoDatabase();
   final taskListIndex = 0; // hardcoded one tasklist for now
 
+  // TODO use NavigationDrawer to set up placeholder views
+
   @override
   void initState() {
     //First-Time Opening Function
@@ -35,29 +37,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Text Controller
+  // We could have multiple controllers to allow multiple simulataneous textboxes
+  // So far, we clear after every use to reuse it (only one textbox at a time)
   final _controller = TextEditingController();
 
-  //Checkbox Checker (was it clicked?)
+  // Handler for clicking the checkbox
+  // Assumes clicking check -> set as DONE. Unchecking -> set as TODO.
+  // User should manually edit task to change status to something else (like WAIT)
   void checkBoxChanged(bool? value, int index) {
+    Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
-      final prevState =
-          db.listOfTaskLists[taskListIndex].list[index].taskStatus;
-      if (prevState.toString() != "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      final prevState = changedTask.taskStatus;
+      if (prevState.toString() !=
+          "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            "DONE"; // TODO should be TaskStatus object
+        changedTask.taskStatus = "DONE"; // TODO should be TaskStatus object
       } else {
-        db.listOfTaskLists[taskListIndex].list[index].taskStatus =
-            "TODO"; // TODO should be TaskStatus object
+        changedTask.taskStatus = "TODO"; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();
   }
 
-  //Save a Task
+  // Handler for when we finish creating a new task
+  // Uses text that was stored in the controller
   void saveNewTask() {
+    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     setState(() {
-      db.listOfTaskLists[taskListIndex].list.add(Task(
+      currentTaskList.add(Task(
         taskID: 0,
         taskName: _controller.text,
         taskStatus: "TODO", // TODO should be TaskStatus object
@@ -69,7 +76,8 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
-  //Create a New Task
+  // Handler for clicking the 'add task' plus button
+  // Uses controller for text input
   void createNewTask() {
     showDialog(
       context: context,
@@ -83,57 +91,69 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Handler for deleting tasks (swipe to delete, press delete button)
   void deleteTask(int index) {
     setState(() {
-      db.listOfTaskLists[taskListIndex].list.removeAt(index);
+      List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+      currentTaskList.removeAt(index);
     });
     db.updateDatabase();
   }
 
+  // Handler for pressing the 'clock in' button in task detail view
   void clockIn(int index) {
+    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
-      (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockIn();
+      currentTask.clockIn();
     });
     db.updateDatabase();
   }
 
+  // Handler for pressing the 'clock out' button in task detail view
   void clockOut(int index) {
+    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
-      (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockOut();
+      currentTask.clockOut();
     });
     db.updateDatabase();
   }
 
+  // Spawns a dialog showing all task details
   void showTaskDetail(int index) {
+    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Row(
               children: [
-                // Text(db.listOfTaskLists[taskListIndex].list[index].taskStatus), // TODO make the enum printable
+                // status
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                      "${db.listOfTaskLists[taskListIndex].list[index].taskStatus}"),
+                  child: Text("${currentTask.taskStatus}"),
                 ),
+
                 Padding(
+                  // name
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                      db.listOfTaskLists[taskListIndex].list[index].taskName),
+                  child: Text(currentTask.taskName ?? "Name"),
                 ),
               ],
             ),
             content: Column(children: [
-              Text(db.listOfTaskLists[taskListIndex].list[index]
-                      .taskDescription ??
-                  "Description"),
-              Text(
-                  "Total Time: ${db.listOfTaskLists[taskListIndex].list[index].totalTime_minutes} mins"),
-              for (List clockPair in (db.listOfTaskLists[taskListIndex] as TaskList).list[index].clockList)
-              Text("${clockPair[0]??DateTime(0) as DateTime} -- ${clockPair[1]??DateTime(0) as DateTime}")
+              // description
+              Text(currentTask.taskDescription ?? "Description"),
+
+              // total time
+              Text("Total Time: ${currentTask.totalTime_minutes} mins"),
+
+              // clock entries
+              for (List clockPair in currentTask.clockList)
+                Text(
+                    "${clockPair[0] ?? DateTime(0)} -- ${clockPair[1] ?? DateTime(0)}")
             ]),
             actions: [
+              // clock in/out
               TextButton(
                 onPressed: () => clockIn(index),
                 child: Text("Clock In"),
@@ -148,7 +168,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  // Builds a scaffold for viewing a list of tasks
+  // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
+    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     return Scaffold(
       backgroundColor: Colors.blue[400],
       appBar: AppBar(
@@ -160,16 +183,14 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: db.listOfTaskLists[taskListIndex].list.length,
+        itemCount: currentTaskList.length,
         itemBuilder: (context, index) {
-          return ToDoTile(
-            taskName: db.listOfTaskLists[taskListIndex].list[index].taskName ??
-                "NoName",
-            taskStatus: db.listOfTaskLists[taskListIndex].list[index].taskStatus.toString(),
+          Task currentTask = currentTaskList[index];
+          return TaskTile(
+            taskName: currentTask.taskName ?? "NoName",
+            taskStatus: currentTask.taskStatus.toString(),
             taskCompleted:
-                db.listOfTaskLists[taskListIndex].list[index].taskStatus.toString() == "DONE"
-                    ? true
-                    : false,
+                currentTask.taskStatus.toString() == "DONE" ? true : false,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
             detailDialogFunction: () => showTaskDetail(index),

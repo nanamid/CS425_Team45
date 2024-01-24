@@ -10,11 +10,14 @@ import 'package:test_app/data/tasklist_classes.dart';
 void main() async {
   //Initialize the Hive
   await Hive.initFlutter();
+
+  // all custom objects need an adapter for hive to store them
   Hive.registerAdapter(TaskListAdapter());
   // Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(TaskAdapter());
 
-  //Open a Box
+  // Open the box named 'taskbox'
+  // This allows you to use Hive.box('taskbox') elsewhere
   var taskbox = await Hive.openBox('taskbox');
 
   //Run the App

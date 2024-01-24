@@ -1,7 +1,10 @@
 import 'package:hive/hive.dart';
 
-part 'tasklist_classes.g.dart';
+part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
+// if it has problems, a cleaning can help `flutter clean`
+// the @HiveType(typeId: 0) annotations tell Hive what fields to store, the rest are not saved
 
+// TaskList: list of tasks
 @HiveType(typeId: 0)
 class TaskList {
   @HiveField(0)
@@ -14,6 +17,10 @@ class TaskList {
     required this.listID,
   });
 }
+
+// TODO make a type for allowed values in the TaskStatus field
+// IE. TODO, DONE, WAIT
+// An enum worked the way I wanted, but Hive couldn't store it
 
 // enum TaskStatus {
 //   @HiveField(0)
@@ -33,13 +40,14 @@ class TaskList {
 //   const TaskStatus.TODO() : _status = "TODO";
 //   const TaskStatus.DONE() : _status = "DONE";
 //   const TaskStatus.WAIT() : _status = "WAIT";
-  
+
 //   @override
 //   String toString() {
 //     return _status;
 //   }
 // }
 
+// Task
 @HiveType(typeId: 2)
 class Task {
   @HiveField(0, defaultValue: -1)
@@ -80,8 +88,10 @@ class Task {
     assert(clockList.last[1] == null);
     clockList.last[1] = DateTime.now();
     print("Clocked out at ${clockList.last[1]}");
-    totalTime_minutes += (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds; // TODO change this back to minutes
-    totalTime_secs += (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
+    totalTime_minutes += (clockList.last[1]!.difference(clockList.last[0]!))
+        .inSeconds; // TODO change this back to minutes
+    totalTime_secs +=
+        (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
   }
 

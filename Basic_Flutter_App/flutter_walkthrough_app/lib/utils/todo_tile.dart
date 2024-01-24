@@ -5,7 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class ToDoTile extends StatelessWidget {
+// Used to build the list of tasks
+class TaskTile extends StatelessWidget {
   final String taskName;
   final String? taskStatus;
   final String? taskDescription;
@@ -14,7 +15,7 @@ class ToDoTile extends StatelessWidget {
   Function(BuildContext)? deleteFunction;
   Function()? detailDialogFunction;
 
-  ToDoTile({
+  TaskTile({
     super.key,
     required this.taskName,
     this.taskStatus,
@@ -52,13 +53,12 @@ class ToDoTile extends StatelessWidget {
             child: Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                //Checkbox
                 Checkbox(
                   value: taskCompleted,
                   onChanged: onChanged,
                   activeColor: Colors.black,
                 ),
-          
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: Container(
@@ -69,10 +69,10 @@ class ToDoTile extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    child: Text(taskStatus?? "-"),
+                    child: Text(taskStatus ?? "-"),
                   ),
                 ),
-          
+
                 //Task Name
                 Text(
                   taskName,
@@ -82,12 +82,12 @@ class ToDoTile extends StatelessWidget {
                         : TextDecoration.none,
                   ),
                 ),
-          
+
                 Spacer(),
-          
+
                 ElevatedButton(
-                  onPressed:
-                      () => deleteFunction != null ? deleteFunction!(context) : null,
+                  onPressed: () =>
+                      deleteFunction != null ? deleteFunction!(context) : null,
                   child: Icon(Icons.delete),
                 ),
               ],
