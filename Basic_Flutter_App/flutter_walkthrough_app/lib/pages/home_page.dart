@@ -8,6 +8,7 @@ import 'package:test_app/data/database.dart';
 import 'package:test_app/utils/dialog_box.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
+import 'package:test_app/utils/confirm_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -86,6 +87,7 @@ class _HomePageState extends State<HomePage> {
           controller: _controller,
           onSave: saveNewTask,
           onCancel: () => Navigator.of(context).pop(),
+          confirmCancel: true,
         );
       },
     );
@@ -155,11 +157,31 @@ class _HomePageState extends State<HomePage> {
             actions: [
               // clock in/out
               TextButton(
-                onPressed: () => clockIn(index),
+                // onPressed has to wrap the async future function with a void function
+                onPressed: () async {
+                  bool? confirmation = await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ConfirmDialog();
+                      });
+                  if (confirmation == true) {
+                    clockIn(
+                        index); // TODO redraw the list of clock entries when you press this
+                  }
+                },
                 child: Text("Clock In"),
               ),
               TextButton(
-                onPressed: () => clockOut(index),
+                onPressed: () async {
+                  bool? confirmation = await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ConfirmDialog();
+                      });
+                  if (confirmation == true) {
+                    clockOut(index);
+                  }
+                },
                 child: Text("Clock Out"),
               ),
             ],
@@ -192,7 +214,16 @@ class _HomePageState extends State<HomePage> {
             taskCompleted:
                 currentTask.taskStatus.toString() == "DONE" ? true : false,
             onChanged: (value) => checkBoxChanged(value, index),
-            deleteFunction: (context) => deleteTask(index),
+            deleteFunction: (context) async {
+              bool? confirmation = await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ConfirmDialog();
+                  });
+              if (confirmation == true) {
+                deleteTask(index);
+              }
+            },
             detailDialogFunction: () => showTaskDetail(index),
           );
         },
