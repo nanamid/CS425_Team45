@@ -105,87 +105,91 @@ class _HomePageState extends State<HomePage> {
   // Handler for pressing the 'clock in' button in task detail view
   void clockIn(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-    setState(() {
-      currentTask.clockIn();
-    });
+    currentTask.clockIn();
     db.updateDatabase();
   }
 
   // Handler for pressing the 'clock out' button in task detail view
   void clockOut(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-    setState(() {
-      currentTask.clockOut();
-    });
+    currentTask.clockOut();
     db.updateDatabase();
   }
 
   // Spawns a dialog showing all task details
   void showTaskDetail(int index) {
-    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                // status
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("${currentTask.taskStatus}"),
-                ),
+          Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
+          // you have to wrap the alert dialog in a stateful builder to setState() correctly
+          // normally AlertDialogs are stateless widgets
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  // status
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("${currentTask.taskStatus}"),
+                  ),
 
-                Padding(
-                  // name
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(currentTask.taskName ?? "Name"),
+                  Padding(
+                    // name
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(currentTask.taskName ?? "Name"),
+                  ),
+                ],
+              ),
+              content: Column(children: [
+                // description
+                Text(currentTask.taskDescription ?? "Description"),
+
+                // total time
+                Text("Total Time: ${currentTask.totalTime_minutes} mins"),
+
+                // clock entries
+                for (List clockPair in currentTask.clockList)
+                  Text(
+                      "${clockPair[0] ?? DateTime(0)} -- ${clockPair[1] ?? DateTime(0)}")
+              ]),
+              actions: [
+                // clock in/out
+                TextButton(
+                  // onPressed has to wrap the async future function with a void function
+                  onPressed: () async {
+                    bool? confirmation = await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ConfirmDialog();
+                        });
+                    if (confirmation == true) {
+                      setState(() {
+                        clockIn(index);
+                      });
+                    }
+                  },
+                  child: Text("Clock In"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    bool? confirmation = await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ConfirmDialog();
+                        });
+                    if (confirmation == true) {
+                      setState(() {
+                        clockOut(index);
+                      });
+                    }
+                  },
+                  child: Text("Clock Out"),
                 ),
               ],
-            ),
-            content: Column(children: [
-              // description
-              Text(currentTask.taskDescription ?? "Description"),
-
-              // total time
-              Text("Total Time: ${currentTask.totalTime_minutes} mins"),
-
-              // clock entries
-              for (List clockPair in currentTask.clockList)
-                Text(
-                    "${clockPair[0] ?? DateTime(0)} -- ${clockPair[1] ?? DateTime(0)}")
-            ]),
-            actions: [
-              // clock in/out
-              TextButton(
-                // onPressed has to wrap the async future function with a void function
-                onPressed: () async {
-                  bool? confirmation = await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ConfirmDialog();
-                      });
-                  if (confirmation == true) {
-                    clockIn(
-                        index); // TODO redraw the list of clock entries when you press this
-                  }
-                },
-                child: Text("Clock In"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  bool? confirmation = await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ConfirmDialog();
-                      });
-                  if (confirmation == true) {
-                    clockOut(index);
-                  }
-                },
-                child: Text("Clock Out"),
-              ),
-            ],
-          );
+            );
+          });
         });
   }
 
