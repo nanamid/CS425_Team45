@@ -18,12 +18,17 @@ class TimeclockTile extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.double_arrow),
+              child: Visibility(
+                  visible: clockPair[1] != null,
+                  child: Icon(Icons.double_arrow)),
             ),
             Spacer(),
-            _TimeBlock(
-                time: clockPair[1] ?? DateTime(0),
-                align: CrossAxisAlignment.center),
+            Visibility(
+              visible: clockPair[1] != null,
+              child: _TimeBlock(
+                  time: clockPair[1] ?? DateTime(0),
+                  align: CrossAxisAlignment.center),
+            ),
           ],
         ),
       ),
