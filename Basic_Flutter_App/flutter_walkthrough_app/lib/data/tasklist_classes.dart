@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
 
 part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
-// if it has problems, a cleaning can help `flutter clean`
+// try first a: `dart run build_runner build`
+// if it still has problems uninstall the app (deletes the database) and `flutter clean`
 // the @HiveType(typeId: 0) annotations tell Hive what fields to store, the rest are not saved
 
 // TaskList: list of tasks
@@ -74,25 +75,60 @@ class Task {
 
   @HiveField(7)
   int totalTime_minutes = 0; // 0
+
   int totalTime_secs = 0; // for testing
 
-  void clockIn() {
+  @HiveField(8)
+  bool _clockRunning = false;
+  bool get clockRunning => _clockRunning; // allow read but no write
+
+  /// adds a clock entry to the task structure
+  /// returns false when cannot add entry, like when a clock is already open.
+  bool clockIn() {
+    try {
+      if (clockList.isNotEmpty && _clockRunning == true) {
+        throw Exception(
+            'clockList not empty. clockList.isEmpty: ${clockList.isEmpty}, _clockRunning: $_clockRunning');
+      }
+    } catch (e) {
+      print('Cannot clock in: $e');
+      return false;
+    }
+
     assert(clockList.isEmpty ||
         (clockList.last[0] != null &&
             clockList.last[1] != null)); // No previously open timeclock
+
     clockList.add([DateTime.now(), null]);
+    _clockRunning = true;
     print("Clocked in at ${clockList.last[0]}");
+    return true;
   }
 
-  void clockOut() {
+  /// completes a clock entry on the task structure
+  /// returns false when cannot add entry, like when a clock is not open.
+  bool clockOut() {
+    try {
+      if (clockList.isEmpty || _clockRunning == false) {
+        throw Exception(
+            'no active clock. clockList.isEmpty: ${clockList.isEmpty}, _clockRunning: $_clockRunning');
+      }
+    } catch (e) {
+      print('Cannot clock in: $e');
+      return false;
+    }
+
     assert(clockList.last[1] == null);
+
     clockList.last[1] = DateTime.now();
+    _clockRunning = false;
     print("Clocked out at ${clockList.last[1]}");
     totalTime_minutes += (clockList.last[1]!.difference(clockList.last[0]!))
-        .inSeconds; // TODO change this back to minutes
+        .inSeconds; // TODO change this back to minutes after the demo
     totalTime_secs +=
         (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
+    return true;
   }
 
   Task({

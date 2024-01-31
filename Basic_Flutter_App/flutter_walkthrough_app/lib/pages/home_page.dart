@@ -3,9 +3,10 @@
 // Started with his stateful ListView, and built our class interface around it
 
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 import 'package:test_app/data/database.dart';
 import 'package:test_app/utils/dialog_box.dart';
+import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
@@ -102,22 +103,36 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
-  // Handler for pressing the 'clock in' button in task detail view
-  void clockIn(int index) {
+  /// Handler for pressing the 'clock in' button in task detail view
+  /// returns false if the clock entry could not be added, see task clockIn method
+  bool clockIn(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-    currentTask.clockIn();
-    db.updateDatabase();
+    if (currentTask.clockIn()) // if it succeeded
+    {
+      db.updateDatabase();
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  // Handler for pressing the 'clock out' button in task detail view
-  void clockOut(int index) {
+  /// Handler for pressing the 'clock out' button in task detail view
+  /// returns false if the clock entry could not be completed, see task clockOut method
+  bool clockOut(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-    currentTask.clockOut();
-    db.updateDatabase();
+    if (currentTask.clockOut()) {
+      db.updateDatabase();
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  // Spawns a dialog showing all task details
-  void showTaskDetail(int index) {
+  /// Spawns a dialog showing all task details
+  /// index is index of the selected task in the current task list
+  /// refreshParent() will tell parent to redraw (usually pass setState) itself
+  // TODO notifications may be a more correct way to do this https://api.flutter.dev/flutter/widgets/NotificationListener-class.html
+  void showTaskDetail(int index, Function() refreshParent) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -127,18 +142,28 @@ class _HomePageState extends State<HomePage> {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Row(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // status
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("${currentTask.taskStatus}"),
-                  ),
+                  Row(
+                    children: [
+                      // status
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("${currentTask.taskStatus}"),
+                      ),
 
-                  Padding(
-                    // name
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(currentTask.taskName ?? "Name"),
+                      Padding(
+                        // name
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(currentTask.taskName ?? "Name"),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    currentTask.clockRunning ? 'Clocked In' : 'Clocked Out',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ],
               ),
@@ -150,38 +175,95 @@ class _HomePageState extends State<HomePage> {
                 Text("Total Time: ${currentTask.totalTime_minutes} mins"),
 
                 // clock entries
-                for (List clockPair in currentTask.clockList)
-                  Text(
-                      "${clockPair[0] ?? DateTime(0)} -- ${clockPair[1] ?? DateTime(0)}")
+                for (List<DateTime?> clockPair in currentTask.clockList)
+                  TimeclockTile(clockPair: clockPair)
+
+                // TODO use ListView.separated below when we move showTaskDetail() away from an alert dialog
+                // ListView.separated(
+                //   padding: const EdgeInsets.all(8),
+                //   itemCount: currentTask.clockList.length,
+                //   itemBuilder: (context, index) {
+                //     return TimeclockTile(
+                //         clockPair: currentTask.clockList[index]);
+                //   },
+                //   separatorBuilder: (context, index) => const Divider(),
+                // )
               ]),
               actions: [
                 // clock in/out
                 TextButton(
                   // onPressed has to wrap the async future function with a void function
                   onPressed: () async {
+                    // Ask for user confirmation
                     bool? confirmation = await showDialog(
                         context: context,
                         builder: (context) {
                           return ConfirmDialog();
                         });
+
+                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
+                    if (!context.mounted) {
+                      return;
+                    }
+
                     if (confirmation == true) {
                       setState(() {
-                        clockIn(index);
+                        // not necessarily best practice to setState such a big function
+                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
+                        bool success = clockIn(index);
+                        if (success == false) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text('Cannot Add Clock Entry'),
+                                    content: Text('Already Clocked In'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('Okay'))
+                                    ],
+                                  ));
+                        }
                       });
                     }
                   },
                   child: Text("Clock In"),
                 ),
+
                 TextButton(
                   onPressed: () async {
+                    // Ask for user confirmation
                     bool? confirmation = await showDialog(
                         context: context,
                         builder: (context) {
                           return ConfirmDialog();
                         });
+
+                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
+                    if (!context.mounted) {
+                      return;
+                    }
+
                     if (confirmation == true) {
                       setState(() {
-                        clockOut(index);
+                        // not necessarily best practice to setState such a big function
+                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
+                        bool success = clockOut(index);
+                        if (success == false) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text('Cannot Add Clock Entry'),
+                                    content: Text('Not Clocked In'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('Okay'))
+                                    ],
+                                  ));
+                        }
                       });
                     }
                   },
@@ -217,6 +299,7 @@ class _HomePageState extends State<HomePage> {
             taskStatus: currentTask.taskStatus.toString(),
             taskCompleted:
                 currentTask.taskStatus.toString() == "DONE" ? true : false,
+            taskClockedIn: currentTask.clockRunning,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) async {
               bool? confirmation = await showDialog(
@@ -228,7 +311,8 @@ class _HomePageState extends State<HomePage> {
                 deleteTask(index);
               }
             },
-            detailDialogFunction: () => showTaskDetail(index),
+            detailDialogFunction: () =>
+                showTaskDetail(index, () => setState(() {})),
           );
         },
       ),

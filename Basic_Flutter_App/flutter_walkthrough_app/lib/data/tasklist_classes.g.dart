@@ -62,13 +62,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..clockList = (fields[6] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
-      ..totalTime_minutes = fields[7] as int;
+      ..totalTime_minutes = fields[7] as int
+      .._clockRunning = fields[8] as bool;
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.taskID)
       ..writeByte(1)
@@ -82,7 +83,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(6)
       ..write(obj.clockList)
       ..writeByte(7)
-      ..write(obj.totalTime_minutes);
+      ..write(obj.totalTime_minutes)
+      ..writeByte(8)
+      ..write(obj._clockRunning);
   }
 
   @override

@@ -5,12 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-// Used to build the list of tasks
+/// Used to build the list of tasks
+/// Shows an overview of a task
 class TaskTile extends StatelessWidget {
   final String taskName;
   final String? taskStatus;
   final String? taskDescription;
   final bool taskCompleted;
+  final bool taskClockedIn;
   Function(bool?)? onChanged;
   Function(BuildContext)? deleteFunction;
   Function()? detailDialogFunction;
@@ -23,6 +25,7 @@ class TaskTile extends StatelessWidget {
     required this.taskCompleted,
     required this.onChanged,
     required this.deleteFunction,
+    required this.taskClockedIn,
     this.detailDialogFunction,
   });
 
@@ -58,6 +61,11 @@ class TaskTile extends StatelessWidget {
                   onChanged: onChanged,
                   activeColor: Colors.black,
                 ),
+
+                Visibility(
+                    visible: taskClockedIn,
+                    child: Icon(Icons
+                        .punch_clock)), // shown if task has currently running clock
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
