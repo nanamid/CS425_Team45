@@ -1,19 +1,32 @@
 //CODE FROM Mitch Koko (YouTube)
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
+// Modified to add user confirmation
 
 import 'package:flutter/material.dart';
 import 'package:test_app/utils/my_buttons.dart';
+import 'package:test_app/utils/confirm_dialog.dart';
 
+/// Shows a dialog with a textbox
+/// controller
 class DialogBox extends StatelessWidget {
-  final controller;
+  /// Text controller
+  final TextEditingController controller;
   VoidCallback onSave;
   VoidCallback onCancel;
+
+  /// Whether to ask confirmation on save
+  bool confirmSave;
+
+  /// Whether to ask confirmation on save
+  bool confirmCancel;
 
   DialogBox({
     super.key,
     required this.controller,
     required this.onSave,
     required this.onCancel,
+    this.confirmSave = false,
+    this.confirmCancel = false,
   });
 
   @override
@@ -39,13 +52,49 @@ class DialogBox extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       //SAVE
-                      MyButton(text: "Save", onPressed: onSave),
+                      MyButton(
+                          text: "Save",
+                          onPressed: () async {
+                            bool? confirmation;
+                            if (confirmSave) {
+                              confirmation = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ConfirmDialog(
+                                        content:
+                                            'Are you sure you want to save?');
+                                  });
+                              if (confirmation == true) {
+                                onSave();
+                              }
+                            } else {
+                              onSave();
+                            }
+                          }),
 
                       //TEXT BOX
                       const SizedBox(width: 8),
 
                       //CANCEL
-                      MyButton(text: "Cancel", onPressed: onCancel),
+                      MyButton(
+                          text: "Cancel",
+                          onPressed: () async {
+                            bool? confirmation;
+                            if (confirmCancel) {
+                              confirmation = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ConfirmDialog(
+                                        content:
+                                            'Are you sure you want to cancel?');
+                                  });
+                              if (confirmation == true) {
+                                onCancel();
+                              }
+                            } else {
+                              onCancel();
+                            }
+                          }),
                     ],
                   )
                 ])));
