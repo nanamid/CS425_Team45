@@ -281,7 +281,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     return Scaffold(
-      backgroundColor: Colors.blue[400],
       appBar: AppBar(
         title: Text('Sample To Do List'),
         elevation: 0,

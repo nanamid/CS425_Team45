@@ -31,74 +31,70 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15),
-      child: Slidable(
-        endActionPane: ActionPane(
-          motion: StretchMotion(),
-          children: [
-            SlidableAction(
-              onPressed: deleteFunction,
-              icon: Icons.delete,
-              backgroundColor: Colors.red,
-              borderRadius: BorderRadius.circular(15),
-            )
-          ],
-        ),
-        child: GestureDetector(
-          onTap: detailDialogFunction,
-          child: Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: Colors.blue[100],
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Checkbox(
-                  value: taskCompleted,
-                  onChanged: onChanged,
-                  activeColor: Colors.black,
-                ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Slidable(
+          endActionPane: ActionPane(
+            motion: StretchMotion(),
+            children: [
+              SlidableAction(
+                onPressed: deleteFunction,
+                icon: Icons.delete,
+                backgroundColor: Theme.of(context).colorScheme.error,
+                borderRadius: BorderRadius.circular(15),
+              )
+            ],
+          ),
+          child: GestureDetector(
+            onTap: detailDialogFunction,
+            child: Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Checkbox(
+                    value: taskCompleted,
+                    onChanged: onChanged,
+                  ),
 
-                Visibility(
-                    visible: taskClockedIn,
-                    child: Icon(Icons
-                        .punch_clock)), // shown if task has currently running clock
+                  Visibility(
+                      visible: taskClockedIn,
+                      child: Icon(Icons
+                          .punch_clock)), // shown if task has currently running clock
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2.0,
-                        color: Colors.grey,
-                      ),
+                  Card(
+                    margin: EdgeInsets.all(8.0),
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text(taskStatus ?? "-"),
                     ),
-                    child: Text(taskStatus ?? "-"),
                   ),
-                ),
 
-                //Task Name
-                Text(
-                  taskName,
-                  style: TextStyle(
-                    decoration: taskCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
+                  //Task Name
+                  Text(
+                    taskName,
+                    style: TextStyle(
+                      decoration: taskCompleted
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
                   ),
-                ),
 
-                Spacer(),
+                  Spacer(),
 
-                ElevatedButton(
-                  onPressed: () =>
-                      deleteFunction != null ? deleteFunction!(context) : null,
-                  child: Icon(Icons.delete),
-                ),
-              ],
+                  ElevatedButton(
+                    onPressed: () => deleteFunction != null
+                        ? deleteFunction!(context)
+                        : null,
+                    child: Icon(Icons.delete),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
