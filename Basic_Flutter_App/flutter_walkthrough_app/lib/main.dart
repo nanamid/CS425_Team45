@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/database.dart';
 import 'package:test_app/pages/home_page.dart';
+import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 
 void main() async {
