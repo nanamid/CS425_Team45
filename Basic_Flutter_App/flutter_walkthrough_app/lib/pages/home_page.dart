@@ -8,19 +8,33 @@ import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this
 
 // based around https://api.flutter.dev/flutter/material/NavigationDrawer-class.html
 // docs also described a side drawer as another option
+/// Used to draw either a widget inside the top scaffold (you see the navbar at the bottom)
+///
+/// Or draw an entire new page with Navigator.push() (new page takes the full screen)
+///
+/// You must have one or the other
+///
+/// Pass either a Widget to widget field.
+///
+/// Or pass a Widget Build function to navBuilder field. See `examplePage` at the bottom for an example
 class ViewDestination {
   final String label;
   final Widget icon;
   final Widget selectedIcon;
-  final Widget widget;
+  final Widget? widget;
   final bool wantAppBar;
+  final Widget Function(BuildContext)? navBuilder;
 
-  const ViewDestination(
-      {required this.label,
-      required this.icon,
-      required this.selectedIcon,
-      required this.widget,
-      this.wantAppBar=false});
+  const ViewDestination({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    this.widget,
+    this.wantAppBar = false,
+    this.navBuilder,
+  });
+
+  // TODO enforce that widget and navBuilder can't both be null
 }
 
 class HomePage extends StatefulWidget {
@@ -32,8 +46,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
-  
-  static const List<ViewDestination> destinations = <ViewDestination>[
+
+  List<ViewDestination> destinations = <ViewDestination>[
     ViewDestination(
       label: 'User Account',
       icon: Icon(Icons.person_outline),
@@ -53,6 +67,13 @@ class _HomePageState extends State<HomePage> {
       selectedIcon: Icon(Icons.star),
       widget: Placeholder(),
     ),
+    ViewDestination(
+      // show an example of a full screen page, using navigator push instead
+      label: 'Example fullpage',
+      icon: Icon(Icons.fullscreen),
+      selectedIcon: Icon(Icons.fullscreen_exit),
+      navBuilder: (context) => ExamplePage(),
+    ),
   ];
 
   int screenIndex = 1; // default to Tasks view
@@ -68,9 +89,21 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: screenIndex,
         onDestinationSelected: (int index) {
-          setState(() {
+          if (destinations[index].navBuilder ==
+              null) // use a widget instead of a new page
+          {
+            // remember, setState redraws the current widget
+            setState(() {
+              screenIndex = index;
+            });
+          } else // push a new route
+          {
+            // without setState(), we can push a navigator without also redrawing this widget
             screenIndex = index;
-          });
+            // has to be wrapped in a closure, otherwise it reuses the same route, which gets disposed of every time
+            Navigator.push(context,
+                MaterialPageRoute(builder: destinations[index].navBuilder!));
+          }
         },
         destinations: destinations.map(
           (ViewDestination destination) {
@@ -82,6 +115,29 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ).toList(),
+      ),
+    );
+  }
+}
+
+// This is an example of a dedicated page we can Navigate.push() to
+// example route from https://docs.flutter.dev/cookbook/navigation/navigation-basics
+class ExamplePage extends StatelessWidget {
+  const ExamplePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Route'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Go back!'),
+        ),
       ),
     );
   }
