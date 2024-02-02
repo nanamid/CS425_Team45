@@ -49,7 +49,7 @@ class _TimeBlock extends StatelessWidget {
       children: [
         Text(
             '${time.year}-${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')}'),
-        Text('${time.hour}:${time.minute.toString().padLeft(2, '0')}')
+        Text('${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}')
       ],
     );
   }
