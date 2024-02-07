@@ -35,29 +35,37 @@ Task Titans’ unique approach, combining gamification and academic task managem
 
 ## Project Related Resources
 ### Problem Domain Book
-  Zichermann, Gabe, and Christopher Cunningham. _Gamification by Design: Implementing Game Mechanics in Web and Mobile Apps_. 1st ed., O’Reilly Media, 2011.
-  Burke, Brian. _Gamify: How Gamification Motivates People to Do Extraordinary Things_. 1st ed., Routledge, 2014.
+Zichermann, Gabe, and Christopher Cunningham. _Gamification by Design: Implementing Game Mechanics in Web and Mobile Apps_. 1st ed., O’Reilly Media, 2011.
+
+Burke, Brian. _Gamify: How Gamification Motivates People to Do Extraordinary Things_. 1st ed., Routledge, 2014.
 
 ### Website Resources
 [//](https://habitica.com/static/home)
+
 [//](https://flutter.dev/)
+
 [//](https://firebase.google.com/docs)
 
 ### Technical Reports, Conference Papers, and/or Journal Articles
 D. Basten, “Gamification,” in IEEE Software, vol. 34, no. 5, pp. 76-81, 2017, doi: 10.1109/MS.2017.3571581.
+
 Dale, S. (2014). “Gamification: Making work fun, or making fun of work?” _Business Information Review_, 31(2), 82-90. [//](https://doi.org/10.1177/0266382114538350).
 "Psychological interventions of virtual gamification within academic intrinsic motivation: A systematic review," [//](https://doi.org/10.1016/j.jad.2021.06.070).
 
 
 ### Other Information
 [//](https://www.statista.com/outlook/dmo/app/productivity/worldwide)
+
 [//](https://www.grandviewresearch.com/industry-analysis/education-technology-market)
+
 [//](https://www.millioninsights.com/snapshots/productivity-apps-market-report)
 
 
 ## Our Team
 Nanami Duncan
+
 Stosh Peterson
+
 Jazzel Radaza
 
 
@@ -67,5 +75,7 @@ Erin Keith
 
 ## Our Instructors
 Sara Davis
+
 David Feil-Seifer
+
 Devrin Lee
