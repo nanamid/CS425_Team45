@@ -12,31 +12,31 @@ Task Titans’ unique approach, combining gamification and academic task managem
 
 ## Gallery
 ### Task List View
-![Screenshot_1706825324](https://github.com/nanamid/CS425_Team45/assets/70532479/f8ecfc03-5a3c-4a1d-8e20-51f394c0c215)
+![Screenshot_1706825324](https://github.com/nanamid/CS425_Team45/assets/70532479/f8ecfc03-5a3c-4a1d-8e20-51f394c0c215 | width=350)
 
 
 ### Task Complete
-![Screenshot_1706825331](https://github.com/nanamid/CS425_Team45/assets/70532479/787aa285-6738-4c69-921e-c3f30a155e64)
+![Screenshot_1706825331](https://github.com/nanamid/CS425_Team45/assets/70532479/787aa285-6738-4c69-921e-c3f30a155e64 | width=350)
 
 
 ### Task Detail View
-![Screenshot_1706825351](https://github.com/nanamid/CS425_Team45/assets/70532479/76a573bb-8a98-4db6-a83a-e959e08fd871)
+![Screenshot_1706825351](https://github.com/nanamid/CS425_Team45/assets/70532479/76a573bb-8a98-4db6-a83a-e959e08fd871 | width=350)
 
 
 ### Slide to delete Task
-![Screenshot_1706825358](https://github.com/nanamid/CS425_Team45/assets/70532479/8ec69605-925c-42f9-8a5e-41ef4926ecc5)
+![Screenshot_1706825358](https://github.com/nanamid/CS425_Team45/assets/70532479/8ec69605-925c-42f9-8a5e-41ef4926ecc5 | width=350)
 
 
 ## Delete Task
-![Screenshot_1706825385](https://github.com/nanamid/CS425_Team45/assets/70532479/40894931-d576-402a-a9d8-9f578a864fa0)
+![Screenshot_1706825385](https://github.com/nanamid/CS425_Team45/assets/70532479/40894931-d576-402a-a9d8-9f578a864fa0 | width=350)
 
 
 ### Enter Task data
-![Screenshot_1706825365](https://github.com/nanamid/CS425_Team45/assets/70532479/ba2cd500-8a94-412f-8b23-771345394136)
+![Screenshot_1706825365](https://github.com/nanamid/CS425_Team45/assets/70532479/ba2cd500-8a94-412f-8b23-771345394136 | width=350)
 
 
 ### Clock Running Indicator
-![Screenshot_1706825418](https://github.com/nanamid/CS425_Team45/assets/70532479/ec2ef322-4e1d-4cdf-ab7f-2f542d2e2013)
+![Screenshot_1706825418](https://github.com/nanamid/CS425_Team45/assets/70532479/ec2ef322-4e1d-4cdf-ab7f-2f542d2e2013 | width=350)
 
 
 
