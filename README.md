@@ -12,32 +12,25 @@ Task Titans’ unique approach, combining gamification and academic task managem
 
 ## Gallery
 ### Task List View
-<img src='/Prototype%20Screenshots/Screenshot_1706825324.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825324.png)
+![A screenshot of the Task Titan home screen](CS_Team45/'Prototype Screenshots'/Screenshot_1706825324.png)
 
 ### Task Complete
-<img src='/Prototype%20Screenshots/Screenshot_1706825331.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825331.png)
+![A screenshot of a task being completed](CS_Team45/'Prototype Screenshots'/Screenshot_1706825331.png)
 
 ### Task Detail View
-<img src='/Prototype%20Screenshots/Screenshot_1706825351.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825351.png)
+![A screenshot of the details of a task, found when clicking on the task bubble](CS_Team45/'Prototype Screenshots'/Screenshot_1706825351.png)
 
 ### Slide to delete Task
-<img src='/Prototype%20Screenshots/Screenshot_1706825358.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825358.png)
+![A screenshot of attempting to delete a task by sliding the task bubble to the left](CS_Team45/'Prototype Screenshots'/Screenshot_1706825358.png)
 
 ## Delete Task
-<img src='/Prototype%20Screenshots/Screenshot_1706825385.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825385.png)
+![A screenshot of confirming the deletion of a task](CS_Team45/'Prototype Screenshots'/Screenshot_1706825385.png)
 
 ### Enter Task data
-<img src='/Prototype%20Screenshots/Screenshot_1706825365.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825365.png)
+![A screenshot of entering a new task](CS_Team45/'Prototype Screenshots'/Screenshot_1706825365.png)
 
 ### Clock Running Indicator
-<img src='/Prototype%20Screenshots/Screenshot_1706825418.png' width='350'>
-(CS_Team45/'Prototype Screenshots'/Screenshot_1706825418.png)
+![A screenshot presenting the pomodoro clock ](CS_Team45/'Prototype Screenshots'/Screenshot_1706825418.png)
 
 
 ## Project Related Resources
