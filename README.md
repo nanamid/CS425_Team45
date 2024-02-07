@@ -12,25 +12,32 @@ Task Titans’ unique approach, combining gamification and academic task managem
 
 ## Gallery
 ### Task List View
-![A screenshot of the Task Titan home screen](CS_Team45/'Prototype Screenshots'/Screenshot_1706825324.png)
+![Screenshot_1706825324](https://github.com/nanamid/CS425_Team45/assets/70532479/f8ecfc03-5a3c-4a1d-8e20-51f394c0c215)
+
 
 ### Task Complete
-![A screenshot of a task being completed](CS_Team45/'Prototype Screenshots'/Screenshot_1706825331.png)
+![Screenshot_1706825331](https://github.com/nanamid/CS425_Team45/assets/70532479/787aa285-6738-4c69-921e-c3f30a155e64)
+
 
 ### Task Detail View
-![A screenshot of the details of a task, found when clicking on the task bubble](CS_Team45/'Prototype Screenshots'/Screenshot_1706825351.png)
+![Screenshot_1706825351](https://github.com/nanamid/CS425_Team45/assets/70532479/76a573bb-8a98-4db6-a83a-e959e08fd871)
+
 
 ### Slide to delete Task
-![A screenshot of attempting to delete a task by sliding the task bubble to the left](CS_Team45/'Prototype Screenshots'/Screenshot_1706825358.png)
+![Screenshot_1706825358](https://github.com/nanamid/CS425_Team45/assets/70532479/8ec69605-925c-42f9-8a5e-41ef4926ecc5)
+
 
 ## Delete Task
-![A screenshot of confirming the deletion of a task](CS_Team45/'Prototype Screenshots'/Screenshot_1706825385.png)
+![Screenshot_1706825385](https://github.com/nanamid/CS425_Team45/assets/70532479/40894931-d576-402a-a9d8-9f578a864fa0)
+
 
 ### Enter Task data
-![A screenshot of entering a new task](CS_Team45/'Prototype Screenshots'/Screenshot_1706825365.png)
+![Screenshot_1706825365](https://github.com/nanamid/CS425_Team45/assets/70532479/ba2cd500-8a94-412f-8b23-771345394136)
+
 
 ### Clock Running Indicator
-![A screenshot presenting the pomodoro clock ](CS_Team45/'Prototype Screenshots'/Screenshot_1706825418.png)
+![Screenshot_1706825418](https://github.com/nanamid/CS425_Team45/assets/70532479/ec2ef322-4e1d-4cdf-ab7f-2f542d2e2013)
+
 
 
 ## Project Related Resources
