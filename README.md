@@ -1,28 +1,16 @@
-# CS425_Team45
-Public repository for Team 45 of CS 425-426 - Software Engineering (2023-2024)
+# Task Titan
+# CS 426, Team 45, Capstone Project, UNR CSE Dept, Spring 2024
 
-## Spring 2024 Project Assignment 1:
-The app includes the following features for our core task list functionality and client-side backend:
-- Users can add tasks
-- Users can remove tasks
-- Users can clock-in and out of tasks
-  - Time entries are viewable and a total time field is calculated. This will be the basis for our gamified XP system
-- Users can view and modify task status (TODO, WAIT, DONE, etc.)
-- When set to ‘DONE,’ tasks appear ‘checked off’
-- Client-side backend: The above UI is a proof-of-concept interface to our backend structures:
-  - List of Task Lists: Supports an arbitrary number of separate task lists (Intended for Home, Work, Friends, etc.)
-  - Task List: Named and contains an arbitrary number of tasks. (Intended as the unit for task collaboration: Users will create a shared Task List)
-  - Task: Contains fields for name, description, clock history, etc. as described in P2 and P3. Time calculations use the native Dart DateTime class.
-  - Backend storage: Using the Flutter Hive package, our structures persist on disk. Our custom objects use generated TypeAdapters (serializers), and this model sets the stage for pushing structures to a remote database.
 
-Additionally, we have added the following features since our last demo:
-- Confirmation dialogs
-- Widget refresh fixes
-- Code readability
-- Improved clock entry widget
-- Improved Material design theme
-- Using bottomNavigationBar() with placeholder screens for later use
- 
+## About our Project
+"Task Titans" is a gamified productivity tool designed to empower students with effective task management and motivational features rooted in habit formation and psychology. Task Titans transforms routine academic responsibilities into engaging challenges, motivating users to excel academically while cultivating lasting study habits. 
+
+The app provides features such as task list management, gamified task completion, Titan battles – game elements that drive app engagement, in-game experience points, promoting collaborative learning and accountability. Task Titans also integrates reminders and notifications to keep students on track and offers in-depth analytics for self-improvement. 
+
+Task Titans’ unique approach, combining gamification and academic task management, positions it to stand out among competitors by enhancing student productivity and fostering success in a gamified academic environment. 
+
+
+## Gallery
 ### Task List View
 <img src='/Prototype%20Screenshots/Screenshot_1706825324.png' width='350'>
 
@@ -43,3 +31,41 @@ Additionally, we have added the following features since our last demo:
 
 ### Clock Running Indicator
 <img src='/Prototype%20Screenshots/Screenshot_1706825418.png' width='350'>
+
+
+## Project Related Resources
+### Problem Domain Book
+  Zichermann, Gabe, and Christopher Cunningham. _Gamification by Design: Implementing Game Mechanics in Web and Mobile Apps_. 1st ed., O’Reilly Media, 2011.
+  Burke, Brian. _Gamify: How Gamification Motivates People to Do Extraordinary Things_. 1st ed., Routledge, 2014.
+
+### Website Resources
+[//](https://habitica.com/static/home)
+[//](https://flutter.dev/)
+[//](https://firebase.google.com/docs)
+
+### Technical Reports, Conference Papers, and/or Journal Articles
+D. Basten, “Gamification,” in IEEE Software, vol. 34, no. 5, pp. 76-81, 2017, doi: 10.1109/MS.2017.3571581.
+Dale, S. (2014). “Gamification: Making work fun, or making fun of work?” _Business Information Review_, 31(2), 82-90. [//](https://doi.org/10.1177/0266382114538350).
+"Psychological interventions of virtual gamification within academic intrinsic motivation: A systematic review," [//](https://doi.org/10.1016/j.jad.2021.06.070).
+
+
+### Other Information
+[//](https://www.statista.com/outlook/dmo/app/productivity/worldwide)
+[//](https://www.grandviewresearch.com/industry-analysis/education-technology-market)
+[//](https://www.millioninsights.com/snapshots/productivity-apps-market-report)
+
+
+## Our Team
+Nanami Duncan
+Stosh Peterson
+Jazzel Radaza
+
+
+## Our Advisor
+Erin Keith
+
+
+## Our Instructors
+Sara Davis
+David Feil-Seifer
+Devrin Lee
