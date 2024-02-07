@@ -15,30 +15,23 @@ Task Titans’ unique approach, combining gamification and academic task managem
 ### Task List View
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/f8ecfc03-5a3c-4a1d-8e20-51f394c0c215" width="350"/>
 
-
 ### Task Complete
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/787aa285-6738-4c69-921e-c3f30a155e64" width="350"/>
-
 
 ### Task Detail View
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/76a573bb-8a98-4db6-a83a-e959e08fd871" width="350"/>
 
-
 ### Slide to delete Task
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/8ec69605-925c-42f9-8a5e-41ef4926ecc5" width="350"/>
 
-
-## Delete Task
+### Delete Task
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/40894931-d576-402a-a9d8-9f578a864fa0" width="350"/>
-
 
 ### Enter Task data
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/ba2cd500-8a94-412f-8b23-771345394136" width="350"/>
 
-
 ### Clock Running Indicator
 <img src="https://github.com/nanamid/CS425_Team45/assets/70532479/ec2ef322-4e1d-4cdf-ab7f-2f542d2e2013" width="350"/>
-
 
 
 ## Project Related Resources
