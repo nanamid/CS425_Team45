@@ -13,24 +13,31 @@ Task Titans’ unique approach, combining gamification and academic task managem
 ## Gallery
 ### Task List View
 <img src='/Prototype%20Screenshots/Screenshot_1706825324.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825324.png)
 
 ### Task Complete
 <img src='/Prototype%20Screenshots/Screenshot_1706825331.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825331.png)
 
 ### Task Detail View
 <img src='/Prototype%20Screenshots/Screenshot_1706825351.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825351.png)
 
 ### Slide to delete Task
 <img src='/Prototype%20Screenshots/Screenshot_1706825358.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825358.png)
 
 ## Delete Task
 <img src='/Prototype%20Screenshots/Screenshot_1706825385.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825385.png)
 
 ### Enter Task data
 <img src='/Prototype%20Screenshots/Screenshot_1706825365.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825365.png)
 
 ### Clock Running Indicator
 <img src='/Prototype%20Screenshots/Screenshot_1706825418.png' width='350'>
+(CS_Team45/'Prototype Screenshots'/Screenshot_1706825418.png)
 
 
 ## Project Related Resources
