@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
 // try first a: `dart run build_runner build`
@@ -9,14 +10,17 @@ part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dar
 @HiveType(typeId: 0)
 class TaskList {
   @HiveField(0)
-  final int listID; // 0 is default tasklist, otherwise TODO make this a uuid
+  late final String _listUUID;
+  String get listUUID => _listUUID;
 
   @HiveField(1)
   List<Task> list = <Task>[];
 
-  TaskList({
-    required this.listID,
-  });
+  TaskList()
+  {
+    Uuid uuid = Uuid();
+    _listUUID = uuid.v4(); // generates a v4 (random) uuid
+  }
 }
 
 // TODO make a type for allowed values in the TaskStatus field
@@ -51,8 +55,9 @@ class TaskList {
 // Task
 @HiveType(typeId: 2)
 class Task {
-  @HiveField(0, defaultValue: -1)
-  final int taskID; // TODO make this a uuid
+  @HiveField(0, defaultValue: "-1")
+  late final String _taskUUID;
+  String get taskUUID => _taskUUID;
 
   @HiveField(1, defaultValue: "none")
   String? taskName;
@@ -132,13 +137,16 @@ class Task {
   }
 
   Task({
-    required this.taskID,
     this.taskName,
     this.taskStatus = "TODO",
     this.taskLabel,
     this.taskDescription,
     // timeclocks not set in constructor
-  });
+  })
+  {
+    Uuid uuid = Uuid();
+    _taskUUID = uuid.v4();
+  }
 }
 
 // TODO instead of a list of lists, how about a timestamp pair class?

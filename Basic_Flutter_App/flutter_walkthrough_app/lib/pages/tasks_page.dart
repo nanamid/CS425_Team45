@@ -67,7 +67,6 @@ class _TaskPageState extends State<TaskPage> {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     setState(() {
       currentTaskList.add(Task(
-        taskID: 0,
         taskName: _controller.text,
         taskStatus: "TODO", // TODO should be TaskStatus object
       ));
@@ -279,10 +278,11 @@ class _TaskPageState extends State<TaskPage> {
   // Builds a scaffold for viewing a list of tasks
   // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+    List<Task> currentTaskListOfTasks = currentTaskList.list;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sample To Do List'),
+        title: Text('Task list: ${currentTaskList.listUUID}'),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
@@ -290,9 +290,9 @@ class _TaskPageState extends State<TaskPage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: currentTaskList.length,
+        itemCount: currentTaskListOfTasks.length,
         itemBuilder: (context, index) {
-          Task currentTask = currentTaskList[index];
+          Task currentTask = currentTaskListOfTasks[index];
           return TaskTile(
             taskName: currentTask.taskName ?? "NoName",
             taskStatus: currentTask.taskStatus.toString(),

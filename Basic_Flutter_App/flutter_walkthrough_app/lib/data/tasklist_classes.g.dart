@@ -16,9 +16,9 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return TaskList(
-      listID: fields[0] as int,
-    )..list = (fields[1] as List).cast<Task>();
+    return TaskList()
+      .._listUUID = fields[0] as String
+      ..list = (fields[1] as List).cast<Task>();
   }
 
   @override
@@ -26,7 +26,7 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.listID)
+      ..write(obj._listUUID)
       ..writeByte(1)
       ..write(obj.list);
   }
@@ -53,12 +53,12 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      taskID: fields[0] == null ? -1 : fields[0] as int,
       taskName: fields[1] == null ? 'none' : fields[1] as String?,
       taskStatus: fields[2] as String,
       taskLabel: fields[3] == null ? 'none' : fields[3] as String?,
       taskDescription: fields[4] == null ? 'none' : fields[4] as String?,
     )
+      .._taskUUID = fields[0] == null ? '-1' : fields[0] as String
       ..clockList = (fields[6] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
@@ -71,7 +71,7 @@ class TaskAdapter extends TypeAdapter<Task> {
     writer
       ..writeByte(8)
       ..writeByte(0)
-      ..write(obj.taskID)
+      ..write(obj._taskUUID)
       ..writeByte(1)
       ..write(obj.taskName)
       ..writeByte(2)
