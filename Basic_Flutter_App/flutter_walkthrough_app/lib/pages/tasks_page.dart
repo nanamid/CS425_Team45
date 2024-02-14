@@ -282,7 +282,7 @@ class _TaskPageState extends State<TaskPage> {
     List<Task> currentTaskListOfTasks = currentTaskList.list;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task list: ${currentTaskList.listUUID}'),
+        title: Text(currentTaskList.listName ?? "Task List"),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(

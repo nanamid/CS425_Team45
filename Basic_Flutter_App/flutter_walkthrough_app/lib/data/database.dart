@@ -18,9 +18,8 @@ class TodoDatabase {
 
   // Called in home_page.dart's state for empty databases
   void createInitialDatabase() {
-    Uuid uuid = Uuid();
     listOfTaskLists = [
-      TaskList()
+      TaskList(listName: "Default Task List")
     ];
     (listOfTaskLists[0] as TaskList).list.add(Task(
           taskName: "Default Task",

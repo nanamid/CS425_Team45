@@ -14,10 +14,12 @@ class TaskList {
   String get listUUID => _listUUID;
 
   @HiveField(1)
+  final String? listName;
+
+  @HiveField(2)
   List<Task> list = <Task>[];
 
-  TaskList()
-  {
+  TaskList({this.listName}) {
     Uuid uuid = Uuid();
     _listUUID = uuid.v4(); // generates a v4 (random) uuid
   }
@@ -142,8 +144,7 @@ class Task {
     this.taskLabel,
     this.taskDescription,
     // timeclocks not set in constructor
-  })
-  {
+  }) {
     Uuid uuid = Uuid();
     _taskUUID = uuid.v4();
   }
