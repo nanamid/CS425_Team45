@@ -62,7 +62,7 @@ class Task {
   String get taskUUID => _taskUUID;
 
   @HiveField(1, defaultValue: "none")
-  String? taskName;
+  String taskName;
 
   @HiveField(2) // default is TODO, set in constructor
   String taskStatus; // TODO should be TaskStatus object
@@ -139,7 +139,7 @@ class Task {
   }
 
   Task({
-    this.taskName,
+    required this.taskName,
     this.taskStatus = "TODO",
     this.taskLabel,
     this.taskDescription,

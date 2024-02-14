@@ -4,30 +4,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 
 /// Used to build the list of tasks
 /// Shows an overview of a task
 class TaskTile extends StatelessWidget {
-  final String taskName;
-  final String? taskStatus;
-  final String? taskDescription;
-  final bool taskCompleted;
-  final bool taskClockedIn;
+  final Task task;
   Function(bool?)? onChanged;
   Function(BuildContext)? deleteFunction;
   Function()? detailDialogFunction;
 
+  late final bool _taskCompleted;
+  late final bool _taskClockedIn;
+
   TaskTile({
     super.key,
-    required this.taskName,
-    this.taskStatus,
-    this.taskDescription,
-    required this.taskCompleted,
+    required this.task,
     required this.onChanged,
     required this.deleteFunction,
-    required this.taskClockedIn,
     this.detailDialogFunction,
-  });
+  })
+  {
+    _taskCompleted = task.taskStatus.toString() == "DONE" ? true : false;
+    _taskClockedIn =  task.clockRunning;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +57,12 @@ class TaskTile extends StatelessWidget {
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Checkbox(
-                    value: taskCompleted,
+                    value: _taskCompleted,
                     onChanged: onChanged,
                   ),
 
                   Visibility(
-                      visible: taskClockedIn,
+                      visible: _taskClockedIn,
                       child: Icon(Icons
                           .punch_clock)), // shown if task has currently running clock
 
@@ -71,15 +71,15 @@ class TaskTile extends StatelessWidget {
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(taskStatus ?? "-"),
+                      child: Text(task.taskStatus),
                     ),
                   ),
 
                   //Task Name
                   Text(
-                    taskName,
+                    task.taskName,
                     style: TextStyle(
-                      decoration: taskCompleted
+                      decoration: _taskCompleted
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
                     ),

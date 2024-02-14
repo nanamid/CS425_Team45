@@ -294,11 +294,7 @@ class _TaskPageState extends State<TaskPage> {
         itemBuilder: (context, index) {
           Task currentTask = currentTaskListOfTasks[index];
           return TaskTile(
-            taskName: currentTask.taskName ?? "NoName",
-            taskStatus: currentTask.taskStatus.toString(),
-            taskCompleted:
-                currentTask.taskStatus.toString() == "DONE" ? true : false,
-            taskClockedIn: currentTask.clockRunning,
+            task: currentTask,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) async {
               bool? confirmation = await showDialog(

@@ -16,18 +16,22 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return TaskList()
+    return TaskList(
+      listName: fields[1] as String?,
+    )
       .._listUUID = fields[0] as String
-      ..list = (fields[1] as List).cast<Task>();
+      ..list = (fields[2] as List).cast<Task>();
   }
 
   @override
   void write(BinaryWriter writer, TaskList obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj._listUUID)
       ..writeByte(1)
+      ..write(obj.listName)
+      ..writeByte(2)
       ..write(obj.list);
   }
 
@@ -53,7 +57,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      taskName: fields[1] == null ? 'none' : fields[1] as String?,
+      taskName: fields[1] == null ? 'none' : fields[1] as String,
       taskStatus: fields[2] as String,
       taskLabel: fields[3] == null ? 'none' : fields[3] as String?,
       taskDescription: fields[4] == null ? 'none' : fields[4] as String?,
