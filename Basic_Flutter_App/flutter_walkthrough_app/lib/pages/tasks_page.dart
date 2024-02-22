@@ -50,11 +50,15 @@ class _TaskPageState extends State<TaskPage> {
     Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
       final prevState = changedTask.taskStatus;
-      if (prevState != TaskStatus.DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      if (prevState !=
+          TaskStatus
+              .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        changedTask.taskStatus = TaskStatus.DONE; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.DONE; // TODO should be TaskStatus object
       } else {
-        changedTask.taskStatus = TaskStatus.TODO; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.TODO; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();

@@ -10,7 +10,8 @@ part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dar
 @HiveType(typeId: 0)
 class TaskList {
   @HiveField(0)
-  String? _listUUID; // This really should be a late final String, but hive had problems // TODO fix this
+  String?
+      _listUUID; // This really should be a late final String, but hive had problems // TODO fix this
   String? get listUUID => _listUUID;
 
   @HiveField(1)
@@ -164,10 +165,8 @@ class Task {
   }
 
   /// Separate a child from this parent task
-  bool unsetSubTask(Task separatedChild)
-  {
-    if (taskSubtasks.where((task) => task == separatedChild).isEmpty)
-    {
+  bool unsetSubTask(Task separatedChild) {
+    if (taskSubtasks.where((task) => task == separatedChild).isEmpty) {
       print("Couldn't separate child from parent, task not a child");
       return false;
     }

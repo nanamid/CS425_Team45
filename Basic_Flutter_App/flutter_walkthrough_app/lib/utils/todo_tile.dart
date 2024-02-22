@@ -23,10 +23,9 @@ class TaskTile extends StatelessWidget {
     required this.onChanged,
     required this.deleteFunction,
     this.detailDialogFunction,
-  })
-  {
+  }) {
     _taskCompleted = task.taskStatus.name == "DONE" ? true : false;
-    _taskClockedIn =  task.clockRunning;
+    _taskClockedIn = task.clockRunning;
   }
 
   @override
