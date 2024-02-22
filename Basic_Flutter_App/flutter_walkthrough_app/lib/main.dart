@@ -14,7 +14,7 @@ void main() async {
 
   // all custom objects need an adapter for hive to store them
   Hive.registerAdapter(TaskListAdapter());
-  // Hive.registerAdapter(TaskStatusAdapter());
+  Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(TaskAdapter());
 
   // Open the box named 'taskbox'

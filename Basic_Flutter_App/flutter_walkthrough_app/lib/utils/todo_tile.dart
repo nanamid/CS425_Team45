@@ -25,7 +25,7 @@ class TaskTile extends StatelessWidget {
     this.detailDialogFunction,
   })
   {
-    _taskCompleted = task.taskStatus.toString() == "DONE" ? true : false;
+    _taskCompleted = task.taskStatus.name == "DONE" ? true : false;
     _taskClockedIn =  task.clockRunning;
   }
 
@@ -71,7 +71,7 @@ class TaskTile extends StatelessWidget {
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(task.taskStatus),
+                      child: Text(task.taskStatus.name),
                     ),
                   ),
 

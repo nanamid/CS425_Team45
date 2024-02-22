@@ -25,34 +25,18 @@ class TaskList {
   }
 }
 
-// TODO make a type for allowed values in the TaskStatus field
 // IE. TODO, DONE, WAIT
-// An enum worked the way I wanted, but Hive couldn't store it
+@HiveType(typeId: 1)
+enum TaskStatus {
+  @HiveField(0)
+  TODO,
 
-// enum TaskStatus {
-//   @HiveField(0)
-//   TODO,
+  @HiveField(1)
+  DONE,
 
-//   @HiveField(1)
-//   DONE,
-// }
-
-// This gave Hive trouble for some reason
-// @HiveType(typeId: 1)
-// class TaskStatus {
-//   @HiveField(0, defaultValue: "-")
-//   final String _status;
-
-//   const TaskStatus() : _status = "-"; // no status
-//   const TaskStatus.TODO() : _status = "TODO";
-//   const TaskStatus.DONE() : _status = "DONE";
-//   const TaskStatus.WAIT() : _status = "WAIT";
-
-//   @override
-//   String toString() {
-//     return _status;
-//   }
-// }
+  @HiveField(2)
+  WAIT,
+}
 
 // Task
 @HiveType(typeId: 2)
@@ -64,8 +48,8 @@ class Task {
   @HiveField(1, defaultValue: "none")
   String taskName;
 
-  @HiveField(2) // default is TODO, set in constructor
-  String taskStatus; // TODO should be TaskStatus object
+  @HiveField(2, defaultValue: TaskStatus.TODO)
+  TaskStatus taskStatus;
 
   @HiveField(3, defaultValue: "none")
   String? taskLabel;
@@ -73,21 +57,30 @@ class Task {
   @HiveField(4, defaultValue: "none")
   String? taskDescription;
 
-  // @HiveField(5, defaultValue: )
-  // DateTime? taskDeadline;
+  // @HiveField(5, defaultValue: DateTime(0))
+  @HiveField(5) // requires defaultValue to be const, which DateTime isn't
+  DateTime? _taskDeadline; // has to be set alongside an alarm
 
   @HiveField(6)
+  List<DateTime> _taskReminders = []; // has to be set alongside an alarm
+
+  @HiveField(7)
   List<List<DateTime?>> clockList = // TODO make private?
       []; // intended as mutable list of mutable [DateTime, DateTime?]
 
-  @HiveField(7)
+  @HiveField(8)
   int totalTime_minutes = 0; // 0
-
   int totalTime_secs = 0; // for testing
 
-  @HiveField(8)
+  @HiveField(9)
   bool _clockRunning = false;
   bool get clockRunning => _clockRunning; // allow read but no write
+
+  @HiveField(10)
+  List<Task> taskSubtasks = [];
+
+  @HiveField(11)
+  Task? taskParentTask;
 
   /// adds a clock entry to the task structure
   /// returns false when cannot add entry, like when a clock is already open.
@@ -140,10 +133,10 @@ class Task {
 
   Task({
     required this.taskName,
-    this.taskStatus = "TODO",
+    this.taskStatus = TaskStatus.TODO,
     this.taskLabel,
     this.taskDescription,
-    // timeclocks not set in constructor
+    // deadline, reminders, clocklist, subtasks, parenttask set with methods
   }) {
     Uuid uuid = Uuid();
     _taskUUID = uuid.v4();

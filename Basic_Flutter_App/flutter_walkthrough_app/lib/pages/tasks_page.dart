@@ -50,12 +50,11 @@ class _TaskPageState extends State<TaskPage> {
     Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
       final prevState = changedTask.taskStatus;
-      if (prevState.toString() !=
-          "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      if (prevState != TaskStatus.DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        changedTask.taskStatus = "DONE"; // TODO should be TaskStatus object
+        changedTask.taskStatus = TaskStatus.DONE; // TODO should be TaskStatus object
       } else {
-        changedTask.taskStatus = "TODO"; // TODO should be TaskStatus object
+        changedTask.taskStatus = TaskStatus.TODO; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();
@@ -68,7 +67,7 @@ class _TaskPageState extends State<TaskPage> {
     setState(() {
       currentTaskList.add(Task(
         taskName: _controller.text,
-        taskStatus: "TODO", // TODO should be TaskStatus object
+        taskStatus: TaskStatus.TODO, // TODO should be TaskStatus object
       ));
       //Clears the textbox for the next task
       _controller.clear();
@@ -149,7 +148,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus}"),
+                        child: Text("${currentTask.taskStatus.name}"),
                       ),
 
                       Padding(
