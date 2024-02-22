@@ -20,7 +20,7 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
       listName: fields[1] as String?,
     )
       .._listUUID = fields[0] as String
-      ..list = (fields[2] as List).cast<Task>();
+      .._list = (fields[2] as List).cast<Task>();
   }
 
   @override
@@ -32,7 +32,7 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
       ..writeByte(1)
       ..write(obj.listName)
       ..writeByte(2)
-      ..write(obj.list);
+      ..write(obj._list);
   }
 
   @override
@@ -62,7 +62,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       taskLabel: fields[3] == null ? 'none' : fields[3] as String?,
       taskDescription: fields[4] == null ? 'none' : fields[4] as String?,
     )
-      .._taskUUID = fields[0] == null ? '-1' : fields[0] as String
+      .._taskUUID = fields[0] as String?
       .._taskDeadline = fields[5] as DateTime?
       .._taskReminders = (fields[6] as List).cast<DateTime>()
       ..clockList = (fields[7] as List)

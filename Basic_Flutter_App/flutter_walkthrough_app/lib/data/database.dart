@@ -21,7 +21,7 @@ class TodoDatabase {
     listOfTaskLists = [
       TaskList(listName: "Default Task List")
     ];
-    (listOfTaskLists[0] as TaskList).list.add(Task(
+    (listOfTaskLists[0] as TaskList).addTask(Task(
           taskName: "Default Task",
           taskStatus: TaskStatus.TODO,
           taskDescription: "Initial task, feel free to delete",

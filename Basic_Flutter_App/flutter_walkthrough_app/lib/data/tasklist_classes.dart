@@ -10,14 +10,34 @@ part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dar
 @HiveType(typeId: 0)
 class TaskList {
   @HiveField(0)
-  late final String _listUUID;
-  String get listUUID => _listUUID;
+  String? _listUUID; // This really should be a late final String, but hive had problems // TODO fix this
+  String? get listUUID => _listUUID;
 
   @HiveField(1)
   final String? listName;
 
   @HiveField(2)
-  List<Task> list = <Task>[];
+  List<Task> _list = <Task>[];
+  List<Task> get list => List.unmodifiable(
+      _list); // the list itself is unmodifiable, but the tasks inside should be modifiable
+
+  bool addTask(Task newTask) {
+    if (_list.where((task) => task == newTask).isNotEmpty) {
+      print("Couldn't add task, child already exists");
+      return false;
+    }
+    _list.add(newTask);
+    print("Added Task UUID: ${newTask.taskUUID}");
+    return true;
+  }
+
+  bool removeTask(Task removedTask) {
+    bool result = _list.remove(removedTask);
+    if (result == false) {
+      print("Could not remove task");
+    }
+    return result;
+  }
 
   TaskList({this.listName}) {
     Uuid uuid = Uuid();
@@ -41,9 +61,10 @@ enum TaskStatus {
 // Task
 @HiveType(typeId: 2)
 class Task {
-  @HiveField(0, defaultValue: "-1")
-  late final String _taskUUID;
-  String get taskUUID => _taskUUID;
+  // @HiveField(0, defaultValue: "-1")
+  @HiveField(0)
+  String? _taskUUID;
+  String? get taskUUID => _taskUUID;
 
   @HiveField(1, defaultValue: "none")
   String taskName;
@@ -128,6 +149,30 @@ class Task {
     totalTime_secs +=
         (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
+    return true;
+  }
+
+  /// set a task to be child of this task
+  bool setSubTask(Task newChild) {
+    if (taskSubtasks.where((task) => task == newChild).isNotEmpty) {
+      print("Couldn't add sub task, child already exists");
+      return false;
+    }
+    newChild.taskParentTask = this;
+    taskSubtasks.add(newChild);
+    return true;
+  }
+
+  /// Separate a child from this parent task
+  bool unsetSubTask(Task separatedChild)
+  {
+    if (taskSubtasks.where((task) => task == separatedChild).isEmpty)
+    {
+      print("Couldn't separate child from parent, task not a child");
+      return false;
+    }
+    separatedChild.taskParentTask = this.taskParentTask;
+    taskSubtasks.remove(separatedChild);
     return true;
   }
 

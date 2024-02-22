@@ -63,9 +63,9 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
   void saveNewTask() {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
     setState(() {
-      currentTaskList.add(Task(
+      currentTaskList.addTask(Task(
         taskName: _controller.text,
         taskStatus: TaskStatus.TODO, // TODO should be TaskStatus object
       ));
@@ -95,8 +95,9 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for deleting tasks (swipe to delete, press delete button)
   void deleteTask(int index) {
     setState(() {
-      List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
-      currentTaskList.removeAt(index);
+      TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+      Task element = currentTaskList.list[index];
+      currentTaskList.removeTask(element);
     });
     db.updateDatabase();
   }
