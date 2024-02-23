@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/pages/auth_page.dart';
 import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
       label: 'User Account',
       icon: Icon(Icons.person_outline),
       selectedIcon: Icon(Icons.person),
-      widget: Placeholder(),
+      widget: AuthPage(),
     ),
     ViewDestination(
       label: 'Tasks',
