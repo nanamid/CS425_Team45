@@ -3,9 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:test_app/data/database.dart';
+import 'package:test_app/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:test_app/pages/home_page.dart';
-import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 
 void main() async {
@@ -20,6 +20,11 @@ void main() async {
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
   var taskbox = await Hive.openBox('taskbox');
+
+  // Firebase Initialization
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   //Run the App
   runApp(const MyApp());
