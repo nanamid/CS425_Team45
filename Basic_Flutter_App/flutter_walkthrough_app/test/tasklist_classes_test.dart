@@ -56,14 +56,14 @@ void main() {
     test("List is unmodifiable, but tasks inside are mutable", () {
       final TaskList taskList = TaskList();
       taskList.addTask(Task(taskName: "foo"));
-      taskList.list[0].taskName = "foobar";
+      taskList.list.last.taskName = "foobar";
       expect(taskList.list.last.taskName, "foobar");
     });
     test("RemoveTask", () {
       final TaskList taskList = TaskList();
       taskList.addTask(Task(taskName: "foo"));
       expect(taskList.list.length, 1);
-      taskList.removeTask(taskList.list[0]);
+      taskList.removeTask(taskList.list.last);
       expect(taskList.list.length, 0);
     });
   });
