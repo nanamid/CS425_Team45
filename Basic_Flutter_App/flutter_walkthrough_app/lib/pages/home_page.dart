@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
 // then this https://docs.flutter.dev/cookbook/navigation/passing-data
@@ -80,6 +81,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+      DateTime alarmTime = DateTime.now().add(Duration(seconds: 2));
+      print("Alarm 2 secs from now home_page");
+      AndroidAlarmManager.oneShotAt(
+        alarmTime,
+        1, // Unique ID for the alarm
+        alarmCallback,
+        wakeup: true,
+        exact: true,
+        alarmClock: true,
+      );
+
     return Scaffold(
       // TODO avoid nested scaffold, will require using the below appBar and floating action button
       // appBar: destinations[screenIndex].wantAppBar
@@ -141,4 +153,10 @@ class ExamplePage extends StatelessWidget {
       ),
     );
   }
+}
+
+@pragma('vm:entry-point')
+void alarmCallback()
+{
+  print("Callback in home_page");
 }
