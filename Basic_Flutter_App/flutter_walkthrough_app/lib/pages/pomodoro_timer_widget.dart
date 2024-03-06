@@ -7,7 +7,8 @@ import 'package:test_app/data/tasklist_classes.dart';
 class PomodoroTimerWidget extends StatefulWidget {
   final PomodoroTimer pomodoroTimer;
   final Task? task;
-  const PomodoroTimerWidget({super.key, required this.pomodoroTimer, this.task});
+  const PomodoroTimerWidget(
+      {super.key, required this.pomodoroTimer, this.task});
   @override
   State<PomodoroTimerWidget> createState() => _PomodoroTimerWidgetState();
 }
@@ -34,30 +35,30 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
   Widget build(BuildContext context) {
     PomodoroTimer pomodoroTimer = widget.pomodoroTimer; // alias
     return Column(
-        children: [
-          Text(
-              "Time: ${getCurrentTimerTime().inMinutes}:${getCurrentTimerTime().inSeconds}"),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      pomodoroTimer.startTimer();
-                    });
-                  },
-                  child: Text("Start")),
-              ElevatedButton(
-                  onPressed: () {
-                    pomodoroTimer.stopTimer();
-                  },
-                  child: Text("Stop Timer")),
-            ],
-          ),
-          ElevatedButton(
-                  onPressed: () => pomodoroTimer.clearTimer(),
-                  child: Text('Clear Timer'))
-        ],
+      children: [
+        Text(
+            "Time: ${getCurrentTimerTime().inMinutes}:${getCurrentTimerTime().inSeconds}"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    pomodoroTimer.startTimer();
+                  });
+                },
+                child: Text("Start")),
+            ElevatedButton(
+                onPressed: () {
+                  pomodoroTimer.stopTimer();
+                },
+                child: Text("Stop Timer")),
+          ],
+        ),
+        ElevatedButton(
+            onPressed: () => pomodoroTimer.clearTimer(),
+            child: Text('Clear Timer'))
+      ],
     );
   }
 

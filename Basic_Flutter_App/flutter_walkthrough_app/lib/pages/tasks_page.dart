@@ -171,7 +171,10 @@ class _TaskPageState extends State<TaskPage> {
                 ],
               ),
               content: Column(children: [
-                PomodoroTimerWidget(pomodoroTimer: widget.pomodoroTimer, task: currentTask,),
+                PomodoroTimerWidget(
+                  pomodoroTimer: widget.pomodoroTimer,
+                  task: currentTask,
+                ),
 
                 // description
                 Text(currentTask.taskDescription ?? "Description"),

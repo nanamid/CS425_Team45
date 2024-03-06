@@ -80,7 +80,7 @@ class PomodoroTimer {
     remaningTime = _timerEndTime!.difference(DateTime.now());
     _timerStartTime = null;
     _timerEndTime = null;
-    
+
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.cancelAll();

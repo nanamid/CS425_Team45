@@ -159,9 +159,3 @@ class ExamplePage extends StatelessWidget {
     );
   }
 }
-
-@pragma('vm:entry-point')
-void alarmCallback()
-{
-  print("Callback in home_page");
-}
