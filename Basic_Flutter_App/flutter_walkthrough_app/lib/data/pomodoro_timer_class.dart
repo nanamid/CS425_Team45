@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'dart:async';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 import 'dart:isolate';
 
 part 'pomodoro_timer_class.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
@@ -35,6 +36,7 @@ class PomodoroTimer {
 
   Function()? userTimerCallback;
 
+  Task? task;
 
   void _privateTimerCallback() {
     print("Inside private timer callback");
@@ -171,6 +173,6 @@ class PomodoroTimer {
     );
   }
 
-  PomodoroTimer({required this.duration, this.userTimerCallback})
+  PomodoroTimer({required this.duration, this.userTimerCallback, this.task})
       : remaningTime = duration;
 }

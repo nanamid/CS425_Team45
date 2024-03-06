@@ -5,7 +5,6 @@ import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/pages/pomodoro_timer_widget.dart';
 
-
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
 // then this https://docs.flutter.dev/cookbook/navigation/passing-data
 // can probably use the content frame to toggle between views, tasks can get their own full navigate.push
@@ -50,45 +49,52 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
-  final PomodoroTimer pomodoroTimer = PomodoroTimer(duration: Duration(seconds: 20));
+  final PomodoroTimer pomodoroTimer =
+      PomodoroTimer(duration: Duration(seconds: 20));
 
   int screenIndex = 1; // default to Tasks view
 
   @override
   Widget build(BuildContext context) {
     List<ViewDestination> destinations = <ViewDestination>[
-    ViewDestination(
-      label: 'User Account',
-      icon: Icon(Icons.person_outline),
-      selectedIcon: Icon(Icons.person),
-      widget: Placeholder(),
-    ),
-    ViewDestination(
-      label: 'Tasks',
-      icon: Icon(Icons.task_outlined),
-      selectedIcon: Icon(Icons.task),
-      widget: TaskPage(),
-      wantAppBar: true,
-    ),
-    ViewDestination(
-      label: 'XP',
-      icon: Icon(Icons.star_outline),
-      selectedIcon: Icon(Icons.star),
-      widget: Placeholder(),
-    ),
-    ViewDestination(
-      label: 'Pomodoro Timer',
-      icon: Icon(Icons.timer_outlined),
-      selectedIcon: Icon(Icons.timer),
-      widget: PomodoroTimerWidget(pomodoroTimer: pomodoroTimer),
-    ),
-    ViewDestination(
-      // show an example of a full screen page, using navigator push instead
-      label: 'Example fullpage',
-      icon: Icon(Icons.fullscreen),
-      selectedIcon: Icon(Icons.fullscreen_exit),
-      navBuilder: (context) => ExamplePage(),
-    ),
+      ViewDestination(
+        label: 'User Account',
+        icon: Icon(Icons.person_outline),
+        selectedIcon: Icon(Icons.person),
+        widget: Placeholder(),
+      ),
+      ViewDestination(
+        label: 'Tasks',
+        icon: Icon(Icons.task_outlined),
+        selectedIcon: Icon(Icons.task),
+        widget: TaskPage(
+          pomodoroTimer: pomodoroTimer,
+        ),
+        wantAppBar: true,
+      ),
+      ViewDestination(
+        label: 'XP',
+        icon: Icon(Icons.star_outline),
+        selectedIcon: Icon(Icons.star),
+        widget: Placeholder(),
+      ),
+      ViewDestination(
+        label: 'Pomodoro Timer',
+        icon: Icon(Icons.timer_outlined),
+        selectedIcon: Icon(Icons.timer),
+        widget: Scaffold(
+            appBar: AppBar(
+              title: Text("Pomodoro Timer"),
+            ),
+            body: PomodoroTimerWidget(pomodoroTimer: pomodoroTimer)),
+      ),
+      // ViewDestination(
+      //   // show an example of a full screen page, using navigator push instead
+      //   label: 'Example fullpage',
+      //   icon: Icon(Icons.fullscreen),
+      //   selectedIcon: Icon(Icons.fullscreen_exit),
+      //   navBuilder: (context) => ExamplePage(),
+      // ),
     ];
 
     return Scaffold(
