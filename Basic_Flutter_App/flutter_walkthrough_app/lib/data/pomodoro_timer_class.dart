@@ -1,5 +1,8 @@
 import 'package:hive/hive.dart';
 import 'dart:async';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:isolate';
 
 part 'pomodoro_timer_class.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
 // try first a: `dart run build_runner build`
@@ -24,35 +27,107 @@ class PomodoroTimer {
   DateTime? get timerEndTime => _timerEndTime;
 
   @HiveField(4)
-  Duration previousTime;
+  Duration remaningTime;
 
   late Timer _nativeTimer;
 
-  void Function()? callback;
-  // TODO add notification callbacks
+  int _alarmID = 0;
 
-  void startTimer() {
+  Function()? userTimerCallback;
+
+  void _privateTimerCallback() {
+    print("Inside private timer callback");
+    clearTimer();
+    if (userTimerCallback != null) {
+      userTimerCallback!();
+    }
+  }
+
+  @pragma('vm:entry-point')
+  static void _alarmCallback() {
+    print("Inside alarmCallback");
+    showNotification();
+  }
+
+  void startTimer() async {
+    if (_timerIsRunning) {
+      print('Tried to start already running timer');
+      return;
+    }
+
     _timerStartTime = DateTime.now();
-    _timerEndTime = _timerStartTime!.add(duration);
-    _nativeTimer = Timer(duration, callback ?? (){});
+    _timerEndTime = _timerStartTime!.add(remaningTime);
+    _nativeTimer = Timer(remaningTime, _privateTimerCallback);
     _timerIsRunning = true;
+    await AndroidAlarmManager.oneShot(remaningTime, _alarmID, _alarmCallback);
+    print('Started Pomodoro Timer');
   }
 
   // Save the time in the timer.
-  void stopTimer()
-  {
-    if (_timerIsRunning == false)
-    {
+  void stopTimer() {
+    if (_timerIsRunning == false) {
       print('Tried to stop timer that was not running');
       return;
     }
     _nativeTimer.cancel();
-    _timerIsRunning=false;
-    previousTime += DateTime.now().difference(_timerStartTime!);
+    AndroidAlarmManager.cancel(_alarmID);
+    _timerIsRunning = false;
+    remaningTime = _timerEndTime!.difference(DateTime.now());
+    _timerStartTime = null;
+    _timerEndTime = null;
+    print('Stopped Pomodoro Timer');
   }
 
-  PomodoroTimer(
-      {required this.duration,
-      this.callback,
-      this.previousTime = Duration.zero});
+  Duration clearTimer() {
+    if (_timerIsRunning) {
+      stopTimer();
+    }
+    Duration temp = remaningTime;
+    remaningTime = duration;
+    return temp;
+  }
+
+  Duration getRemainingTime() {
+    if (_timerIsRunning == true && _timerEndTime != null) {
+      return _timerEndTime!.difference(DateTime.now());
+    } else {
+      return remaningTime;
+    }
+  }
+
+  static void showNotification() async {
+    print("Inside showNotification, isolate=${Isolate.current.hashCode}");
+    // Initialize the notification plugin
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    // Initialize settings for Android
+    var android = AndroidInitializationSettings('app_icon');
+    var initializationSettings = InitializationSettings(android: android);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    // Define the notification details
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your_channel_id',
+      'pomodoro timer alarm',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    // Show the notification
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Reminder',
+      'It\'s time for your task!',
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
+  }
+
+  PomodoroTimer({required this.duration, this.userTimerCallback})
+      : remaningTime = duration;
 }

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/database.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/pages/home_page.dart';
 import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/data/tasklist_classes.dart';
@@ -22,6 +23,7 @@ void main() async {
   Hive.registerAdapter(TaskListAdapter());
   // Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(PomodoroTimerAdapter());
 
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
@@ -29,17 +31,6 @@ void main() async {
 
   //Run the App
   runApp(const MyApp());
-
-  DateTime alarmTime = DateTime.now().add(Duration(seconds: 10));
-  print("Alarm 10 secs from now");
-  await AndroidAlarmManager.oneShotAt(
-    alarmTime,
-    0, // Unique ID for the alarm
-    alarmCallback,
-    wakeup: true,
-    exact: true,
-    alarmClock: true,
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -57,43 +48,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}
-
-@pragma('vm:entry-point')
-void alarmCallback() {
-  print("Inside alarmCallback");
-  showNotification();
-}
-
-void showNotification() async {
-  print("Inside showNotification, isolate=${Isolate.current.hashCode}");
-  // Initialize the notification plugin
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  // Initialize settings for Android
-  var android = AndroidInitializationSettings('app_icon');
-  var initializationSettings = InitializationSettings(android: android);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-  // Define the notification details
-  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'your_channel_id',
-    'your_channel_name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    priority: Priority.high,
-    ticker: 'ticker',
-  );
-  var platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  // Show the notification
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    'Reminder',
-    'It\'s time for your task!',
-    platformChannelSpecifics,
-    payload: 'item x',
-  );
 }

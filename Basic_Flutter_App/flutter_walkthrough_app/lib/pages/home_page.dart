@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:test_app/pages/pomodoro_timer_widget.dart';
+
 
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
 // then this https://docs.flutter.dev/cookbook/navigation/passing-data
@@ -47,8 +50,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
+  final PomodoroTimer pomodoroTimer = PomodoroTimer(duration: Duration(seconds: 20));
 
-  List<ViewDestination> destinations = <ViewDestination>[
+  int screenIndex = 1; // default to Tasks view
+
+  @override
+  Widget build(BuildContext context) {
+    List<ViewDestination> destinations = <ViewDestination>[
     ViewDestination(
       label: 'User Account',
       icon: Icon(Icons.person_outline),
@@ -69,28 +77,19 @@ class _HomePageState extends State<HomePage> {
       widget: Placeholder(),
     ),
     ViewDestination(
+      label: 'Pomodoro Timer',
+      icon: Icon(Icons.timer_outlined),
+      selectedIcon: Icon(Icons.timer),
+      widget: PomodoroTimerWidget(pomodoroTimer: pomodoroTimer),
+    ),
+    ViewDestination(
       // show an example of a full screen page, using navigator push instead
       label: 'Example fullpage',
       icon: Icon(Icons.fullscreen),
       selectedIcon: Icon(Icons.fullscreen_exit),
       navBuilder: (context) => ExamplePage(),
     ),
-  ];
-
-  int screenIndex = 1; // default to Tasks view
-
-  @override
-  Widget build(BuildContext context) {
-      DateTime alarmTime = DateTime.now().add(Duration(seconds: 2));
-      print("Alarm 2 secs from now home_page");
-      AndroidAlarmManager.oneShotAt(
-        alarmTime,
-        1, // Unique ID for the alarm
-        alarmCallback,
-        wakeup: true,
-        exact: true,
-        alarmClock: true,
-      );
+    ];
 
     return Scaffold(
       // TODO avoid nested scaffold, will require using the below appBar and floating action button

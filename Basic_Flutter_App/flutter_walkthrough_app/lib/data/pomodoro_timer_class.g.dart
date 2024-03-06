@@ -18,11 +18,11 @@ class PomodoroTimerAdapter extends TypeAdapter<PomodoroTimer> {
     };
     return PomodoroTimer(
       duration: fields[0] as Duration,
-      previousTime: fields[4] as Duration,
     )
       .._timerIsRunning = fields[1] as bool
       .._timerStartTime = fields[2] as DateTime?
-      .._timerEndTime = fields[3] as DateTime?;
+      .._timerEndTime = fields[3] as DateTime?
+      ..remaningTime = fields[4] as Duration;
   }
 
   @override
@@ -38,7 +38,7 @@ class PomodoroTimerAdapter extends TypeAdapter<PomodoroTimer> {
       ..writeByte(3)
       ..write(obj._timerEndTime)
       ..writeByte(4)
-      ..write(obj.previousTime);
+      ..write(obj.remaningTime);
   }
 
   @override
