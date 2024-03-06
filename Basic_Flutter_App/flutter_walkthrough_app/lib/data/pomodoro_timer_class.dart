@@ -35,6 +35,7 @@ class PomodoroTimer {
 
   Function()? userTimerCallback;
 
+
   void _privateTimerCallback() {
     print("Inside private timer callback");
     clearTimer();
@@ -60,6 +61,8 @@ class PomodoroTimer {
     _nativeTimer = Timer(remaningTime, _privateTimerCallback);
     _timerIsRunning = true;
     await AndroidAlarmManager.oneShot(remaningTime, _alarmID, _alarmCallback);
+    showOngoingNotification();
+    task?.clockIn();
     print('Started Pomodoro Timer');
   }
 
@@ -75,6 +78,11 @@ class PomodoroTimer {
     remaningTime = _timerEndTime!.difference(DateTime.now());
     _timerStartTime = null;
     _timerEndTime = null;
+    
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.cancelAll();
+    task?.clockOut();
     print('Stopped Pomodoro Timer');
   }
 
@@ -120,9 +128,44 @@ class PomodoroTimer {
 
     // Show the notification
     await flutterLocalNotificationsPlugin.show(
-      0,
+      0, // 0 is notification id for final task reminder notification
       'Reminder',
       'It\'s time for your task!',
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
+  }
+
+  /// shows an ongoing (persistent notification)
+  static void showOngoingNotification() async {
+    print("Inside showNotification, isolate=${Isolate.current.hashCode}");
+    // Initialize the notification plugin
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    // Initialize settings for Android
+    var android = AndroidInitializationSettings('app_icon');
+    var initializationSettings = InitializationSettings(android: android);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    // Define the notification details
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your_channel_id',
+      'pomodoro timer ongoing',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      ongoing: true,
+    );
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    // Show the notification
+    await flutterLocalNotificationsPlugin.show(
+      1, // 1 is notification id for ongoing timer
+      'Timer Running',
+      'You Have a Timer Running',
       platformChannelSpecifics,
       payload: 'item x',
     );
