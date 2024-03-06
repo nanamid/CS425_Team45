@@ -6,8 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RegisterPage extends StatefulWidget {
-  final VoidCallback showLoginPage;
-  const RegisterPage({super.key, required this.showLoginPage});
+  final VoidCallback? showLoginPage;
+  const RegisterPage({
+    super.key,
+    required this.title,
+    required this.showLoginPage,
+  });
+
+  final String title;
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -52,6 +58,9 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
