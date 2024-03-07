@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
-import 'package:test_app/pages/tasks_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
+import 'package:test_app/pages/tasks_page.dart';
+import 'package:test_app/pages/auth/user_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/pages/pomodoro_timer_widget.dart';
 
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
         label: 'User Account',
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
-        widget: Placeholder(),
+        widget: UserPage(),
       ),
       ViewDestination(
         label: 'Tasks',
