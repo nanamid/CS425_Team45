@@ -16,9 +16,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_slidable: ^3.0.1
   uuid: ^4.3.2
+  android_alarm_manager_plus: ^3.0.4
 
   english_words: ^4.0.0
   provider: ^6.0.0
+  flutter_local_notifications: ^16.3.3
 
 dev_dependencies:
   flutter_test:
