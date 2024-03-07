@@ -19,7 +19,7 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
     return TaskList(
       listName: fields[1] as String?,
     )
-      .._listUUID = fields[0] as String
+      .._listUUID = fields[0] as String?
       .._list = (fields[2] as List).cast<Task>();
   }
 
