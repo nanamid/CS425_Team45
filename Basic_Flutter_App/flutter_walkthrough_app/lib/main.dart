@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:test_app/data/database.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
