@@ -10,9 +10,12 @@ import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/pages/pomodoro_timer_widget.dart';
 
 class TaskPage extends StatefulWidget {
-  const TaskPage({super.key});
+  final PomodoroTimer pomodoroTimer;
+  const TaskPage({super.key, required this.pomodoroTimer});
   @override
   State<TaskPage> createState() => _TaskPageState();
 }
@@ -168,6 +171,11 @@ class _TaskPageState extends State<TaskPage> {
                 ],
               ),
               content: Column(children: [
+                PomodoroTimerWidget(
+                  pomodoroTimer: widget.pomodoroTimer,
+                  task: currentTask,
+                ),
+
                 // description
                 Text(currentTask.taskDescription ?? "Description"),
 
