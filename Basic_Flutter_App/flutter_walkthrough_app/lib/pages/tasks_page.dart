@@ -53,12 +53,15 @@ class _TaskPageState extends State<TaskPage> {
     Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
       final prevState = changedTask.taskStatus;
-      if (prevState.toString() !=
-          "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      if (prevState !=
+          TaskStatus
+              .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        changedTask.taskStatus = "DONE"; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.DONE; // TODO should be TaskStatus object
       } else {
-        changedTask.taskStatus = "TODO"; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.TODO; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();
@@ -67,12 +70,11 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
   void saveNewTask() {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
     setState(() {
-      currentTaskList.add(Task(
-        taskID: 0,
+      currentTaskList.addTask(Task(
         taskName: _controller.text,
-        taskStatus: "TODO", // TODO should be TaskStatus object
+        taskStatus: TaskStatus.TODO, // TODO should be TaskStatus object
       ));
       //Clears the textbox for the next task
       _controller.clear();
@@ -100,8 +102,9 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for deleting tasks (swipe to delete, press delete button)
   void deleteTask(int index) {
     setState(() {
-      List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
-      currentTaskList.removeAt(index);
+      TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+      Task element = currentTaskList.list[index];
+      currentTaskList.removeTask(element);
     });
     db.updateDatabase();
   }
@@ -153,7 +156,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus}"),
+                        child: Text("${currentTask.taskStatus.name}"),
                       ),
 
                       Padding(
@@ -287,10 +290,11 @@ class _TaskPageState extends State<TaskPage> {
   // Builds a scaffold for viewing a list of tasks
   // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+    List<Task> currentTaskListOfTasks = currentTaskList.list;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sample To Do List'),
+        title: Text(currentTaskList.listName ?? "Task List"),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
@@ -298,15 +302,11 @@ class _TaskPageState extends State<TaskPage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: currentTaskList.length,
+        itemCount: currentTaskListOfTasks.length,
         itemBuilder: (context, index) {
-          Task currentTask = currentTaskList[index];
+          Task currentTask = currentTaskListOfTasks[index];
           return TaskTile(
-            taskName: currentTask.taskName ?? "NoName",
-            taskStatus: currentTask.taskStatus.toString(),
-            taskCompleted:
-                currentTask.taskStatus.toString() == "DONE" ? true : false,
-            taskClockedIn: currentTask.clockRunning,
+            task: currentTask,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) async {
               bool? confirmation = await showDialog(
