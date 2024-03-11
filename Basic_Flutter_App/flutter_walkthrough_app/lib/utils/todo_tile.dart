@@ -10,6 +10,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 class TaskTile extends StatelessWidget {
   final String taskName;
   final String? taskStatus;
+  final String taskCategory;
   final String? taskDescription;
   final bool taskCompleted;
   final bool taskClockedIn;
@@ -21,6 +22,7 @@ class TaskTile extends StatelessWidget {
     super.key,
     required this.taskName,
     this.taskStatus,
+    required this.taskCategory,
     this.taskDescription,
     required this.taskCompleted,
     required this.onChanged,
@@ -32,6 +34,7 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      //color: Colors.red,
       child: Padding(
         padding: const EdgeInsets.all(15),
         child: Slidable(
@@ -49,53 +52,65 @@ class TaskTile extends StatelessWidget {
           child: GestureDetector(
             onTap: detailDialogFunction,
             child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Checkbox(
-                    value: taskCompleted,
-                    onChanged: onChanged,
-                  ),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  //color: Colors.yellow,
+                ),
+                child: (Column(
+                  children: [
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Checkbox(
+                          value: taskCompleted,
+                          onChanged: onChanged,
+                        ),
 
-                  Visibility(
-                      visible: taskClockedIn,
-                      child: Icon(Icons
-                          .punch_clock)), // shown if task has currently running clock
+                        Visibility(
+                            visible: taskClockedIn,
+                            child: Icon(Icons
+                                .punch_clock)), // shown if task has currently running clock
 
-                  Card(
-                    margin: EdgeInsets.all(8.0),
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(taskStatus ?? "-"),
+                        Card(
+                          margin: EdgeInsets.all(8.0),
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Text(taskStatus ?? "-"),
+                          ),
+                        ),
+
+                        //Task Name
+                        Text(
+                          taskName,
+                          style: TextStyle(
+                            decoration: taskCompleted
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                          ),
+                        ),
+
+                        Spacer(),
+
+                        ElevatedButton(
+                          onPressed: () => deleteFunction != null
+                              ? deleteFunction!(context)
+                              : null,
+                          child: Icon(Icons.delete),
+                        ),
+                      ],
                     ),
-                  ),
-
-                  //Task Name
-                  Text(
-                    taskName,
-                    style: TextStyle(
-                      decoration: taskCompleted
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
-                    ),
-                  ),
-
-                  Spacer(),
-
-                  ElevatedButton(
-                    onPressed: () => deleteFunction != null
-                        ? deleteFunction!(context)
-                        : null,
-                    child: Icon(Icons.delete),
-                  ),
-                ],
-              ),
-            ),
+                    Row(
+                      children: [
+                        Text(taskCategory),
+                        Spacer(),
+                        Text(taskDescription ?? ""),
+                      ],
+                    )
+                  ],
+                ))),
           ),
         ),
       ),

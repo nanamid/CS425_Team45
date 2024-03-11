@@ -60,7 +60,7 @@ class Task {
   @HiveField(2) // default is TODO, set in constructor
   String taskStatus; // TODO should be TaskStatus object
 
-  @HiveField(3, defaultValue: "none")
+  @HiveField(3, defaultValue: "Study Hour")
   String? taskLabel;
 
   @HiveField(4, defaultValue: "none")
