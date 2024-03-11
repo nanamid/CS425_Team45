@@ -26,7 +26,7 @@ class DialogBox extends StatelessWidget {
     required this.onSave,
     required this.onCancel,
     this.confirmSave = false,
-    this.confirmCancel = false,
+    this.confirmCancel = false, required content,
   });
 
   @override

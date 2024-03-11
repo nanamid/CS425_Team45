@@ -11,6 +11,13 @@ import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
 
+const List<String> list = <String>[
+  'Study Hour',
+  'Homework',
+  'Project',
+  'Programming'
+];
+
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
   @override
@@ -63,12 +70,15 @@ class _TaskPageState extends State<TaskPage> {
 
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
-  void saveNewTask() {
+  void saveNewTask(taskCategory) {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     setState(() {
       currentTaskList.add(Task(
         taskID: 0,
         taskName: _controller.text,
+        taskLabel: taskCategory ?? "Unlabeled",
+        taskDescription:
+            "Task description here", // Placeholder for task description
         taskStatus: "TODO", // TODO should be TaskStatus object
       ));
       //Clears the textbox for the next task
@@ -81,14 +91,49 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for clicking the 'add task' plus button
   // Uses controller for text input
   void createNewTask() {
+    String _selectedTaskType = list.first;
     showDialog(
       context: context,
       builder: (context) {
-        return DialogBox(
-          controller: _controller,
-          onSave: saveNewTask,
-          onCancel: () => Navigator.of(context).pop(),
-          confirmCancel: true,
+        // Assuming DialogBox is a custom dialog widget you've defined
+        // For simplicity, replaced with AlertDialog in this example
+        return AlertDialog(
+          title: Text("New Task"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _controller,
+                decoration: InputDecoration(hintText: "Task Name"),
+              ),
+              DropdownMenu<String>(
+                width: 220,
+                hintText: "Select Task Type",
+                initialSelection: list.first,
+                onSelected: (String? value) {
+                  // This is called when the user selects an item.
+                  setState(() {
+                    _selectedTaskType = value!;
+                  });
+                },
+                dropdownMenuEntries:
+                    list.map<DropdownMenuEntry<String>>((String value) {
+                  return DropdownMenuEntry<String>(value: value, label: value);
+                }).toList(),
+              ),
+              // Add more input fields for additional task details if needed
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Save'),
+              onPressed: () => saveNewTask(_selectedTaskType),
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
         );
       },
     );
@@ -295,6 +340,7 @@ class _TaskPageState extends State<TaskPage> {
           Task currentTask = currentTaskList[index];
           return TaskTile(
             taskName: currentTask.taskName ?? "NoName",
+            taskCategory: currentTask.taskLabel ?? "NoCategory",
             taskStatus: currentTask.taskStatus.toString(),
             taskCompleted:
                 currentTask.taskStatus.toString() == "DONE" ? true : false,
