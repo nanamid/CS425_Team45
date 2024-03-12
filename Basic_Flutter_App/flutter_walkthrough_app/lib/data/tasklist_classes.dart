@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
 // try first a: `dart run build_runner build`
@@ -9,56 +10,68 @@ part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dar
 @HiveType(typeId: 0)
 class TaskList {
   @HiveField(0)
-  final int listID; // 0 is default tasklist, otherwise TODO make this a uuid
+  String?
+      _listUUID; // This really should be a late final String, but hive had problems // TODO fix this
+  String? get listUUID => _listUUID;
 
   @HiveField(1)
-  List<Task> list = <Task>[];
+  final String? listName;
 
-  TaskList({
-    required this.listID,
-  });
+  @HiveField(2)
+  List<Task> _list = <Task>[];
+  List<Task> get list => List.unmodifiable(
+      _list); // the list itself is unmodifiable, but the tasks inside should be modifiable
+
+  bool addTask(Task newTask) {
+    if (_list.where((task) => task == newTask).isNotEmpty) {
+      print("Couldn't add task, child already exists");
+      return false;
+    }
+    _list.add(newTask);
+    print("Added Task UUID: ${newTask.taskUUID}");
+    return true;
+  }
+
+  bool removeTask(Task removedTask) {
+    bool result = _list.remove(removedTask);
+    if (result == false) {
+      print("Could not remove task");
+    }
+    return result;
+  }
+
+  TaskList({this.listName}) {
+    Uuid uuid = Uuid();
+    _listUUID = uuid.v4(); // generates a v4 (random) uuid
+  }
 }
 
-// TODO make a type for allowed values in the TaskStatus field
 // IE. TODO, DONE, WAIT
-// An enum worked the way I wanted, but Hive couldn't store it
+@HiveType(typeId: 1)
+enum TaskStatus {
+  @HiveField(0)
+  TODO,
 
-// enum TaskStatus {
-//   @HiveField(0)
-//   TODO,
+  @HiveField(1)
+  DONE,
 
-//   @HiveField(1)
-//   DONE,
-// }
-
-// This gave Hive trouble for some reason
-// @HiveType(typeId: 1)
-// class TaskStatus {
-//   @HiveField(0, defaultValue: "-")
-//   final String _status;
-
-//   const TaskStatus() : _status = "-"; // no status
-//   const TaskStatus.TODO() : _status = "TODO";
-//   const TaskStatus.DONE() : _status = "DONE";
-//   const TaskStatus.WAIT() : _status = "WAIT";
-
-//   @override
-//   String toString() {
-//     return _status;
-//   }
-// }
+  @HiveField(2)
+  WAIT,
+}
 
 // Task
 @HiveType(typeId: 2)
 class Task {
-  @HiveField(0, defaultValue: -1)
-  final int taskID; // TODO make this a uuid
+  // @HiveField(0, defaultValue: "-1")
+  @HiveField(0)
+  String? _taskUUID;
+  String? get taskUUID => _taskUUID;
 
   @HiveField(1, defaultValue: "none")
-  String? taskName;
+  String taskName;
 
-  @HiveField(2) // default is TODO, set in constructor
-  String taskStatus; // TODO should be TaskStatus object
+  @HiveField(2, defaultValue: TaskStatus.TODO)
+  TaskStatus taskStatus;
 
   @HiveField(3, defaultValue: "none")
   String? taskLabel;
@@ -66,21 +79,30 @@ class Task {
   @HiveField(4, defaultValue: "none")
   String? taskDescription;
 
-  // @HiveField(5, defaultValue: )
-  // DateTime? taskDeadline;
+  // @HiveField(5, defaultValue: DateTime(0))
+  @HiveField(5) // requires defaultValue to be const, which DateTime isn't
+  DateTime? _taskDeadline; // has to be set alongside an alarm
 
   @HiveField(6)
+  List<DateTime> _taskReminders = []; // has to be set alongside an alarm
+
+  @HiveField(7)
   List<List<DateTime?>> clockList = // TODO make private?
       []; // intended as mutable list of mutable [DateTime, DateTime?]
 
-  @HiveField(7)
+  @HiveField(8)
   int totalTime_minutes = 0; // 0
-
   int totalTime_secs = 0; // for testing
 
-  @HiveField(8)
+  @HiveField(9)
   bool _clockRunning = false;
   bool get clockRunning => _clockRunning; // allow read but no write
+
+  @HiveField(10)
+  List<Task> taskSubtasks = [];
+
+  @HiveField(11)
+  Task? taskParentTask;
 
   /// adds a clock entry to the task structure
   /// returns false when cannot add entry, like when a clock is already open.
@@ -131,14 +153,43 @@ class Task {
     return true;
   }
 
+  /// set a task to be child of this task
+  bool setSubTask(Task newChild) {
+    if (taskSubtasks.where((task) => task == newChild).isNotEmpty) {
+      print("Couldn't add sub task, child already exists");
+      return false;
+    }
+    if (identical(this, newChild))
+    {
+      print("Couldn't add subtask, is itself");
+      return false;
+    }
+    newChild.taskParentTask = this;
+    taskSubtasks.add(newChild);
+    return true;
+  }
+
+  /// Separate a child from this parent task
+  bool unsetSubTask(Task separatedChild) {
+    if (taskSubtasks.where((task) => task == separatedChild).isEmpty) {
+      print("Couldn't separate child from parent, task not a child");
+      return false;
+    }
+    separatedChild.taskParentTask = this.taskParentTask;
+    taskSubtasks.remove(separatedChild);
+    return true;
+  }
+
   Task({
-    required this.taskID,
-    this.taskName,
-    this.taskStatus = "TODO",
+    required this.taskName,
+    this.taskStatus = TaskStatus.TODO,
     this.taskLabel,
     this.taskDescription,
-    // timeclocks not set in constructor
-  });
+    // deadline, reminders, clocklist, subtasks, parenttask set with methods
+  }) {
+    Uuid uuid = Uuid();
+    _taskUUID = uuid.v4();
+  }
 }
 
 // TODO instead of a list of lists, how about a timestamp pair class?
