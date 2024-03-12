@@ -21,7 +21,6 @@ class _BattlePageState extends State<BattlePage> {
     userAvatar = Avatar(name: "User Titan", health: 100, attackPower: 2);
     botAvatar = Avatar(name: "Bot Titan", health: 100, attackPower: 1);
     battle = Battle(user: userAvatar, bot: botAvatar);
-    battle.calculateBotHealth();
   }
 
   void performAttack() {

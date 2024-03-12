@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/pages/battle_page.dart';
 import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/pages/auth/user_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 
@@ -63,10 +64,10 @@ class _HomePageState extends State<HomePage> {
       wantAppBar: true,
     ),
     ViewDestination(
-      label: 'XP',
-      icon: Icon(Icons.star_outline),
-      selectedIcon: Icon(Icons.star),
-      widget: Placeholder(),
+      label: 'Battle',
+      icon: Icon(Icons.sports_martial_arts),
+      selectedIcon: Icon(Icons.sports_martial_arts),
+      widget: BattlePage(),
     ),
     ViewDestination(
       // show an example of a full screen page, using navigator push instead
