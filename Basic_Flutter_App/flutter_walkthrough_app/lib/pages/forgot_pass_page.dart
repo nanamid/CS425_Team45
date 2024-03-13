@@ -40,6 +40,24 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
   }
 
+  void emailCheckDialog() {
+    // ignore: use_build_context_synchronously
+    showDialog(
+      context: context,
+      builder: (context){
+        return AlertDialog(
+          content: Text('Password Reset Email Sent!'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ]
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
