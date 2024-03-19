@@ -16,7 +16,7 @@ void main() {
       expect(rm.taskReminderMap, isEmpty);
     });
     test('list getters are unmodifiable', () {
-      final Reminder reminder = Reminder(DateTime.now(), DateTime.now(), (){});
+      final Reminder reminder = Reminder(DateTime.now(), DateTime.now(), () {});
       final ReminderManager rm = ReminderManager();
       try {
         rm.alarmIDs.add(5);
@@ -63,14 +63,15 @@ void main() {
     });
     test('reminder for deadline', () {
       final ReminderManager rm = ReminderManager();
-      final r = rm.createReminderForDeadline(DateTime.now().add(Duration(seconds: 1)));
+      final r = rm
+          .createReminderForDeadline(DateTime.now().add(Duration(seconds: 1)));
       expect(rm.allReminders, contains(r));
     });
     test('register task with reminder', () {
       final ReminderManager rm = ReminderManager();
       final reminder = rm.createReminderForTimer(Duration(seconds: 1));
       final Task task = Task(taskName: "foo");
-      
+
       expect(rm.taskReminderMap, isEmpty);
       rm.registerTaskWithReminder(reminder, task);
       expect(rm.taskReminderMap, isNotEmpty);
@@ -80,7 +81,7 @@ void main() {
       final ReminderManager rm = ReminderManager();
       final reminder = rm.createReminderForTimer(Duration(seconds: 1));
       final Task task = Task(taskName: "foo");
-      
+
       rm.registerTaskWithReminder(reminder, task);
       rm.registerTaskWithReminder(reminder, task);
       expect(rm.taskReminderMap, containsPair(reminder, task));
@@ -93,7 +94,7 @@ void main() {
       final reminder1 = rm.createReminderForTimer(Duration(seconds: 1));
       final reminder2 = rm.createReminderForTimer(Duration(seconds: 1));
       final Task task = Task(taskName: "foo");
-      
+
       rm.registerTaskWithReminder(reminder1, task);
       rm.registerTaskWithReminder(reminder2, task);
       expect(rm.taskReminderMap, containsPair(reminder1, task));
@@ -166,29 +167,35 @@ void main() {
       List<Reminder> list = rm.getAllRemindersOfTask(task);
       expect(list, <Reminder>[reminder1, reminder3]);
     });
-    test('reminder manager callbacks', () => null, skip: "TODO reminder manager callbacks");
+    test('reminder manager callbacks', () => null,
+        skip: "TODO reminder manager callbacks");
   });
   group('test Reminder object', () {
-    dummyCallback(){};
+    dummyCallback() {}
+    ;
     test('Constructor', () async {
-      final Reminder a = Reminder(DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+      final Reminder a = Reminder(DateTime.now(),
+          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
       expect(a.timer.isActive, isTrue);
-      await(Future.delayed(Duration(milliseconds: 2)));
+      await (Future.delayed(Duration(milliseconds: 2)));
     });
     test('reminder total duration', () async {
-      final Reminder a = Reminder(DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+      final Reminder a = Reminder(DateTime.now(),
+          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
       expect(a.totalDuration.inMilliseconds, 1);
-      await(Future.delayed(Duration(milliseconds: 2)));
+      await (Future.delayed(Duration(milliseconds: 2)));
     });
     test('reminder remaining duration', () async {
-      final Reminder a = Reminder(DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+      final Reminder a = Reminder(DateTime.now(),
+          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
       expect(a.remainingDuration, lessThan(a.totalDuration));
-      await(Future.delayed(Duration(milliseconds: 2)));
+      await (Future.delayed(Duration(milliseconds: 2)));
     });
     test('reminder callback', () async {
       bool fired = false;
-      final Reminder a = Reminder(DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)), () => fired = true);
-      await(Future.delayed(Duration(milliseconds: 2)));
+      final Reminder a = Reminder(DateTime.now(),
+          DateTime.now().add(Duration(milliseconds: 1)), () => fired = true);
+      await (Future.delayed(Duration(milliseconds: 2)));
       expect(fired, isTrue);
     });
   });
