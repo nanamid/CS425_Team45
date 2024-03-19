@@ -37,6 +37,29 @@ class _RegisterPageState extends State<RegisterPage> {
 
   //This function confirms the new account and sends it to the database
   Future signUp() async {
+    //Before attempting to confirm the account, we check that...
+    //    1.) The password text fields match
+    //    2.) The password is 10 or more characters
+    bool matchNewPassword = passwordConfirmed();
+    if (matchNewPassword) {
+      validatePassword(_emailController.text.trim()); //Still working on it
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text('Passwords must match.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -79,13 +102,35 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  //This function checks the length of the password
+  //The code was derived from this StackOverflow thread:
+  // https://stackoverflow.com/questions/56253787/how-to-handle-textfield-validation-in-password-in-flutter
+  void validatePassword(String input) {
+    if (input.length < 10) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text('Passwords must be 10 or more characters.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   //This function confirms the password
   // confirmation is the same as the given password
   bool passwordConfirmed() {
-    if (_passwordController.text.trim() == _confirmController.text.trim()) {
-      return true;
-    } else {
+    if (_passwordController.text.trim() != _confirmController.text.trim()) {
       return false;
+    } else {
+      return true;
     }
   }
 
