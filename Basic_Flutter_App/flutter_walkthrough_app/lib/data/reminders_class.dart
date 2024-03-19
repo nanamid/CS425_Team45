@@ -40,7 +40,8 @@ class ReminderManager {
       {bool persistentNotification = false,
       bool timerEndNotification = true,
       bool alarm = true}) {
-    Reminder reminder = Reminder(DateTime.now(), DateTime.now().add(dura), (){});
+    Reminder reminder =
+        Reminder(DateTime.now(), DateTime.now().add(dura), () {});
 
     if (persistentNotification) {}
     if (timerEndNotification) {}
@@ -51,7 +52,7 @@ class ReminderManager {
   }
 
   Reminder createReminderForDeadline(DateTime deadline) {
-    Reminder reminder = Reminder(DateTime.now(), deadline, (){});
+    Reminder reminder = Reminder(DateTime.now(), deadline, () {});
     _allReminders.add(reminder);
     return reminder;
   }
@@ -108,8 +109,7 @@ class Reminder {
 
   // think of this as a destructor
   // rather than relying on a finalizer, just explicitly kill the reminder
-  void killReminder()
-  {
+  void killReminder() {
     this.timer.cancel();
   }
 
