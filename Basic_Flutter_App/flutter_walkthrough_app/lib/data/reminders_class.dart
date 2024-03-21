@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:isolate';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'dart:async';
+import 'dart:math';
 
 /* 
 needs to set/unset ongoing notification/alarm
@@ -12,8 +13,12 @@ needs to set/unset pomodoro timer notification/alarm
 purpose is to abstract away alarm id management
 */
 class ReminderManager {
-  final List<int> _alarmIDs = [];
-  List<int> get alarmIDs => List.unmodifiable(_alarmIDs);
+  final Map<int, Reminder> _alarmIDToReminder = Map<int, Reminder>();
+  Map<int, Reminder> alarmIDToReminder = Map<int, Reminder>();
+
+  final Map<int, Reminder> _notificationIDToReminder = Map<int, Reminder>();
+  Map<int, Reminder> get notificationIDToReminder =>
+      Map.unmodifiable(_notificationIDToReminder);
 
   final List<Reminder> _allReminders = [];
   List<Reminder> get allReminders => List.unmodifiable(_allReminders);
@@ -39,11 +44,30 @@ class ReminderManager {
   Reminder createReminderForTimer(Duration dura,
       {bool persistentNotification = false,
       bool timerEndNotification = true,
-      bool alarm = true}) {
-    Reminder reminder =
-        Reminder(DateTime.now(), DateTime.now().add(dura), () {});
+      bool alarm = true,
+      void Function()? timerCallback,
+      void Function()? alarmCallback}) {
+    return createReminderForDeadline(DateTime.now().add(dura),
+        persistentNotification: persistentNotification,
+        timerEndNotification: timerEndNotification,
+        alarm: alarm,
+        timerCallback: timerCallback,
+        alarmCallback: alarmCallback);
+  }
 
-    if (persistentNotification) {}
+  Reminder createReminderForDeadline(DateTime deadline,
+      {bool persistentNotification = false,
+      bool timerEndNotification = true,
+      bool alarm = true,
+      void Function()? timerCallback,
+      void Function()? alarmCallback}) {
+    Reminder reminder = Reminder(
+        DateTime.now(), deadline, genPrivateTimerCallback(timerCallback));
+
+    // remember to set a notification in the callback here
+    if (persistentNotification) {
+      _showPersistentReminder(reminder);
+    }
     if (timerEndNotification) {}
     if (alarm) {}
 
@@ -51,10 +75,13 @@ class ReminderManager {
     return reminder;
   }
 
-  Reminder createReminderForDeadline(DateTime deadline) {
-    Reminder reminder = Reminder(DateTime.now(), deadline, () {});
-    _allReminders.add(reminder);
-    return reminder;
+  void Function() genPrivateTimerCallback(void Function()? timerCallback) {
+    return () {
+      print("inside Reminder->_privateTimerCallback");
+      if (timerCallback != null) {
+        timerCallback();
+      }
+    };
   }
 
   void cancelReminder(Reminder reminder) {}
@@ -67,7 +94,7 @@ class ReminderManager {
     this._taskReminderMap[reminder] = task;
   }
 
-  void unregisterReminder(Reminder reminder) {
+  void unregisterReminderTask(Reminder reminder) {
     if (this._taskReminderMap[reminder] == null) {
       print('reminder-task pair does not exist');
       return;
@@ -91,6 +118,63 @@ class ReminderManager {
     return list;
   }
 
+  void _showPersistentReminder(Reminder reminder) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    List<ActiveNotification> allNotifications =
+        await (flutterLocalNotificationsPlugin.getActiveNotifications());
+
+    List<int> existingNotificationIDs = [];
+
+    allNotifications.forEach((element) {
+      existingNotificationIDs.add(element.id ?? -1);
+    });
+
+    int newKey = existingNotificationIDs.reduce(max);
+    _notificationIDToReminder[newKey] = reminder;
+    _showNotification(newKey, ongoing: true);
+  }
+
+  static void _showNotification(int id,
+      {String? title,
+      String? body,
+      String? payload,
+      bool ongoing = false}) async {
+    print(
+        "Inside _showOngoingNotification, isolate=${Isolate.current.hashCode}");
+    // Initialize the notification plugin
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    // Initialize settings for Android
+    var android = AndroidInitializationSettings('app_icon');
+    var initializationSettings = InitializationSettings(android: android);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    // Define the notification details
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'testChannel',
+      'testChannelName',
+      channelDescription: 'testDescription',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      ongoing: ongoing,
+    );
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    // Show the notification
+    await flutterLocalNotificationsPlugin.show(
+      id, // 1 is notification id for ongoing timer
+      title ?? 'title',
+      body ?? 'body',
+      platformChannelSpecifics,
+      payload: payload ?? 'payload',
+    );
+  }
+
   ReminderManager();
 }
 
@@ -108,17 +192,17 @@ class Reminder {
   Duration get remainingDuration => _timerEndTime.difference(DateTime.now());
 
   // think of this as a destructor
-  // rather than relying on a finalizer, just explicitly kill the reminder
+  // rather than relying on a finalizer, just explicitly kill the reminder timer
   void killReminder() {
     this.timer.cancel();
   }
 
-  Reminder(DateTime startTime, DateTime endTime, void Function() callback)
+  Reminder(DateTime startTime, DateTime endTime, void Function() timerCallback)
       : this._timerStartTime = startTime,
         this._timerEndTime = endTime {
     timer = Timer(this.totalDuration, () {
       print("Reminder callback fired");
-      callback();
+      timerCallback();
     });
   }
 }
