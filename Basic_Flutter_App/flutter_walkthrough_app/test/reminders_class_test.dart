@@ -2,6 +2,7 @@ import 'package:test_app/data/reminders_class.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/data/tasklist_classes.dart';
+import 'package:fake_async/fake_async.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -171,19 +172,21 @@ void main() {
     });
     test(
       'reminder manager timer callbacks',
-      () async {
-        bool fired1 = false;
-        bool fired2 = false;
-        final ReminderManager rm = ReminderManager();
-        final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
-            timerCallback: () => fired1 = true);
-        final reminder2 = rm.createReminderForDeadline(
-            DateTime.now().add(Duration(milliseconds: 1)),
-            timerCallback: () => fired2 = true);
+      () {
+        fakeAsync((async) {
+          bool fired1 = false;
+          bool fired2 = false;
+          final ReminderManager rm = ReminderManager();
+          final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
+              timerCallback: () => fired1 = true);
+          final reminder2 = rm.createReminderForDeadline(
+              DateTime.now().add(Duration(milliseconds: 1)),
+              timerCallback: () => fired2 = true);
 
-        await (Future.delayed(Duration(milliseconds: 1)));
-        expect(fired1, isTrue);
-        expect(fired2, isTrue);
+          async.elapse(Duration(milliseconds: 1));
+          expect(fired1, isTrue);
+          expect(fired2, isTrue);
+        });
       },
     );
     test('reminder sets persistent notification', () {
@@ -202,29 +205,37 @@ void main() {
   });
   group('test Reminder object', () {
     test('Constructor', () async {
-      final Reminder a = Reminder(DateTime.now(),
-          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
-      expect(a.timer.isActive, isTrue);
-      await (Future.delayed(Duration(milliseconds: 2)));
+      fakeAsync((async) {
+        final Reminder a = Reminder(DateTime.now(),
+            DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+        expect(a.timer.isActive, isTrue);
+        async.elapse(Duration(milliseconds: 2));
+      });
     });
     test('reminder total duration', () async {
-      final Reminder a = Reminder(DateTime.now(),
-          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
-      expect(a.totalDuration.inMilliseconds, 1);
-      await (Future.delayed(Duration(milliseconds: 2)));
+      fakeAsync((async) {
+        final Reminder a = Reminder(DateTime.now(),
+            DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+        expect(a.totalDuration.inMilliseconds, 1);
+        async.elapse(Duration(milliseconds: 2));
+      });
     });
     test('reminder remaining duration', () async {
-      final Reminder a = Reminder(DateTime.now(),
-          DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
-      expect(a.remainingDuration, lessThan(a.totalDuration));
-      await (Future.delayed(Duration(milliseconds: 2)));
+      fakeAsync((async) {
+        final Reminder a = Reminder(DateTime.now(),
+            DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+        expect(a.remainingDuration, lessThan(a.totalDuration));
+        async.elapse(Duration(milliseconds: 2));
+      });
     });
     test('reminder callback', () async {
-      bool fired = false;
-      final Reminder a = Reminder(DateTime.now(),
-          DateTime.now().add(Duration(milliseconds: 1)), () => fired = true);
-      await (Future.delayed(Duration(milliseconds: 2)));
-      expect(fired, isTrue);
+      fakeAsync((async) {
+        bool fired = false;
+        final Reminder a = Reminder(DateTime.now(),
+            DateTime.now().add(Duration(milliseconds: 1)), () => fired = true);
+        async.elapse(Duration(milliseconds: 2));
+        expect(fired, isTrue);
+      });
     });
   });
 }
