@@ -4,7 +4,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:test_app/data/password_checker.dart';
 
+//RegisterPage class declaration
 class RegisterPage extends StatefulWidget {
   final VoidCallback? showLoginPage;
   const RegisterPage({
@@ -26,6 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  bool _isStrong = false;
 
   @override
   void dispose() {
@@ -39,10 +42,68 @@ class _RegisterPageState extends State<RegisterPage> {
   Future signUp() async {
     //Before attempting to confirm the account, we check that...
     //    1.) The password text fields match
-    //    2.) The password is 10 or more characters
+    //    2.) The password meets the strong password criteria
     bool matchNewPassword = passwordConfirmed();
     if (matchNewPassword) {
-      validatePassword(_emailController.text.trim()); //Still working on it
+      if (_isStrong) {
+        try {
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+        } on FirebaseAuthException catch (e) {
+          if (_emailController.text.isEmpty ||
+              _passwordController.text.isEmpty) {
+            // ignore: use_build_context_synchronously
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text('No Login Credentials Found!'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            // ignore: use_build_context_synchronously
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text(e.message.toString()),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        }
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text('Password not strong enough.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
     } else {
       showDialog(
         context: context,
@@ -60,46 +121,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-        // ignore: use_build_context_synchronously
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: Text('No Login Credentials Found!'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        // ignore: use_build_context_synchronously
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: Text(e.message.toString()),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
+    //
   }
 
   //This function checks the length of the password
@@ -230,6 +252,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 SizedBox(height: 10),
+                AnimatedBuilder(
+                  animation: _passwordController,
+                  builder: (context, child) {
+                    final password = _passwordController.text;
+                    return PasswordStrengthChecker(
+                      password: password,
+                      onStrengthChanged: (bool value) {
+                        setState(() {
+                          _isStrong = value;
+                        });
+                      },
+                    );
+                  },
+                ),
 
                 //Sign-In Button
                 Padding(
