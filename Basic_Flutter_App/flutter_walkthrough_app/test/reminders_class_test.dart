@@ -5,10 +5,12 @@ import 'package:test_app/data/tasklist_classes.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  void dummyCallback() {}
+  ;
   group('test reminders class', () {
     test('Constructor', () {
       final ReminderManager rm = ReminderManager();
-      expect(rm.alarmIDs, isEmpty);
+      expect(rm.alarmIDToReminder, isEmpty);
       expect(rm.allReminders, isEmpty);
       expect(rm.remindersWithPersistentNotifications, isEmpty);
       expect(rm.remindersWithEndNotifications, isEmpty);
@@ -19,7 +21,7 @@ void main() {
       final Reminder reminder = Reminder(DateTime.now(), DateTime.now(), () {});
       final ReminderManager rm = ReminderManager();
       try {
-        rm.alarmIDs.add(5);
+        rm.alarmIDToReminder[5] = reminder;
       } catch (e) {
         expect(e, isUnsupportedError);
       }
@@ -112,10 +114,10 @@ void main() {
       rm.registerTaskWithReminder(reminder2, task2);
       rm.registerTaskWithReminder(reminder3, task2);
 
-      rm.unregisterReminder(reminder1);
+      rm.unregisterReminderTask(reminder1);
       expect(rm.taskReminderMap, isNot(containsPair(reminder1, task1)));
 
-      rm.unregisterReminder(reminder2);
+      rm.unregisterReminderTask(reminder2);
       // task2 still has reminder3
       expect(rm.taskReminderMap, containsPair(reminder3, task2));
     });
@@ -124,7 +126,7 @@ void main() {
       final reminder1 = rm.createReminderForTimer(Duration(seconds: 1));
 
       expect(rm.taskReminderMap, isEmpty);
-      rm.unregisterReminder(reminder1);
+      rm.unregisterReminderTask(reminder1);
       expect(rm.taskReminderMap, isEmpty);
     });
     test('unregister all reminders of a task', () {
@@ -167,12 +169,38 @@ void main() {
       List<Reminder> list = rm.getAllRemindersOfTask(task);
       expect(list, <Reminder>[reminder1, reminder3]);
     });
-    test('reminder manager callbacks', () => null,
-        skip: "TODO reminder manager callbacks");
+    test(
+      'reminder manager timer callbacks',
+      () async {
+        bool fired1 = false;
+        bool fired2 = false;
+        final ReminderManager rm = ReminderManager();
+        final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
+            timerCallback: () => fired1 = true);
+        final reminder2 = rm.createReminderForDeadline(
+            DateTime.now().add(Duration(milliseconds: 1)),
+            timerCallback: () => fired2 = true);
+
+        await (Future.delayed(Duration(milliseconds: 1)));
+        expect(fired1, isTrue);
+        expect(fired2, isTrue);
+      },
+    );
+    test('reminder sets persistent notification', () {
+      final ReminderManager rm = ReminderManager();
+      final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
+          persistentNotification: true);
+      expect(rm.notificationIDToReminder.values, contains(reminder1));
+    }, skip: 'notifications require native code');
+    test('duplicate persistent reminder', () => null,
+        skip: 'notifications require native code');
+    test('reminder sets end notification', () {},
+        skip: 'notifications require native code');
+    test('reminder sets alarm', () {}, skip: "skip");
+    test('reminder manager alarm callbacks', () {}, skip: "skip");
+    test('cancel reminder', () => null, skip: "skip");
   });
   group('test Reminder object', () {
-    dummyCallback() {}
-    ;
     test('Constructor', () async {
       final Reminder a = Reminder(DateTime.now(),
           DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
