@@ -26,15 +26,9 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  //This function checks if the inputted email
-  // and password exist in the database
-  // Future signIn() async {
-  //   await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //     email: _emailController.text.trim(),
-  //     password: _passwordController.text.trim(),
-  //   );
-  // }
-
+  //This function attempts to sign in with the given credentials
+  //It returns an error message if no credentials were given or invalid
+  // credentials (e.g., malformed email) were used
   Future signIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(

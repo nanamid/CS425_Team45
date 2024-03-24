@@ -42,9 +42,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         },
       );
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email' ||
-          e.code == 'user-not-found' ||
-          _emailController.text.isEmpty) {
+      if (e.code.isEmpty == false || _emailController.text.isEmpty) {
         // ignore: use_build_context_synchronously
         showDialog(
           context: context,

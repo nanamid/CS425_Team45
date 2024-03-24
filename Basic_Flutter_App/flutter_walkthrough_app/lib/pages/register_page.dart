@@ -124,28 +124,6 @@ class _RegisterPageState extends State<RegisterPage> {
     //
   }
 
-  //This function checks the length of the password
-  //The code was derived from this StackOverflow thread:
-  // https://stackoverflow.com/questions/56253787/how-to-handle-textfield-validation-in-password-in-flutter
-  void validatePassword(String input) {
-    if (input.length < 10) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text('Passwords must be 10 or more characters.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
   //This function confirms the password
   // confirmation is the same as the given password
   bool passwordConfirmed() {
