@@ -2,6 +2,7 @@
 //WEB: https://www.youtube.com/watch?v=Mfa3u3naQew
 
 import 'package:firebase_auth/firebase_auth.dart';
+//
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_app/data/password_checker.dart';
@@ -24,15 +25,19 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   //Text Controllers
   //These variables hold the email and password entered by the user
-  //Compared to the login page, there is password confirmation
+  //Fields include email, username, password, and password confirmation
   final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+
+  //This controller is used to test the new password strength
   bool _isStrong = false;
 
   @override
   void dispose() {
     _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -124,6 +129,12 @@ class _RegisterPageState extends State<RegisterPage> {
     //
   }
 
+  //This function adds the user information (username)
+  /**/
+  Future addUserDetails() async {
+    //
+  }
+
   //This function confirms the password
   // confirmation is the same as the given password
   bool passwordConfirmed() {
@@ -163,7 +174,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 10),
 
-                //Username/Email Textfield
+                //Email Textfield
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: TextField(
@@ -178,6 +189,28 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
+                      fillColor: Colors.grey[200],
+                      filled: true,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+
+                //Username Textfield
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.blue),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'Username',
                       fillColor: Colors.grey[200],
                       filled: true,
                     ),
@@ -230,6 +263,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 SizedBox(height: 10),
+
+                //Password Strength Indicator Text
                 AnimatedBuilder(
                   animation: _passwordController,
                   builder: (context, child) {
