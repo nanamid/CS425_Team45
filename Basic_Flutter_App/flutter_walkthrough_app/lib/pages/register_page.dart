@@ -1,8 +1,8 @@
 //CODE FROM Mitch Koko (YouTube)
-//WEB: https://www.youtube.com/watch?v=Mfa3u3naQew, https://www.youtube.com/watch?v=rHIFJo4IbOE
+//WEB: https://www.youtube.com/watch?v=Mfa3u3naQew, https://www.youtube.com/watch?v=PBxbWZZTG2Q
 
 import 'package:firebase_auth/firebase_auth.dart';
-//
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_app/data/password_checker.dart';
@@ -41,6 +41,16 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
+  }
+
+  //This function adds the user information (email, username)
+  Future addUserDetails(String newEmail, String newUsername) async {
+    await FirebaseFirestore.instance.collection('users').add({
+      'email': newEmail,
+      'username': newUsername,
+      //Entry for tasks?
+      //Entry for avatar information?
+    });
   }
 
   //This function confirms the new account and sends it to the database
@@ -126,13 +136,14 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    //
-  }
 
-  //This function adds the user information (username)
-  /**/
-  Future addUserDetails() async {
-    //
+    //Add user details to the database (email, username)
+    addUserDetails(
+      _emailController.text.trim(),
+      _usernameController.text.trim(),
+      //Entry for tasks?
+      //Entry for avatar information?
+    );
   }
 
   //This function confirms the password
