@@ -4,6 +4,9 @@ import 'dart:isolate';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:mutex/mutex.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 /* 
 needs to set/unset ongoing notification/alarm
@@ -35,6 +38,8 @@ class ReminderManager {
   List<Reminder> get remindersWithAlarms =>
       List.unmodifiable(_remindersWithAlarms);
 
+  final Mutex _notificationIDMutex = Mutex();
+
   // it is important that it is <Reminder, Task> not <Task, Reminder>
   // Keys map to only one value, but one value can be associated with many keys
   // Each Reminder can only be associated with one task, while a Task can have multiple reminders
@@ -44,13 +49,11 @@ class ReminderManager {
   Reminder createReminderForTimer(Duration dura,
       {bool persistentNotification = false,
       bool timerEndNotification = true,
-      bool alarm = true,
       void Function()? timerCallback,
       void Function()? alarmCallback}) {
     return createReminderForDeadline(DateTime.now().add(dura),
         persistentNotification: persistentNotification,
         timerEndNotification: timerEndNotification,
-        alarm: alarm,
         timerCallback: timerCallback,
         alarmCallback: alarmCallback);
   }
@@ -58,18 +61,35 @@ class ReminderManager {
   Reminder createReminderForDeadline(DateTime deadline,
       {bool persistentNotification = false,
       bool timerEndNotification = true,
-      bool alarm = true,
       void Function()? timerCallback,
       void Function()? alarmCallback}) {
     Reminder reminder = Reminder(
         DateTime.now(), deadline, genPrivateTimerCallback(timerCallback));
 
+    late void Function() privateAlarmCallback;
+
     // remember to set a notification in the callback here
     if (persistentNotification) {
-      _showPersistentReminder(reminder);
+      _remindersWithPersistentNotifications.add(reminder);
+      _showPersistentNotification(reminder);
     }
-    if (timerEndNotification) {}
-    if (alarm) {}
+    if (timerEndNotification) {
+      _remindersWithEndNotifications.add(reminder);
+      privateAlarmCallback = () {
+        _showEndNotification(reminder);
+        if (alarmCallback != null) {
+          alarmCallback();
+        }
+      };
+
+      try {
+        AndroidAlarmManager.oneShotAt(
+                deadline, _findNextAvailableAlarmID(), privateAlarmCallback)
+            .timeout(Duration(seconds: 1));
+      } on TimeoutException {
+        print("Failed to set alarm: AndroidAlarmManager timed out");
+      }
+    }
 
     _allReminders.add(reminder);
     return reminder;
@@ -118,28 +138,68 @@ class ReminderManager {
     return list;
   }
 
-  void _showPersistentReminder(Reminder reminder) async {
+  Future<int> _findNextAvailableNotificationID() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
+    late final List<ActiveNotification> allNotifications;
+    final List<int> existingNotificationIDs =
+        _notificationIDToReminder.keys.toList();
 
-    List<ActiveNotification> allNotifications =
-        await (flutterLocalNotificationsPlugin.getActiveNotifications());
+    try {
+      allNotifications =
+          await (flutterLocalNotificationsPlugin.getActiveNotifications())
+              .timeout(Duration(seconds: 1));
+      allNotifications.forEach((element) {
+        existingNotificationIDs.add(element.id ?? -1);
+      });
+    } on TimeoutException {
+      print(
+          "Timed out waiting for LocalNotifications"); // this should only ever happen in tests (android not running)
+      // rethrow;
+    }
 
-    List<int> existingNotificationIDs = [];
+    // we still want this to run regardless of the timeout
+    // would not conflict with a reminder in notificationIDToReminder.keys, but could possibly conflict with a notification created outside this class
+    final int newKey = existingNotificationIDs.isEmpty
+        ? 0
+        : existingNotificationIDs.reduce(max) + 1;
 
-    allNotifications.forEach((element) {
-      existingNotificationIDs.add(element.id ?? -1);
-    });
+    return newKey;
+  }
 
-    int newKey = existingNotificationIDs.reduce(max);
+  _findNextAvailableAlarmID() {
+    final int newKey =
+        alarmIDToReminder.isEmpty ? 0 : alarmIDToReminder.keys.reduce(max) + 1;
+
+    return newKey;
+  }
+
+  void _showPersistentNotification(Reminder reminder) async {
+    // CRITICAL SECTION
+    await this._notificationIDMutex.acquire();
+    final int newKey = await _findNextAvailableNotificationID();
     _notificationIDToReminder[newKey] = reminder;
+    this._notificationIDMutex.release();
+    //
+
     _showNotification(newKey, ongoing: true);
   }
 
-  static void _showNotification(int id,
+  void _showEndNotification(Reminder reminder) async {
+    // CRITICAL SECTION
+    await this._notificationIDMutex.acquire();
+    final int newKey = await _findNextAvailableNotificationID();
+    _notificationIDToReminder[newKey] = reminder;
+    this._notificationIDMutex.release();
+    //
+    _showNotification(newKey);
+  }
+
+  static Future<void> _showNotification(int id,
       {String? title,
       String? body,
       String? payload,
+      DateTime? scheduleDeadline,
       bool ongoing = false}) async {
     print(
         "Inside _showOngoingNotification, isolate=${Isolate.current.hashCode}");
@@ -166,13 +226,24 @@ class ReminderManager {
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     // Show the notification
-    await flutterLocalNotificationsPlugin.show(
-      id, // 1 is notification id for ongoing timer
-      title ?? 'title',
-      body ?? 'body',
-      platformChannelSpecifics,
-      payload: payload ?? 'payload',
-    );
+    if (scheduleDeadline == null) {
+      return flutterLocalNotificationsPlugin.show(
+        id, // 1 is notification id for ongoing timer
+        title ?? 'title',
+        body ?? 'body',
+        platformChannelSpecifics,
+        payload: payload ?? 'payload',
+      );
+    } else if (scheduleDeadline != null) {
+      return flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title ?? 'title',
+          body ?? 'body',
+          tz.TZDateTime.from(scheduleDeadline, tz.local),
+          platformChannelSpecifics,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.wallClockTime);
+    }
   }
 
   ReminderManager();
