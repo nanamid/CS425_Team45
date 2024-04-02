@@ -2,6 +2,7 @@
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
@@ -13,6 +14,7 @@ import 'package:test_app/data/tasklist_classes.dart';
 import 'dart:isolate';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:test_app/utils/device/device_utility.dart';
 
 void main() async {
   //Initialize the Hive
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set status bar text color to white
+    AppDeviceUtils.setStatusBarColor(Colors.white);
+    
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       home: NavigationMenu(),

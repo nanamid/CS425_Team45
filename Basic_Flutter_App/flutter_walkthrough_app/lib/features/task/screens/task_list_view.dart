@@ -15,7 +15,7 @@ class TaskListView extends StatefulWidget {
 }
 
 class _TaskListViewState extends State<TaskListView> {
-  List<int> testing = [1,2,3];
+  List<int> testing = [1, 2, 3, 4, 5, 6, 7, 8];
 
   @override
   Widget build(BuildContext context) {
