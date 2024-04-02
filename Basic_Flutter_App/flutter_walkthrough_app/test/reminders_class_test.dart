@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:fake_async/fake_async.dart';
+import 'dart:async';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -190,15 +191,38 @@ void main() {
       },
     );
     test('reminder sets persistent notification', () {
-      final ReminderManager rm = ReminderManager();
-      final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
-          persistentNotification: true);
-      expect(rm.notificationIDToReminder.values, contains(reminder1));
-    }, skip: 'notifications require native code');
-    test('duplicate persistent reminder', () => null,
-        skip: 'notifications require native code');
-    test('reminder sets end notification', () {},
-        skip: 'notifications require native code');
+      fakeAsync((async) {
+        final ReminderManager rm = ReminderManager();
+        final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
+            persistentNotification: true);
+        final reminder2 = rm.createReminderForTimer(Duration(milliseconds: 1),
+            persistentNotification: true);
+        async.elapse(
+            Duration(seconds: 2)); // wait for platform notification to timeout
+        expect(rm.notificationIDToReminder.values, contains(reminder1));
+        expect(rm.notificationIDToReminder.values, contains(reminder2));
+        expect(rm.remindersWithPersistentNotifications, contains(reminder1));
+        expect(rm.remindersWithPersistentNotifications, contains(reminder2));
+      });
+    });
+    test('reminder sets end notification and alarm', () {
+      fakeAsync((async) {
+        AndroidAlarmManager.initialize();
+        final ReminderManager rm = ReminderManager();
+        final reminder1 = rm.createReminderForTimer(Duration(milliseconds: 1),
+            timerEndNotification: true);
+        final reminder2 = rm.createReminderForTimer(Duration(milliseconds: 1),
+            timerEndNotification: true);
+        async.elapse(Duration(seconds: 2));
+        expect(rm.notificationIDToReminder.values, contains(reminder1));
+        expect(rm.notificationIDToReminder.values, contains(reminder2));
+        expect(rm.alarmIDToReminder.values, contains(reminder1));
+        expect(rm.alarmIDToReminder.values, contains(reminder2));
+        expect(rm.remindersWithEndNotifications, contains(reminder1));
+        expect(rm.remindersWithEndNotifications, contains(reminder2));
+      });
+    });
+    test('reminders with persistent and end notification', () {});
     test('reminder sets alarm', () {}, skip: "skip");
     test('reminder manager alarm callbacks', () {}, skip: "skip");
     test('cancel reminder', () => null, skip: "skip");
