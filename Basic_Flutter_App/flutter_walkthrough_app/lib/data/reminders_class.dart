@@ -17,7 +17,8 @@ purpose is to abstract away alarm id management
 */
 class ReminderManager {
   final Map<int, Reminder> _alarmIDToReminder = Map<int, Reminder>();
-  Map<int, Reminder> alarmIDToReminder = Map<int, Reminder>();
+  Map<int, Reminder> get alarmIDToReminder =>
+      Map.unmodifiable(_alarmIDToReminder);
 
   final Map<int, Reminder> _notificationIDToReminder = Map<int, Reminder>();
   Map<int, Reminder> get notificationIDToReminder =>
@@ -39,6 +40,10 @@ class ReminderManager {
       List.unmodifiable(_remindersWithAlarms);
 
   final Mutex _notificationIDMutex = Mutex();
+  final Mutex _alarmIDMutex = Mutex();
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   // it is important that it is <Reminder, Task> not <Task, Reminder>
   // Keys map to only one value, but one value can be associated with many keys
@@ -49,11 +54,13 @@ class ReminderManager {
   Reminder createReminderForTimer(Duration dura,
       {bool persistentNotification = false,
       bool timerEndNotification = true,
+      bool alarm = false,
       void Function()? timerCallback,
       void Function()? alarmCallback}) {
     return createReminderForDeadline(DateTime.now().add(dura),
         persistentNotification: persistentNotification,
         timerEndNotification: timerEndNotification,
+        alarm: alarm,
         timerCallback: timerCallback,
         alarmCallback: alarmCallback);
   }
@@ -61,37 +68,26 @@ class ReminderManager {
   Reminder createReminderForDeadline(DateTime deadline,
       {bool persistentNotification = false,
       bool timerEndNotification = true,
+      bool alarm = false,
       void Function()? timerCallback,
       void Function()? alarmCallback}) {
     Reminder reminder = Reminder(
         DateTime.now(), deadline, genPrivateTimerCallback(timerCallback));
 
-    late void Function() privateAlarmCallback;
+    _allReminders.add(reminder);
 
-    // remember to set a notification in the callback here
     if (persistentNotification) {
       _remindersWithPersistentNotifications.add(reminder);
       _showPersistentNotification(reminder);
     }
     if (timerEndNotification) {
       _remindersWithEndNotifications.add(reminder);
-      privateAlarmCallback = () {
-        _showEndNotification(reminder);
-        if (alarmCallback != null) {
-          alarmCallback();
-        }
-      };
-
-      try {
-        AndroidAlarmManager.oneShotAt(
-                deadline, _findNextAvailableAlarmID(), privateAlarmCallback)
-            .timeout(Duration(seconds: 1));
-      } on TimeoutException {
-        print("Failed to set alarm: AndroidAlarmManager timed out");
-      }
+      _scheduleEndNotification(reminder, deadline);
     }
-
-    _allReminders.add(reminder);
+    if (alarm) {
+      _remindersWithAlarms.add(reminder);
+      _setAlarm(reminder, deadline, alarmCallback ?? () {});
+    }
     return reminder;
   }
 
@@ -104,7 +100,40 @@ class ReminderManager {
     };
   }
 
-  void cancelReminder(Reminder reminder) {}
+  void cancelReminder(Reminder reminder) async {
+    // cancel the reminder timer
+    reminder.killReminder();
+    _allReminders.removeWhere((element) => identical(element, reminder));
+
+    // CRITICAL SECTION
+    await _notificationIDMutex.acquire();
+    _notificationIDToReminder.forEach((key, value) {
+      if (identical(value, reminder)) {
+        flutterLocalNotificationsPlugin.cancel(key);
+      }
+    });
+    _notificationIDToReminder
+        .removeWhere((key, value) => identical(value, reminder));
+    _notificationIDMutex.release();
+    //
+
+    // CRITICAL SECTION
+    await _alarmIDMutex.acquire();
+    _alarmIDToReminder.forEach((key, value) {
+      if (identical(value, reminder)) {
+        AndroidAlarmManager.cancel(key);
+      }
+    });
+    _alarmIDToReminder.removeWhere((key, value) => identical(value, reminder));
+    _alarmIDMutex.release();
+    //
+
+    _remindersWithPersistentNotifications
+        .removeWhere((element) => identical(element, reminder));
+    _remindersWithEndNotifications
+        .removeWhere((element) => identical(element, reminder));
+    _remindersWithAlarms.removeWhere((element) => identical(element, reminder));
+  }
 
   void registerTaskWithReminder(Reminder reminder, Task task) {
     if (this._taskReminderMap[reminder] != null) {
@@ -127,7 +156,7 @@ class ReminderManager {
       print('task has no reminders registered');
       return;
     }
-    this._taskReminderMap.removeWhere((key, value) => value == task);
+    this._taskReminderMap.removeWhere((key, value) => identical(value, task));
   }
 
   List<Reminder> getAllRemindersOfTask(Task task) {
@@ -139,8 +168,6 @@ class ReminderManager {
   }
 
   Future<int> _findNextAvailableNotificationID() async {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
     late final List<ActiveNotification> allNotifications;
     final List<int> existingNotificationIDs =
         _notificationIDToReminder.keys.toList();
@@ -168,8 +195,9 @@ class ReminderManager {
   }
 
   _findNextAvailableAlarmID() {
-    final int newKey =
-        alarmIDToReminder.isEmpty ? 0 : alarmIDToReminder.keys.reduce(max) + 1;
+    final int newKey = _alarmIDToReminder.isEmpty
+        ? 0
+        : _alarmIDToReminder.keys.reduce(max) + 1;
 
     return newKey;
   }
@@ -182,17 +210,44 @@ class ReminderManager {
     this._notificationIDMutex.release();
     //
 
-    _showNotification(newKey, ongoing: true);
+    final Task? assignedTask = this._taskReminderMap[reminder];
+    _showNotification(newKey,
+        ongoing: true,
+        title: assignedTask?.taskName,
+        body: "Task Clock Open");
   }
 
-  void _showEndNotification(Reminder reminder) async {
+  void _scheduleEndNotification(Reminder reminder, DateTime deadline) async {
     // CRITICAL SECTION
     await this._notificationIDMutex.acquire();
     final int newKey = await _findNextAvailableNotificationID();
     _notificationIDToReminder[newKey] = reminder;
     this._notificationIDMutex.release();
     //
-    _showNotification(newKey);
+
+    final Task? assignedTask = this._taskReminderMap[reminder];
+    _showNotification(newKey,
+        scheduleDeadline: deadline,
+        title: assignedTask?.taskName,
+        body: "Task Reminder");
+  }
+
+  void _setAlarm(
+      Reminder reminder, DateTime deadline, Function alarmCallback) async {
+    // CRITICAL SECTION
+    await this._alarmIDMutex.acquire();
+    final int newKey = await _findNextAvailableAlarmID();
+    _alarmIDToReminder[newKey] = reminder;
+    this._alarmIDMutex.release();
+    //
+
+    try {
+      AndroidAlarmManager.oneShotAt(
+              deadline, _findNextAvailableAlarmID(), alarmCallback)
+          .timeout(Duration(seconds: 1));
+    } on TimeoutException {
+      print("Failed to set alarm: AndroidAlarmManager timed out");
+    }
   }
 
   static Future<void> _showNotification(int id,
@@ -201,8 +256,7 @@ class ReminderManager {
       String? payload,
       DateTime? scheduleDeadline,
       bool ongoing = false}) async {
-    print(
-        "Inside _showOngoingNotification, isolate=${Isolate.current.hashCode}");
+    print("Inside _showNotification, isolate=${Isolate.current.hashCode}");
     // Initialize the notification plugin
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
