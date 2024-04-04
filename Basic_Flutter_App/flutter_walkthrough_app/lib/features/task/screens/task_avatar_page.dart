@@ -42,26 +42,7 @@ class TaskAvatarView extends StatelessWidget {
             //Task Stats
 
             child: Row(
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: buildText(
-                        "Total Tasks: ${TaskAvatarController.totalTasks}",
-                        Colors.white,
-                        AppSizes.textLarge,
-                        FontWeight.w500,
-                        TextAlign.start,
-                        TextOverflow.clip)),
-                Expanded(
-                    flex: 2,
-                    child: buildText(
-                        "Remaining Tasks: ${TaskAvatarController.remainingTasks}",
-                        Colors.white,
-                        AppSizes.textLarge,
-                        FontWeight.w500,
-                        TextAlign.start,
-                        TextOverflow.clip)),
-              ],
+              
             ),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_app/features/task/screens/task_page.dart';
+import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 
 class NavigationMenu extends StatelessWidget {
@@ -13,7 +14,7 @@ class NavigationMenu extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: Obx(
         () => NavigationBar(
-          backgroundColor: Color(0xFF69325B),
+          backgroundColor: AppColors.accent,
           height: 90,
           elevation: 0,
           selectedIndex: controller.selectedIndex.value,

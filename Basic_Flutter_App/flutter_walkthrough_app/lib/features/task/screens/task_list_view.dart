@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
+import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
@@ -15,7 +16,7 @@ class TaskListView extends StatefulWidget {
 }
 
 class _TaskListViewState extends State<TaskListView> {
-  List<int> testing = [1, 2, 3, 4, 5, 6, 7, 8];
+  List<int> testing = [1, 2, 3, 4, ];
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,9 @@ class _TaskListViewState extends State<TaskListView> {
     return Container(
       decoration: BoxDecoration(
           //color: testing.clrLvl2,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          color: AppColors.secondary,
+          ),
       child: testing.isNotEmpty
 
           //Task List HAS ITEMS
@@ -41,7 +44,8 @@ class _TaskListViewState extends State<TaskListView> {
                     HapticFeedback.mediumImpact();
                     //testing.deleteTask(index);
                     
-                    setState(() {testing.removeAt(index); // Modify the list inside setState
+                    setState(() {
+                      testing.removeAt(index); // Modify the list inside setState
                      });
                   },
                   background: Container(
@@ -62,7 +66,7 @@ class _TaskListViewState extends State<TaskListView> {
               },
             )
           :
-          //Task List IS EMPTY | if All Tasks Done Show this Widgets
+          //Task List IS EMPTY -> Lottie Animation | if All Tasks Done Show this Widgets
           Column(
               mainAxisAlignment: MainAxisAlignment.center,
               //Output if the list IS EMPTY

@@ -14,6 +14,7 @@ class ImageStrings {
 
   // -- Misc Icons
   static const String categoryIcon = "assets/icons/category_icon.png";
+  static const String swordIcon = "assets/icons/sword_icon.png";
 
   
   // -- Backgrounds
