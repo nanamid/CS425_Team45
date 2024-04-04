@@ -177,6 +177,7 @@ class ReminderManager {
           await (flutterLocalNotificationsPlugin.getActiveNotifications())
               .timeout(Duration(seconds: 1));
       allNotifications.forEach((element) {
+        print("Existing notification id: ${element.id}");
         existingNotificationIDs.add(element.id ?? -1);
       });
     } on TimeoutException {
@@ -289,6 +290,7 @@ class ReminderManager {
         payload: payload ?? 'payload',
       );
     } else if (scheduleDeadline != null) {
+      tz.initializeTimeZones();
       return flutterLocalNotificationsPlugin.zonedSchedule(
           id,
           title ?? 'title',
@@ -330,4 +332,28 @@ class Reminder {
       timerCallback();
     });
   }
+}
+
+/// Intended as a quick and dirty manual test to show some notifications
+/// Just call this somewhere when the app is running
+void testReminders() async
+{
+  final reminderManager = ReminderManager();
+  var reminder = reminderManager.createReminderForDeadline(
+      DateTime.now().add(Duration(seconds: 5)),
+      persistentNotification: true,
+      alarm: true,
+      alarmCallback: alarmCallback);
+
+  var activeNotifications = await reminderManager
+      .flutterLocalNotificationsPlugin
+      .getActiveNotifications();
+  print(activeNotifications);
+  await Future.delayed(Duration(seconds: 10));
+  reminderManager.cancelReminder(reminder);
+}
+
+@pragma('vm:entry-point')
+void alarmCallback() {
+    print("Inside alarmCallback");
 }
