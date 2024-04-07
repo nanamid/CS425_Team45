@@ -46,7 +46,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
+  //final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
 
   List<ViewDestination> destinations = <ViewDestination>[
     ViewDestination(
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  int screenIndex = 1; // default to Tasks view
+  int screenIndex = 0; // default to Login screen
 
   @override
   Widget build(BuildContext context) {

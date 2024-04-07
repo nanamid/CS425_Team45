@@ -45,12 +45,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   //This function adds the user information (email, username)
   Future addUserDetails(String newEmail, String newUsername) async {
-    await FirebaseFirestore.instance.collection('users').add({
-      'email': newEmail,
-      'username': newUsername,
-      //Entry for tasks?
-      //Entry for avatar information?
-    });
+    final user = <String, String>{"email": newEmail, "username": newUsername};
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc()
+        .set(user)
+        .onError((e, _) => print(
+              "An error occurred: $e",
+            ));
   }
 
   //This function confirms the new account and sends it to the database
@@ -141,8 +143,6 @@ class _RegisterPageState extends State<RegisterPage> {
     addUserDetails(
       _emailController.text.trim(),
       _usernameController.text.trim(),
-      //Entry for tasks?
-      //Entry for avatar information?
     );
   }
 

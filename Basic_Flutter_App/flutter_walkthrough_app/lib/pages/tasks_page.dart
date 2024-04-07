@@ -2,6 +2,8 @@
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
 // Started with his stateful ListView, and built our class interface around it
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/database.dart';
@@ -20,13 +22,14 @@ class TaskPage extends StatefulWidget {
 
 class _TaskPageState extends State<TaskPage> {
   //Reference the Hive Box
-  final _myBox = Hive.box('taskbox');
+  //final _myBox = Hive.box('taskbox');
   TodoDatabase db = TodoDatabase();
   final taskListIndex = 0; // hardcoded one tasklist for now
 
   // TODO use NavigationDrawer to set up placeholder views
 
   @override
+  /*
   void initState() {
     //First-Time Opening Function
     if (_myBox.get("TASK_LIST") == null) {
@@ -38,11 +41,19 @@ class _TaskPageState extends State<TaskPage> {
 
     super.initState();
   }
+  */
 
-  //Text Controller
-  // We could have multiple controllers to allow multiple simulataneous textboxes
-  // So far, we clear after every use to reuse it (only one textbox at a time)
+  // Text Controller
+  // These controllers are responsible for handling the text of a task
   final _controller = TextEditingController();
+  final _taskNameController = TextEditingController();
+  final _taskDescController = TextEditingController();
+
+  void dispose() {
+    _taskNameController.dispose();
+    _taskDescController.dispose();
+    super.dispose();
+  }
 
   // Handler for clicking the checkbox
   // Assumes clicking check -> set as DONE. Unchecking -> set as TODO.
@@ -62,8 +73,13 @@ class _TaskPageState extends State<TaskPage> {
     db.updateDatabase();
   }
 
+  void checkBoxChanged_v2() {
+    //
+  }
+
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
+  /**/
   void saveNewTask() {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     setState(() {
@@ -79,6 +95,32 @@ class _TaskPageState extends State<TaskPage> {
     db.updateDatabase();
   }
 
+  //Updated version of the handler for saving a new task
+  //Now with Firebase Firestore capabilities!
+  void saveNewTask_v2(String newTaskName, String newTaskDesc) {
+    final newTask = <String, String>{
+      "taskName": newTaskName,
+      "taskDesc": newTaskDesc
+    };
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection("tasks")
+        .add(newTask);
+  }
+
+  //A new handler designed to update the currently selected task
+  void updateTask(String newTaskName, String newTaskDesc) {
+    final newTask = <String, String>{
+      "taskName": newTaskName,
+      "taskDesc": newTaskDesc
+    };
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .update(newTask);
+  }
+
   // Handler for clicking the 'add task' plus button
   // Uses controller for text input
   void createNewTask() {
@@ -86,7 +128,7 @@ class _TaskPageState extends State<TaskPage> {
       context: context,
       builder: (context) {
         return DialogBox(
-          controller: _controller,
+          controller: _taskNameController,
           onSave: saveNewTask,
           onCancel: () => Navigator.of(context).pop(),
           confirmCancel: true,
@@ -104,6 +146,10 @@ class _TaskPageState extends State<TaskPage> {
     db.updateDatabase();
   }
 
+  void deleteTask_v2() {
+    //
+  }
+
   /// Handler for pressing the 'clock in' button in task detail view
   /// returns false if the clock entry could not be added, see task clockIn method
   bool clockIn(int index) {
@@ -117,6 +163,12 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
+  bool clockIn_v2(int index) {
+    //TEMP
+    return false;
+    //TEMP
+  }
+
   /// Handler for pressing the 'clock out' button in task detail view
   /// returns false if the clock entry could not be completed, see task clockOut method
   bool clockOut(int index) {
@@ -127,6 +179,12 @@ class _TaskPageState extends State<TaskPage> {
     } else {
       return false;
     }
+  }
+
+  bool clockOut_v2(int index) {
+    //TEMP
+    return false;
+    //TEMP
   }
 
   /// Spawns a dialog showing all task details
@@ -276,14 +334,19 @@ class _TaskPageState extends State<TaskPage> {
         });
   }
 
+  void showTaskDetail_v2() {
+    //
+  }
+
   @override
   // Builds a scaffold for viewing a list of tasks
   // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    //
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sample To Do List'),
+        title: Text('To Do List'),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
