@@ -12,7 +12,6 @@ import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
-//import 'package:test_app/pages/tasks_page.service.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -22,14 +21,13 @@ class TaskPage extends StatefulWidget {
 
 class _TaskPageState extends State<TaskPage> {
   //Reference the Hive Box
-  //final _myBox = Hive.box('taskbox');
+  final _myBox = Hive.box('taskbox');
   TodoDatabase db = TodoDatabase();
   final taskListIndex = 0; // hardcoded one tasklist for now
 
   // TODO use NavigationDrawer to set up placeholder views
 
   @override
-  /*
   void initState() {
     //First-Time Opening Function
     if (_myBox.get("TASK_LIST") == null) {
@@ -41,17 +39,17 @@ class _TaskPageState extends State<TaskPage> {
 
     super.initState();
   }
-  */
 
   // Text Controller
   // These controllers are responsible for handling the text of a task
   final _controller = TextEditingController();
   final _taskNameController = TextEditingController();
-  final _taskDescController = TextEditingController();
+  //final _taskDescController = TextEditingController();
 
   void dispose() {
+    _controller.dispose();
     _taskNameController.dispose();
-    _taskDescController.dispose();
+    //_taskDescController.dispose();
     super.dispose();
   }
 
@@ -79,46 +77,53 @@ class _TaskPageState extends State<TaskPage> {
 
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
-  /**/
   void saveNewTask() {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
     setState(() {
       currentTaskList.add(Task(
         taskID: 0,
-        taskName: _controller.text,
+        taskName: _taskNameController.text,
         taskStatus: "TODO", // TODO should be TaskStatus object
       ));
-      //Clears the textbox for the next task
-      _controller.clear();
     });
     Navigator.of(context).pop();
     db.updateDatabase();
+
+    addTask_DB(_taskNameController.text);
+    _taskNameController.clear(); //Clears the textbox for the next task
   }
 
   //Updated version of the handler for saving a new task
   //Now with Firebase Firestore capabilities!
-  void saveNewTask_v2(String newTaskName, String newTaskDesc) {
+  void addTask_DB(String newTaskName) {
     final newTask = <String, String>{
       "taskName": newTaskName,
-      "taskDesc": newTaskDesc
+      //"taskDesc": newTaskDesc
     };
+
     FirebaseFirestore.instance
         .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .collection("tasks")
-        .add(newTask);
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('tasks')
+        .add(newTask)
+        .then((value) => print("Note Added"))
+        .catchError((error) => print("Failed to add note: $error"));
+
+    //
   }
 
   //A new handler designed to update the currently selected task
-  void updateTask(String newTaskName, String newTaskDesc) {
+  void updateTask_DB(String newTaskName) {
     final newTask = <String, String>{
       "taskName": newTaskName,
-      "taskDesc": newTaskDesc
+      //"taskDesc": newTaskDesc
     };
     FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser?.uid)
-        .update(newTask);
+        .update(newTask)
+        .then((value) => print("Note Updated"))
+        .catchError((error) => print("Failed to update note: $error"));
   }
 
   // Handler for clicking the 'add task' plus button
@@ -144,10 +149,20 @@ class _TaskPageState extends State<TaskPage> {
       currentTaskList.removeAt(index);
     });
     db.updateDatabase();
+
+    //deleteTask_DB();
   }
 
-  void deleteTask_v2() {
-    //
+  //
+  void deleteTask_DB() {
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection("tasks")
+        .doc()
+        .delete()
+        .then((value) => print("Note Deleted"))
+        .catchError((error) => print("Failed to delete note: $error"));
   }
 
   /// Handler for pressing the 'clock in' button in task detail view
@@ -193,13 +208,13 @@ class _TaskPageState extends State<TaskPage> {
   // TODO notifications may be a more correct way to do this https://api.flutter.dev/flutter/widgets/NotificationListener-class.html
   void showTaskDetail(int index, Function() refreshParent) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-          // you have to wrap the alert dialog in a stateful builder to setState() correctly
-          // normally AlertDialogs are stateless widgets
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
+      context: context,
+      builder: (BuildContext context) {
+        Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
+        // you have to wrap the alert dialog in a stateful builder to setState() correctly
+        // normally AlertDialogs are stateless widgets
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +224,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus}"),
+                        child: Text(currentTask.taskStatus),
                       ),
 
                       Padding(
@@ -305,33 +320,37 @@ class _TaskPageState extends State<TaskPage> {
                     }
 
                     if (confirmation == true) {
-                      setState(() {
-                        // not necessarily best practice to setState such a big function
-                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                        bool success = clockOut(index);
-                        if (success == false) {
-                          showDialog(
+                      setState(
+                        () {
+                          // not necessarily best practice to setState such a big function
+                          refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
+                          bool success = clockOut(index);
+                          if (success == false) {
+                            showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                    title: Text('Cannot Add Clock Entry'),
-                                    content: Text('Not Clocked In'),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text('Okay'))
-                                    ],
-                                  ));
-                        }
-                      });
+                                title: Text('Cannot Add Clock Entry'),
+                                content: Text('Not Clocked In'),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('Okay'))
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      );
                     }
                   },
                   child: Text("Clock Out"),
                 ),
               ],
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   void showTaskDetail_v2() {
@@ -343,7 +362,6 @@ class _TaskPageState extends State<TaskPage> {
   // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
     List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
-    //
     return Scaffold(
       appBar: AppBar(
         title: Text('To Do List'),

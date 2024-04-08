@@ -18,8 +18,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final currentUser = FirebaseFirestore.instance.collection("users");
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
