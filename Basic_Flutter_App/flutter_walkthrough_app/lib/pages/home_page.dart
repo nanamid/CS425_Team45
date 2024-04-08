@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/pages/battle_page.dart';
 import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/pages/auth/user_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
@@ -50,6 +51,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
+  
   final PomodoroTimer pomodoroTimer =
       PomodoroTimer(duration: Duration(seconds: 20));
 
