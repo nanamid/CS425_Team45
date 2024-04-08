@@ -44,7 +44,6 @@ class Battle {
       print("Bot wins!");
       return true;
     }
-
     return false; // Continue the battle
   }
 }
