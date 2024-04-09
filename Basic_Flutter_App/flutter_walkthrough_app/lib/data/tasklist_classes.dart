@@ -67,16 +67,16 @@ class Task {
   String? _taskUUID;
   String? get taskUUID => _taskUUID;
 
-  @HiveField(1, defaultValue: "none")
+  @HiveField(1, defaultValue: "Default Task")
   String taskName;
 
   @HiveField(2, defaultValue: TaskStatus.TODO)
   TaskStatus taskStatus;
 
-  @HiveField(3, defaultValue: "none")
+  @HiveField(3, defaultValue: "Default")
   String? taskLabel;
 
-  @HiveField(4, defaultValue: "none")
+  @HiveField(4, defaultValue: "Default Description")
   String? taskDescription;
 
   // @HiveField(5, defaultValue: DateTime(0))
