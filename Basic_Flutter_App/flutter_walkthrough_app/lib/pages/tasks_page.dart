@@ -89,7 +89,7 @@ class _TaskPageState extends State<TaskPage> {
     Navigator.of(context).pop();
     db.updateDatabase();
 
-    addTask_DB(_taskNameController.text);
+    addTask_DB_v2(_taskNameController.text);
     _taskNameController.clear(); //Clears the textbox for the next task
   }
 
@@ -103,13 +103,29 @@ class _TaskPageState extends State<TaskPage> {
 
     FirebaseFirestore.instance
         .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('tasks')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection("tasks")
         .add(newTask)
         .then((value) => print("Note Added"))
         .catchError((error) => print("Failed to add note: $error"));
 
     //
+  }
+
+  Future addTask_DB_v2(String newTaskName) async {
+    final newTask = <String, String>{
+      "taskName": newTaskName,
+      //"taskDesc": newTaskDesc
+    };
+
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .collection("tasks")
+        .add(newTask)
+        .then((value) =>
+            print("Note Added to ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to add note: $error"));
   }
 
   //A new handler designed to update the currently selected task
@@ -122,7 +138,8 @@ class _TaskPageState extends State<TaskPage> {
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .update(newTask)
-        .then((value) => print("Note Updated"))
+        .then((value) => print(
+            "Note Updated to ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to update note: $error"));
   }
 
@@ -150,18 +167,25 @@ class _TaskPageState extends State<TaskPage> {
     });
     db.updateDatabase();
 
-    //deleteTask_DB();
+    deleteTask_DB();
   }
 
   //
   void deleteTask_DB() {
-    FirebaseFirestore.instance
+    var docID = FirebaseFirestore.instance
         .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .doc(FirebaseAuth.instance.currentUser?.email)
         .collection("tasks")
         .doc()
+        .id;
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .collection("tasks")
+        .doc(docID)
         .delete()
-        .then((value) => print("Note Deleted"))
+        .then((value) => print(
+            "Note Deleted on ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to delete note: $error"));
   }
 

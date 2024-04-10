@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final user = <String, String>{"email": newEmail, "username": newUsername};
     FirebaseFirestore.instance
         .collection("users")
-        .doc()
+        .doc(newEmail)
         .set(user)
         .onError((e, _) => print(
               "An error occurred: $e",
