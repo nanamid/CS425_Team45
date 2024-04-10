@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_app/features/game/controllers/game_controller.dart';
 import 'package:test_app/features/game/views/game_attack_view.dart';
+import 'package:test_app/features/game/widgets/bot_health_bar.dart';
 import 'package:test_app/utils/device/device_utility.dart';
 
 class MainBattleView extends StatefulWidget {
@@ -57,7 +58,7 @@ class _MainBattleViewState extends State<MainBattleView> {
     width: AppDeviceUtils.getScreenWidth(context),
     child: Obx(() => Text('Bot Health: ${_gameController.botHealth}')),
   );
-}
+  }
 
 Container _userInterface() {
   return Container(
@@ -73,7 +74,19 @@ Container _userInterface() {
     color: Colors.pink,
     child: Center(
       child: ElevatedButton(
-        onPressed: () => onAttackPressed(), // Updated line
+        onPressed: () {
+
+          //PLAYER ATTACKS
+          onAttackPressed();
+
+          // BOT ATTACKS
+          // dialog box and delay already happens in the controller during player attack
+
+          // 1. Show the bubble dialog by bot interface that says "My turn to attack you"
+          // 2. Play the attack animation in the game window (like a flash or something)
+          // 3. (in the user interface): Show the player image being blurred and hit and the health bar decreasing
+        
+        }, 
         child: Text(buttonText),
       ),
     ),
