@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<dynamic> confirmDialog(BuildContext context) {
+Future<dynamic> endGameDialogue(BuildContext context, int winner) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {

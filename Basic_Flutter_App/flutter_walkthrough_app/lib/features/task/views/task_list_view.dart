@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:test_app/features/task/screens/task_tile_view.dart';
+import 'package:test_app/features/task/views/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/text_strings.dart';

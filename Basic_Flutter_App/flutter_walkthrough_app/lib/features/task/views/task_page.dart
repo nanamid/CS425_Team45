@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/features/task/screens/task_avatar_page.dart';
-import 'package:test_app/features/task/screens/task_list_view.dart';
-import 'package:test_app/features/task/screens/task_stats_view.dart';
+import 'package:test_app/features/task/views/task_avatar_page.dart';
+import 'package:test_app/features/task/views/task_list_view.dart';
+import 'package:test_app/features/task/views/task_stats_view.dart';
 
 class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
