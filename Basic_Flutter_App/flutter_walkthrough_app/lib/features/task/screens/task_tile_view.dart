@@ -6,6 +6,7 @@ import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 
+// might be better do do this in a Form widget
 class TaskTileView extends StatefulWidget {
   final Task task;
   Function(bool?)? onChanged;
@@ -23,7 +24,7 @@ class TaskTileView extends StatefulWidget {
       required this.deleteFunction,
       required this.taskIndex,
       this.detailDialogFunction}) {
-    taskCompleted = task.taskStatus.name == "DONE" ? true : false;
+    taskCompleted = task.taskStatus == TaskStatus.DONE ? true : false;
     _taskClockedIn = task.clockRunning;
   }
 
@@ -172,7 +173,7 @@ class _TaskTileViewState extends State<TaskTileView> {
               child: Row(
                 children: [
                   buildText(
-                      widget.task.taskStatus.name,
+                      widget.task.taskStatus.label,
                       AppColors.textWhite,
                       AppSizes.textLarge,
                       FontWeight.normal,
@@ -199,45 +200,49 @@ class _TaskTileViewState extends State<TaskTileView> {
                 children: [
                   //DATE
                   Container(
-                      width: 80,
+                      width: 100,
                       //padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(.1),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(5))),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Icon(Icons.calendar_today_rounded,
-                              color: AppColors.primaryBackground),
-                          5.width_space,
-                          Expanded(
-                            child: buildText(
-                                // TODO task date
-                                'APR 1',
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded,
+                                  color: AppColors.primaryBackground),
+                              5.width_space,
+                              Expanded(
+                                child: buildText(
+                                    // TODO task date
+                                    'APR 1',
+                                    AppColors.lightGrey,
+                                    AppSizes.textSmall,
+                                    FontWeight.w400,
+                                    TextAlign.start,
+                                    TextOverflow.clip),
+                              )
+                            ],
+                          ),
+
+                          //CATEGORY
+                          Row(children: [
+                            Icon(
+                              Icons.label,
+                              color: AppColors.primaryBackground,
+                            ),
+                            5.width_space,
+                            buildText(
+                                widget.task.taskLabel.label,
                                 AppColors.lightGrey,
                                 AppSizes.textSmall,
                                 FontWeight.w400,
                                 TextAlign.start,
                                 TextOverflow.clip),
-                          )
+                          ]),
                         ],
                       )),
-
-                  //CATEGORY
-                  Row(children: [
-                    Icon(
-                      Icons.label,
-                      color: AppColors.primaryBackground,
-                    ),
-                    5.width_space,
-                    buildText(
-                        widget.task.taskLabel ?? 'Default',
-                        AppColors.lightGrey,
-                        AppSizes.textSmall,
-                        FontWeight.w400,
-                        TextAlign.start,
-                        TextOverflow.clip),
-                  ]),
                 ],
               ),
             ),

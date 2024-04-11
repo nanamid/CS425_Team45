@@ -24,6 +24,7 @@ class TodoDatabase {
       taskStatus: TaskStatus.TODO,
       taskDescription: "Initial task, feel free to delete",
     ));
+    updateDatabase();
     print("Created initial tasklist database");
   }
 

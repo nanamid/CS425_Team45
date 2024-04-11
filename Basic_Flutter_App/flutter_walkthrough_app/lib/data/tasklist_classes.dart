@@ -50,13 +50,37 @@ class TaskList {
 @HiveType(typeId: 1)
 enum TaskStatus {
   @HiveField(0)
-  TODO,
+  TODO('TODO'),
 
   @HiveField(1)
-  DONE,
+  DONE('DONE'),
 
   @HiveField(2)
-  WAIT,
+  WAIT('WAIT');
+
+  const TaskStatus(this.label);
+  final String label;
+}
+
+@HiveType(typeId: 3)
+enum TaskLabel {
+  @HiveField(0)
+  Study('Study Hour'),
+
+  @HiveField(1)
+  Homework('Homework'),
+
+  @HiveField(2)
+  Project('Project'),
+
+  @HiveField(3)
+  Programming('Programming'),
+
+  @HiveField(4)
+  Default('Default');
+
+  const TaskLabel(this.label);
+  final String label;
 }
 
 // Task
@@ -73,8 +97,8 @@ class Task {
   @HiveField(2, defaultValue: TaskStatus.TODO)
   TaskStatus taskStatus;
 
-  @HiveField(3, defaultValue: "Default")
-  String? taskLabel;
+  @HiveField(3, defaultValue: TaskLabel.Default)
+  TaskLabel taskLabel;
 
   @HiveField(4, defaultValue: "Default Description")
   String? taskDescription;
@@ -159,8 +183,7 @@ class Task {
       print("Couldn't add sub task, child already exists");
       return false;
     }
-    if (identical(this, newChild))
-    {
+    if (identical(this, newChild)) {
       print("Couldn't add subtask, is itself");
       return false;
     }
@@ -183,7 +206,7 @@ class Task {
   Task({
     required this.taskName,
     this.taskStatus = TaskStatus.TODO,
-    this.taskLabel,
+    this.taskLabel = TaskLabel.Default,
     this.taskDescription,
     // deadline, reminders, clocklist, subtasks, parenttask set with methods
   }) {

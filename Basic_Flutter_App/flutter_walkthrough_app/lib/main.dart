@@ -23,6 +23,7 @@ void main() async {
   // all custom objects need an adapter for hive to store them
   Hive.registerAdapter(TaskListAdapter());
   Hive.registerAdapter(TaskStatusAdapter());
+  Hive.registerAdapter(TaskLabelAdapter());
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PomodoroTimerAdapter());
 
@@ -32,10 +33,9 @@ void main() async {
   TodoDatabase db = TodoDatabase();
   if (taskbox.get("TASK_LIST") == null) {
     db.createInitialDatabase();
-  } else {
-    //Done when data already exists
-    db.loadData();
   }
+  //Done when data already exists
+  db.loadData();
 
   // Firebase Initialization
   await Firebase.initializeApp(

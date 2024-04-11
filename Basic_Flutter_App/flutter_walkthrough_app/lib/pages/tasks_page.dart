@@ -156,7 +156,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus.name}"),
+                        child: Text("${currentTask.taskStatus.label}"),
                       ),
 
                       Padding(
