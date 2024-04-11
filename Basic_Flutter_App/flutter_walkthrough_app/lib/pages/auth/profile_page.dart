@@ -5,10 +5,11 @@
 // landing page for a successful login (that is not the tasks page,
 // as seen in the login solo demo)
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:color_blindness/color_blindness.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,38 +19,51 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  // Variables
+  double sliderValue = 0;
+  ColorBlindnessType typeSelected = ColorBlindnessType.none;
+  int seed = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Welcome, USER!"),
+        backgroundColor: Theme.of(context).colorScheme.background,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Dark Mode",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onPrimary,
+              borderRadius: BorderRadius.circular(12),
             ),
-            CupertinoSwitch(
-              value: false,
-              onChanged: (value) {},
+            margin: const EdgeInsets.only(left: 25, top: 10, right: 25),
+            padding: const EdgeInsets.all(25),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Colorblindness Modes",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                //
+              ],
             ),
-            //
-            //
-            MaterialButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              color: Colors.blue,
-              child: Text('Sign Out'),
-            ),
-          ],
-        ),
+          ),
+          MaterialButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            color: Colors.blue,
+            textColor: Colors.white,
+            child: Text('Sign Out'),
+          ),
+        ],
       ),
     );
   }

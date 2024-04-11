@@ -12,6 +12,7 @@ import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
+//import 'package:test_app/utils/firestore.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -69,10 +70,44 @@ class _TaskPageState extends State<TaskPage> {
       }
     });
     db.updateDatabase();
+    checkBoxChanged_v2(value!);
   }
 
-  void checkBoxChanged_v2() {
-    //
+  //A new handler designed to update the status of the task
+  //This handler only works for the status of the task
+  void checkBoxChanged_v2(bool isTaskComplete) {
+    var docID = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .collection("tasks")
+        .doc()
+        .id;
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .collection("tasks")
+        .doc(docID)
+        .update({"completed": isTaskComplete})
+        .then((value) => print(
+            "Note Deleted on ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to delete note: $error"));
+  }
+
+  //A new handler designed to update the currently selected task
+  //This handler only works for the content of the task
+  void updateTask_DB(String newTaskName) {
+    final updateTask = {
+      "completed": false,
+      "taskName": newTaskName,
+      //"taskDesc": newTaskDesc
+    };
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .update(updateTask)
+        .then((value) => print(
+            "Note Updated from ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to update note: $error"));
   }
 
   // Handler for when we finish creating a new task
@@ -93,31 +128,12 @@ class _TaskPageState extends State<TaskPage> {
     _taskNameController.clear(); //Clears the textbox for the next task
   }
 
-  //Updated version of the handler for saving a new task
-  //Now with Firebase Firestore capabilities!
-  void addTask_DB(String newTaskName) {
-    final newTask = <String, String>{
-      "taskName": newTaskName,
-      //"taskDesc": newTaskDesc
-    };
-
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .collection("tasks")
-        .add(newTask)
-        .then((value) => print("Note Added"))
-        .catchError((error) => print("Failed to add note: $error"));
-
-    //
-  }
-
   Future addTask_DB_v2(String newTaskName) async {
-    final newTask = <String, String>{
+    final newTask = {
+      "completed": false,
       "taskName": newTaskName,
       //"taskDesc": newTaskDesc
     };
-
     FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser?.email)
@@ -126,21 +142,6 @@ class _TaskPageState extends State<TaskPage> {
         .then((value) =>
             print("Note Added to ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to add note: $error"));
-  }
-
-  //A new handler designed to update the currently selected task
-  void updateTask_DB(String newTaskName) {
-    final newTask = <String, String>{
-      "taskName": newTaskName,
-      //"taskDesc": newTaskDesc
-    };
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .update(newTask)
-        .then((value) => print(
-            "Note Updated to ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to update note: $error"));
   }
 
   // Handler for clicking the 'add task' plus button
