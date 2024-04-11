@@ -5,10 +5,10 @@
 // landing page for a successful login (that is not the tasks page,
 // as seen in the login solo demo)
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:settings_ui/settings_ui.dart';
 import 'package:color_blindness/color_blindness.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -20,19 +20,45 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   // Variables
-  double sliderValue = 0;
+  String selectedThemeColor = "";
+  double userTextSize = 0.5;
   ColorBlindnessType typeSelected = ColorBlindnessType.none;
   int seed = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Welcome, USER!"),
+        appBar: AppBar(
+          title: Text("Welcome, USER!"),
+          backgroundColor: Theme.of(context).colorScheme.background,
+        ),
         backgroundColor: Theme.of(context).colorScheme.background,
-      ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: Column(
+        body: SettingsList(
+          sections: [
+            SettingsSection(
+              title: Text('General'),
+              tiles: [
+                SettingsTile(
+                  leading: Icon(Icons.person),
+                  title: Text('Account'),
+                  onPressed: (BuildContext context) {},
+                ),
+                SettingsTile.switchTile(
+                  title: Text('Dark Mode'),
+                  leading: Icon(Icons.dark_mode),
+                  onToggle: (bool value) {},
+                  initialValue: false,
+                ),
+              ],
+            ),
+          ],
+        ));
+  }
+}
+
+
+/*
+Column(
         children: [
           Container(
             decoration: BoxDecoration(
@@ -51,6 +77,33 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
+                Expanded(
+                  child: SizedBox(
+                    height: 10,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text("Button1"),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: 10,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text("Button2"),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: 10,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text("Button1"),
+                    ),
+                  ),
+                ),
                 //
               ],
             ),
@@ -65,6 +118,4 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-    );
-  }
-}
+*/

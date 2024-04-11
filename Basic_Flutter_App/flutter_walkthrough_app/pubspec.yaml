@@ -25,6 +25,7 @@ dependencies:
   cloud_firestore: ^4.15.0
   color_blindness: ^0.1.2
   theme_provider: ^0.6.0
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
