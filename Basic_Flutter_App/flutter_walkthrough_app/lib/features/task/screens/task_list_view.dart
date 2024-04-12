@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:test_app/data/reminders_class.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
@@ -176,6 +177,11 @@ class _TaskListViewState extends State<TaskListView> {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     if (currentTask.clockIn()) // if it succeeded
     {
+      Reminder reminder = db.reminderManager.createReminderForTimer(
+          Duration.zero,
+          persistentNotification: true,
+          timerEndNotification: false);
+      db.reminderManager.registerTaskWithReminder(reminder, currentTask);
       db.updateDatabase();
       return true;
     } else {
@@ -188,6 +194,14 @@ class _TaskListViewState extends State<TaskListView> {
   bool clockOut(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     if (currentTask.clockOut()) {
+      List<Reminder> ongoingReminders = db
+          .reminderManager.remindersWithPersistentNotifications
+          .where((reminder) => identical(
+              db.reminderManager.taskReminderMap[reminder], currentTask))
+          .toList();
+      ongoingReminders.forEach((reminder) {
+        db.reminderManager.cancelReminder(reminder);
+      });
       db.updateDatabase();
       return true;
     } else {

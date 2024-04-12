@@ -22,7 +22,8 @@ void main() {
       expect(rm.taskReminderMap, isEmpty);
     });
     test('list getters are unmodifiable', () {
-      final Reminder reminder = Reminder(DateTime.now(), DateTime.now(), () {});
+      final Reminder reminder =
+          Reminder(DateTime.now(), DateTime.now(), timerCallback: () {});
       final ReminderManager rm = ReminderManager();
       try {
         rm.alarmIDToReminder[5] = reminder;
@@ -270,10 +271,10 @@ void main() {
             timerEndNotification: false,
             alarm: false);
 
-        expect(reminder1.timer.isActive, isTrue);
+        expect(reminder1.timer?.isActive, isTrue);
         expect(rm.allReminders, contains(reminder1));
         rm.cancelReminder(reminder1);
-        expect(reminder1.timer.isActive, isFalse);
+        expect(reminder1.timer?.isActive, isFalse);
         expect(rm.allReminders, isNot(contains(reminder1)));
         async.elapse(testTimeout); // acquires and releases lock
 
@@ -320,23 +321,26 @@ void main() {
     test('Constructor', () async {
       fakeAsync((async) {
         final Reminder a = Reminder(
-            DateTime.now(), DateTime.now().add(testDuration), dummyCallback);
-        expect(a.timer.isActive, isTrue);
+            DateTime.now(), DateTime.now().add(testDuration),
+            timerCallback: dummyCallback);
+        expect(a.timer?.isActive, isTrue);
         async.elapse(testTimeout);
       });
     });
     test('reminder total duration', () async {
       fakeAsync((async) {
-        final Reminder a = Reminder(DateTime.now(),
-            DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+        final Reminder a = Reminder(
+            DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)),
+            timerCallback: dummyCallback);
         expect(a.totalDuration.inMilliseconds, 1);
         async.elapse(testTimeout);
       });
     });
     test('reminder remaining duration', () async {
       fakeAsync((async) {
-        final Reminder a = Reminder(DateTime.now(),
-            DateTime.now().add(Duration(milliseconds: 1)), dummyCallback);
+        final Reminder a = Reminder(
+            DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)),
+            timerCallback: dummyCallback);
         expect(a.remainingDuration, lessThan(a.totalDuration));
         async.elapse(testTimeout);
       });
@@ -344,8 +348,9 @@ void main() {
     test('reminder callback', () async {
       fakeAsync((async) {
         bool fired = false;
-        final Reminder a = Reminder(DateTime.now(),
-            DateTime.now().add(Duration(milliseconds: 1)), () => fired = true);
+        final Reminder a = Reminder(
+            DateTime.now(), DateTime.now().add(Duration(milliseconds: 1)),
+            timerCallback: () => fired = true);
         async.elapse(testTimeout);
         expect(fired, isTrue);
       });

@@ -10,6 +10,7 @@ import 'package:test_app/data/database.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:get/get.dart';
 
+// Might be better to do this in a form widget
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key});
 

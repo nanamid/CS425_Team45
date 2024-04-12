@@ -32,7 +32,7 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     //First-Time Opening Function
     if (_myBox.get("TASK_LIST") == null) {
-      db.createInitialDatabase();
+      db.createInitialTasklist();
     } else {
       //Done when data already exists
       db.loadData();

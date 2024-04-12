@@ -81,8 +81,8 @@ class ReminderManager {
       bool alarm = false,
       void Function()? timerCallback,
       void Function()? alarmCallback}) {
-    Reminder reminder = Reminder(
-        DateTime.now(), deadline, genPrivateTimerCallback(timerCallback));
+    Reminder reminder = Reminder(DateTime.now(), deadline,
+        timerCallback: genPrivateTimerCallback(timerCallback));
 
     _allReminders.add(reminder);
 
@@ -223,9 +223,7 @@ class ReminderManager {
 
     final Task? assignedTask = this._taskReminderMap[reminder];
     _showNotification(newKey,
-        ongoing: true,
-        title: assignedTask?.taskName,
-        body: "Task Clock Open");
+        ongoing: true, title: assignedTask?.taskName, body: "Task Clock Open");
   }
 
   void _scheduleEndNotification(Reminder reminder, DateTime deadline) async {
@@ -341,12 +339,12 @@ class Reminder {
   Reminder(this._timerStartTime, this._timerEndTime,
       {void Function()? timerCallback}) {
     if (totalDuration.compareTo(Duration.zero) > 0) {
-    timer = Timer(this.totalDuration, () {
+      timer = Timer(this.totalDuration, () {
         if (timerCallback != null) {
-      print("Reminder callback fired");
-      timerCallback();
+          print("Reminder callback fired");
+          timerCallback();
         }
-    });
+      });
     }
   }
 }
@@ -371,5 +369,5 @@ void testReminders() async {
 
 @pragma('vm:entry-point')
 void alarmCallback() {
-    print("Inside alarmCallback");
+  print("Inside alarmCallback");
 }
