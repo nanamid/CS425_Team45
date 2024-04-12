@@ -335,7 +335,7 @@ class Reminder {
     this.timer?.cancel();
   }
 
-  // Hive can only generate type adapters for zero-arg constructors, or constructors that initialize like: this.whatever
+  // Hive can only generate type adapsters for zero-arg constructors, or constructors that initialize like: this.whatever
   Reminder(this._timerStartTime, this._timerEndTime,
       {void Function()? timerCallback}) {
     if (totalDuration.compareTo(Duration.zero) > 0) {

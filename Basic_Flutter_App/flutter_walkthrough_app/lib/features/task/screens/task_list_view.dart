@@ -75,6 +75,9 @@ class _TaskListViewState extends State<TaskListView> {
                 // description
                 Text(currentTask.taskDescription ?? "Description"),
 
+                Text(currentTask.taskDeadline != null
+                    ? 'Deadline: ${currentTask.taskDeadline!.year}-${currentTask.taskDeadline!.month.toString().padLeft(2, '0')}-${currentTask.taskDeadline!.day.toString().padLeft(2, '0')}'
+                    : ""),
                 // total time
                 Text("Total Time: ${currentTask.totalTime_minutes} mins"),
 

@@ -64,8 +64,7 @@ class TaskAdapter extends TypeAdapter<Task> {
           fields[4] == null ? 'Default Description' : fields[4] as String?,
     )
       .._taskUUID = fields[0] as String?
-      .._taskDeadline = fields[5] as DateTime?
-      .._taskReminders = (fields[6] as List).cast<DateTime>()
+      ..taskDeadline = fields[5] as DateTime?
       ..clockList = (fields[7] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
@@ -78,7 +77,7 @@ class TaskAdapter extends TypeAdapter<Task> {
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj._taskUUID)
       ..writeByte(1)
@@ -90,9 +89,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(4)
       ..write(obj.taskDescription)
       ..writeByte(5)
-      ..write(obj._taskDeadline)
-      ..writeByte(6)
-      ..write(obj._taskReminders)
+      ..write(obj.taskDeadline)
       ..writeByte(7)
       ..write(obj.clockList)
       ..writeByte(8)
