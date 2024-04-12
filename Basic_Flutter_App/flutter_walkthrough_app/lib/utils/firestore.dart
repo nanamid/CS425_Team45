@@ -12,11 +12,10 @@ class FirestoreService {
 
   // Function for adding a new task
   // The completion field defaults to "false" (a new task isn't completed)
-  Future<void> addTask_v2(String newTaskName, String newTaskDesc) async {
+  Future<void> addTask_v2(String newTaskName) async {
     final newTask = {
       "completed": false,
       "taskName": newTaskName,
-      "taskDesc": newTaskDesc
     };
     userTasks
         .add(newTask)
@@ -28,18 +27,16 @@ class FirestoreService {
   // Function for retrieving the task list from the database
   Stream<QuerySnapshot> getTasksStream() {
     final tasksStream =
-        userTasks.orderBy("completed", descending: true).snapshots();
+        userTasks.orderBy("completed", descending: false).snapshots();
     return tasksStream;
   }
 
   // Function for updating a task
   // This function is only for updating the text of the task
-  Future<void> updateTask(
-      String docID, String newTaskName, String newTaskDesc) async {
+  Future<void> updateTask(String docID, String newTaskName) async {
     final updateTask = {
       "completed": false,
       "taskName": newTaskName,
-      "taskDesc": newTaskDesc
     };
     return userTasks.doc(docID).update(updateTask);
   }

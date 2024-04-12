@@ -42,7 +42,7 @@ class DialogBox extends StatelessWidget {
                     controller: controller,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "Add a New Task",
+                      hintText: "Task Name",
                     ),
                   ),
 
