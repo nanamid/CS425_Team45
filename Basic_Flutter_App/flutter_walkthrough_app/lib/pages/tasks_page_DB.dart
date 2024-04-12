@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:test_app/data/database.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/dialog_box.dart';
+import 'package:test_app/utils/firestore.dart';
+import 'package:test_app/utils/todo_tile.dart';
+import 'package:test_app/utils/confirm_dialog.dart';
+//import 'package:test_app/data/database.dart';
 //import 'package:test_app/utils/timeclock_tile.dart';
 //import 'package:test_app/utils/todo_tile.dart';
 //import 'package:test_app/data/tasklist_classes.dart';
-//import 'package:test_app/utils/confirm_dialog.dart';
-import 'package:test_app/utils/firestore.dart';
 
 class TaskPageDB extends StatefulWidget {
   const TaskPageDB({super.key});
@@ -61,6 +63,12 @@ class _TaskPageDBState extends State<TaskPageDB> {
     );
   }
 
+  // Handler for clicking the checkbox
+  // This changes the "completed" field between true and false
+  void checkBoxChanged(bool? value, String? docID) {
+    //
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,14 +90,32 @@ class _TaskPageDBState extends State<TaskPageDB> {
               itemBuilder: (context, index) {
                 // Retrieve the document from Firestore
                 DocumentSnapshot document = notesList[index];
+                //Task currentTask = (document) as Task;
                 String docID = document.id;
 
                 // Get the tasks from the document
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
                 String noteText = data['taskName'];
+                Task currentTask = (noteText) as Task;
 
                 // Display the tasks as a list tile
+                return TaskTile(
+                  task: currentTask,
+                  onChanged: (value) => checkBoxChanged(value, docID),
+                  deleteFunction: (context) async {
+                    bool? confirmation = await showDialog(
+                      context: context,
+                      builder: (context) {
+                      return ConfirmDialog();
+                    });
+                    if (confirmation == true) {
+                      firestoreService.deleteTask(docID);
+                    }
+                  },
+                  detailDialogFunction: () {},
+                );
+                /*
                 return ListTile(
                   title: Text(noteText),
                   trailing: Row(
@@ -105,8 +131,8 @@ class _TaskPageDBState extends State<TaskPageDB> {
                       ),
                     ],
                   ),
-                  //
                 );
+                */
               },
             );
           } else {

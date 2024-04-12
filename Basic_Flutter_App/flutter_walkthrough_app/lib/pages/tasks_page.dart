@@ -2,8 +2,6 @@
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
 // Started with his stateful ListView, and built our class interface around it
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/database.dart';
@@ -12,10 +10,12 @@ import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
-//import 'package:test_app/utils/firestore.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/pages/pomodoro_timer_widget.dart';
 
 class TaskPage extends StatefulWidget {
-  const TaskPage({super.key});
+  final PomodoroTimer pomodoroTimer;
+  const TaskPage({super.key, required this.pomodoroTimer});
   @override
   State<TaskPage> createState() => _TaskPageState();
 }
@@ -41,18 +41,10 @@ class _TaskPageState extends State<TaskPage> {
     super.initState();
   }
 
-  // Text Controller
-  // These controllers are responsible for handling the text of a task
+  //Text Controller
+  // We could have multiple controllers to allow multiple simulataneous textboxes
+  // So far, we clear after every use to reuse it (only one textbox at a time)
   final _controller = TextEditingController();
-  final _taskNameController = TextEditingController();
-  //final _taskDescController = TextEditingController();
-
-  void dispose() {
-    _controller.dispose();
-    _taskNameController.dispose();
-    //_taskDescController.dispose();
-    super.dispose();
-  }
 
   // Handler for clicking the checkbox
   // Assumes clicking check -> set as DONE. Unchecking -> set as TODO.
@@ -61,87 +53,34 @@ class _TaskPageState extends State<TaskPage> {
     Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
     setState(() {
       final prevState = changedTask.taskStatus;
-      if (prevState.toString() !=
-          "DONE") // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
+      if (prevState !=
+          TaskStatus
+              .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        changedTask.taskStatus = "DONE"; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.DONE; // TODO should be TaskStatus object
       } else {
-        changedTask.taskStatus = "TODO"; // TODO should be TaskStatus object
+        changedTask.taskStatus =
+            TaskStatus.TODO; // TODO should be TaskStatus object
       }
     });
     db.updateDatabase();
-    checkBoxChanged_v2(value!);
-  }
-
-  //A new handler designed to update the status of the task
-  //This handler only works for the status of the task
-  void checkBoxChanged_v2(bool isTaskComplete) {
-    var docID = FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .collection("tasks")
-        .doc()
-        .id;
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .collection("tasks")
-        .doc(docID)
-        .update({"completed": isTaskComplete})
-        .then((value) => print(
-            "Note Deleted on ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to delete note: $error"));
-  }
-
-  //A new handler designed to update the currently selected task
-  //This handler only works for the content of the task
-  void updateTask_DB(String newTaskName) {
-    final updateTask = {
-      "completed": false,
-      "taskName": newTaskName,
-      //"taskDesc": newTaskDesc
-    };
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .update(updateTask)
-        .then((value) => print(
-            "Note Updated from ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to update note: $error"));
   }
 
   // Handler for when we finish creating a new task
   // Uses text that was stored in the controller
   void saveNewTask() {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
     setState(() {
-      currentTaskList.add(Task(
-        taskID: 0,
-        taskName: _taskNameController.text,
-        taskStatus: "TODO", // TODO should be TaskStatus object
+      currentTaskList.addTask(Task(
+        taskName: _controller.text,
+        taskStatus: TaskStatus.TODO, // TODO should be TaskStatus object
       ));
+      //Clears the textbox for the next task
+      _controller.clear();
     });
     Navigator.of(context).pop();
     db.updateDatabase();
-
-    addTask_DB_v2(_taskNameController.text);
-    _taskNameController.clear(); //Clears the textbox for the next task
-  }
-
-  Future addTask_DB_v2(String newTaskName) async {
-    final newTask = {
-      "completed": false,
-      "taskName": newTaskName,
-      //"taskDesc": newTaskDesc
-    };
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .collection("tasks")
-        .add(newTask)
-        .then((value) =>
-            print("Note Added to ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to add note: $error"));
   }
 
   // Handler for clicking the 'add task' plus button
@@ -151,7 +90,7 @@ class _TaskPageState extends State<TaskPage> {
       context: context,
       builder: (context) {
         return DialogBox(
-          controller: _taskNameController,
+          controller: _controller,
           onSave: saveNewTask,
           onCancel: () => Navigator.of(context).pop(),
           confirmCancel: true,
@@ -163,31 +102,11 @@ class _TaskPageState extends State<TaskPage> {
   // Handler for deleting tasks (swipe to delete, press delete button)
   void deleteTask(int index) {
     setState(() {
-      List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
-      currentTaskList.removeAt(index);
+      TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+      Task element = currentTaskList.list[index];
+      currentTaskList.removeTask(element);
     });
     db.updateDatabase();
-
-    deleteTask_DB();
-  }
-
-  //
-  void deleteTask_DB() {
-    var docID = FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .collection("tasks")
-        .doc()
-        .id;
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email)
-        .collection("tasks")
-        .doc(docID)
-        .delete()
-        .then((value) => print(
-            "Note Deleted on ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to delete note: $error"));
   }
 
   /// Handler for pressing the 'clock in' button in task detail view
@@ -203,12 +122,6 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
-  bool clockIn_v2(int index) {
-    //TEMP
-    return false;
-    //TEMP
-  }
-
   /// Handler for pressing the 'clock out' button in task detail view
   /// returns false if the clock entry could not be completed, see task clockOut method
   bool clockOut(int index) {
@@ -221,25 +134,19 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
-  bool clockOut_v2(int index) {
-    //TEMP
-    return false;
-    //TEMP
-  }
-
   /// Spawns a dialog showing all task details
   /// index is index of the selected task in the current task list
   /// refreshParent() will tell parent to redraw (usually pass setState) itself
   // TODO notifications may be a more correct way to do this https://api.flutter.dev/flutter/widgets/NotificationListener-class.html
   void showTaskDetail(int index, Function() refreshParent) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
-        // you have to wrap the alert dialog in a stateful builder to setState() correctly
-        // normally AlertDialogs are stateless widgets
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
+        context: context,
+        builder: (BuildContext context) {
+          Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
+          // you have to wrap the alert dialog in a stateful builder to setState() correctly
+          // normally AlertDialogs are stateless widgets
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +156,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(currentTask.taskStatus),
+                        child: Text("${currentTask.taskStatus.name}"),
                       ),
 
                       Padding(
@@ -267,6 +174,11 @@ class _TaskPageState extends State<TaskPage> {
                 ],
               ),
               content: Column(children: [
+                PomodoroTimerWidget(
+                  pomodoroTimer: widget.pomodoroTimer,
+                  task: currentTask,
+                ),
+
                 // description
                 Text(currentTask.taskDescription ?? "Description"),
 
@@ -345,51 +257,44 @@ class _TaskPageState extends State<TaskPage> {
                     }
 
                     if (confirmation == true) {
-                      setState(
-                        () {
-                          // not necessarily best practice to setState such a big function
-                          refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                          bool success = clockOut(index);
-                          if (success == false) {
-                            showDialog(
+                      setState(() {
+                        // not necessarily best practice to setState such a big function
+                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
+                        bool success = clockOut(index);
+                        if (success == false) {
+                          showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Cannot Add Clock Entry'),
-                                content: Text('Not Clocked In'),
-                                actions: <Widget>[
-                                  ElevatedButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('Okay'))
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      );
+                                    title: Text('Cannot Add Clock Entry'),
+                                    content: Text('Not Clocked In'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('Okay'))
+                                    ],
+                                  ));
+                        }
+                      });
                     }
                   },
                   child: Text("Clock Out"),
                 ),
               ],
             );
-          },
-        );
-      },
-    );
-  }
-
-  void showTaskDetail_v2() {
-    //
+          });
+        });
   }
 
   @override
   // Builds a scaffold for viewing a list of tasks
   // As we move to multiple views, this will become a NavigationDrawer with some way to control which screen is drawn
   Widget build(BuildContext context) {
-    List<Task> currentTaskList = db.listOfTaskLists[taskListIndex].list;
+    TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
+    List<Task> currentTaskListOfTasks = currentTaskList.list;
     return Scaffold(
       appBar: AppBar(
-        title: Text('To Do List'),
+        title: Text(currentTaskList.listName ?? "Task List"),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
@@ -397,15 +302,11 @@ class _TaskPageState extends State<TaskPage> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: currentTaskList.length,
+        itemCount: currentTaskListOfTasks.length,
         itemBuilder: (context, index) {
-          Task currentTask = currentTaskList[index];
+          Task currentTask = currentTaskListOfTasks[index];
           return TaskTile(
-            taskName: currentTask.taskName ?? "NoName",
-            taskStatus: currentTask.taskStatus.toString(),
-            taskCompleted:
-                currentTask.taskStatus.toString() == "DONE" ? true : false,
-            taskClockedIn: currentTask.clockRunning,
+            task: currentTask,
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) async {
               bool? confirmation = await showDialog(

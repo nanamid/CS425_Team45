@@ -26,6 +26,8 @@ dependencies:
   color_blindness: ^0.1.2
   theme_provider: ^0.6.0
   settings_ui: ^2.0.2
+  android_alarm_manager_plus: ^4.0.2
+  flutter_local_notifications: ^17.0.0
 
 dev_dependencies:
   flutter_test:

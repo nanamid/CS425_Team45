@@ -4,6 +4,7 @@
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/tasklist_classes.dart';
+import 'package:uuid/uuid.dart'; // https://pub.dev/packages/uuid
 
 // A TodoDatabase object is the working copy of what is stored in hive
 // Remember to load and store back to hive before the object dies
@@ -17,15 +18,12 @@ class TodoDatabase {
 
   // Called in home_page.dart's state for empty databases
   void createInitialDatabase() {
-    listOfTaskLists = [
-      TaskList(listID: 0) // default
-    ];
-    (listOfTaskLists[0] as TaskList).list.add(Task(
-          taskID: 0,
-          taskName: "Default Task",
-          taskStatus: "TODO", // TODO should be TaskStatus object
-          taskDescription: "Initial task, feel free to delete",
-        ));
+    listOfTaskLists = [TaskList(listName: "Default Task List")];
+    (listOfTaskLists[0] as TaskList).addTask(Task(
+      taskName: "Default Task",
+      taskStatus: TaskStatus.TODO,
+      taskDescription: "Initial task, feel free to delete",
+    ));
     print("Created initial tasklist database");
   }
 
@@ -34,7 +32,7 @@ class TodoDatabase {
     listOfTaskLists = _myTaskBox.get("TASK_LIST");
     print("Loaded ${listOfTaskLists.length} task lists:");
     for (final TaskList tlist in listOfTaskLists) {
-      print("ID: ${tlist.listID}");
+      print("ID: ${tlist.listUUID}");
     }
     // TODO check list was added to box correctly
   }
@@ -44,7 +42,7 @@ class TodoDatabase {
     _myTaskBox.put("TASK_LIST", listOfTaskLists);
     print("Stored ${listOfTaskLists.length} task lists:");
     for (final TaskList tlist in listOfTaskLists) {
-      print("ID: ${tlist.listID}");
+      print("ID: ${tlist.listUUID}");
     }
   }
 }
