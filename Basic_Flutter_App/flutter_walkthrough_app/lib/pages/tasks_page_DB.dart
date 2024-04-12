@@ -110,7 +110,13 @@ class _TaskPageDBState extends State<TaskPageDB> {
               },
             );
           } else {
-            return const Text("No tasks yet!");
+            return const Text(
+              "No tasks yet!",
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.deepPurple),
+            );
           }
         },
       ),
