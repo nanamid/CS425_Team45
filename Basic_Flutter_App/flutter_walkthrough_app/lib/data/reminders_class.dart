@@ -7,6 +7,9 @@ import 'dart:math';
 import 'package:mutex/mutex.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:hive/hive.dart';
+
+part 'reminders_class.g.dart';
 
 /* 
 needs to set/unset ongoing notification/alarm
@@ -15,26 +18,33 @@ needs to set/unset pomodoro timer notification/alarm
 
 purpose is to abstract away alarm id management
 */
+@HiveType(typeId: 5)
 class ReminderManager {
+  @HiveField(0)
   final Map<int, Reminder> _alarmIDToReminder = Map<int, Reminder>();
   Map<int, Reminder> get alarmIDToReminder =>
       Map.unmodifiable(_alarmIDToReminder);
 
+  @HiveField(1)
   final Map<int, Reminder> _notificationIDToReminder = Map<int, Reminder>();
   Map<int, Reminder> get notificationIDToReminder =>
       Map.unmodifiable(_notificationIDToReminder);
 
+  @HiveField(2)
   final List<Reminder> _allReminders = [];
   List<Reminder> get allReminders => List.unmodifiable(_allReminders);
 
+  @HiveField(3)
   final List<Reminder> _remindersWithPersistentNotifications = [];
   List<Reminder> get remindersWithPersistentNotifications =>
       List.unmodifiable(_remindersWithPersistentNotifications);
 
+  @HiveField(4)
   final List<Reminder> _remindersWithEndNotifications = [];
   List<Reminder> get remindersWithEndNotifications =>
       List.unmodifiable(_remindersWithEndNotifications);
 
+  @HiveField(5)
   final List<Reminder> _remindersWithAlarms = [];
   List<Reminder> get remindersWithAlarms =>
       List.unmodifiable(_remindersWithAlarms);
@@ -306,14 +316,17 @@ class ReminderManager {
 }
 
 // all members should be immutable
+@HiveType(typeId: 6)
 class Reminder {
-  final DateTime _timerStartTime;
+  @HiveField(0)
+  late final DateTime _timerStartTime;
   DateTime get timerStartTime => _timerStartTime;
 
-  final DateTime _timerEndTime;
+  @HiveField(1)
+  late final DateTime _timerEndTime;
   DateTime get timerEndTime => _timerEndTime;
 
-  late final Timer timer;
+  Timer? timer;
 
   Duration get totalDuration => _timerEndTime.difference(_timerStartTime);
   Duration get remainingDuration => _timerEndTime.difference(DateTime.now());
@@ -321,23 +334,26 @@ class Reminder {
   // think of this as a destructor
   // rather than relying on a finalizer, just explicitly kill the reminder timer
   void killReminder() {
-    this.timer.cancel();
+    this.timer?.cancel();
   }
 
-  Reminder(DateTime startTime, DateTime endTime, void Function() timerCallback)
-      : this._timerStartTime = startTime,
-        this._timerEndTime = endTime {
+  // Hive can only generate type adapters for zero-arg constructors, or constructors that initialize like: this.whatever
+  Reminder(this._timerStartTime, this._timerEndTime,
+      {void Function()? timerCallback}) {
+    if (totalDuration.compareTo(Duration.zero) > 0) {
     timer = Timer(this.totalDuration, () {
+        if (timerCallback != null) {
       print("Reminder callback fired");
       timerCallback();
+        }
     });
+    }
   }
 }
 
 /// Intended as a quick and dirty manual test to show some notifications
 /// Just call this somewhere when the app is running
-void testReminders() async
-{
+void testReminders() async {
   final reminderManager = ReminderManager();
   var reminder = reminderManager.createReminderForDeadline(
       DateTime.now().add(Duration(seconds: 5)),

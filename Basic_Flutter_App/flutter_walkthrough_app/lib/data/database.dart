@@ -5,6 +5,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:uuid/uuid.dart'; // https://pub.dev/packages/uuid
+import 'package:test_app/data/reminders_class.dart';
 
 // A TodoDatabase object is the working copy of what is stored in hive
 // Remember to load and store back to hive before the object dies
@@ -13,11 +14,13 @@ class TodoDatabase {
   List listOfTaskLists =
       []; // Meant to be List<TaskList> but Hive requires this to be List<dynamic>
 
+  ReminderManager reminderManager = ReminderManager();
+
   final _myTaskBox =
       Hive.box('taskbox'); // refers to box named 'taskbox' opened in main.dart
 
   // Called in home_page.dart's state for empty databases
-  void createInitialDatabase() {
+  void createInitialTasklist() {
     listOfTaskLists = [TaskList(listName: "Default Task List")];
     (listOfTaskLists[0] as TaskList).addTask(Task(
       taskName: "Default Task",
@@ -28,6 +31,10 @@ class TodoDatabase {
     print("Created initial tasklist database");
   }
 
+  void createInitialReminderManager() {
+    updateDatabase();
+  }
+
   //Load Data (from hive database)
   void loadData() {
     listOfTaskLists = _myTaskBox.get("TASK_LIST");
@@ -36,6 +43,8 @@ class TodoDatabase {
       print("ID: ${tlist.listUUID}");
     }
     // TODO check list was added to box correctly
+
+    reminderManager = _myTaskBox.get("REMINDER_MANAGER");
   }
 
   //Update Data (to hive database)
@@ -45,5 +54,8 @@ class TodoDatabase {
     for (final TaskList tlist in listOfTaskLists) {
       print("ID: ${tlist.listUUID}");
     }
+
+    _myTaskBox.put("REMINDER_MANAGER", reminderManager);
+    print("Stored reminder manager");
   }
 }
