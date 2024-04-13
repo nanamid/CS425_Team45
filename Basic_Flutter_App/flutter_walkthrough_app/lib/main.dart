@@ -35,14 +35,19 @@ void main() async {
   var taskbox = await Hive.openBox('taskbox');
   TodoDatabase db = TodoDatabase();
   if (taskbox.get("TASK_LIST") == null || taskbox.get("TASK_LIST").isEmpty) {
-    db.createInitialTasklist();
+    await db.createInitialTasklist();
   }
   if (taskbox.get("REMINDER_MANAGER") == null) {
-    db.createInitialReminderManager();
+    await db.createInitialReminderManager();
   }
   //Done when data already exists
   db.loadData();
-  // TODO check if we need to re-initialize any reminders
+
+  /* Restore notifications and alarms if the app died before they fired
+     There should be no harm in doing this to an empty reminderManager
+     So we call it unconditionally */
+  db.reminderManager.rebuildReminders(db.listOfTaskLists);
+  await db.reminderManager.rebuildNotifications();
 
   // Firebase Initialization
   await Firebase.initializeApp(

@@ -62,9 +62,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       taskLabel: fields[3] == null ? TaskLabel.Default : fields[3] as TaskLabel,
       taskDescription:
           fields[4] == null ? 'Default Description' : fields[4] as String?,
+      taskDeadline: fields[5] as DateTime?,
     )
       .._taskUUID = fields[0] as String?
-      ..taskDeadline = fields[5] as DateTime?
       ..clockList = (fields[7] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()

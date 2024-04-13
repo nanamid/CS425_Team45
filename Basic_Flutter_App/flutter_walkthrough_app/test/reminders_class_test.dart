@@ -251,8 +251,10 @@ void main() {
       fakeAsync((async) {
         AndroidAlarmManager.initialize();
         final ReminderManager rm = ReminderManager();
-        final reminder1 = rm.createReminderForTimer(testDuration, alarm: true);
-        final reminder2 = rm.createReminderForTimer(testDuration, alarm: true);
+        final reminder1 = rm.createReminderForTimer(testDuration,
+            alarm: true, alarmCallback: () {});
+        final reminder2 = rm.createReminderForTimer(testDuration,
+            alarm: true, alarmCallback: () {});
         async.elapse(testTimeout);
         expect(rm.alarmIDToReminder.values, contains(reminder1));
         expect(rm.alarmIDToReminder.values, contains(reminder2));
@@ -305,7 +307,8 @@ void main() {
         final Reminder reminder4 = rm.createReminderForTimer(testDuration,
             persistentNotification: true,
             timerEndNotification: true,
-            alarm: true);
+            alarm: true,
+            alarmCallback: () {});
         async.elapse(testTimeout); // create notification
         rm.cancelReminder(reminder4);
         async.elapse(testTimeout); // wait for lock

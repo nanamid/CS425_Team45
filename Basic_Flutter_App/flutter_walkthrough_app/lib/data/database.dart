@@ -14,25 +14,27 @@ class TodoDatabase {
   List listOfTaskLists =
       []; // Meant to be List<TaskList> but Hive requires this to be List<dynamic>
 
-  ReminderManager reminderManager = ReminderManager();
+  late ReminderManager reminderManager;
 
   final _myTaskBox =
       Hive.box('taskbox'); // refers to box named 'taskbox' opened in main.dart
 
   // Called in home_page.dart's state for empty databases
-  void createInitialTasklist() {
+  Future<void> createInitialTasklist() async {
     listOfTaskLists = [TaskList(listName: "Default Task List")];
     (listOfTaskLists[0] as TaskList).addTask(Task(
       taskName: "Default Task",
       taskStatus: TaskStatus.TODO,
       taskDescription: "Initial task, feel free to delete",
     ));
-    updateDatabase();
+    await _myTaskBox.put("TASK_LIST", listOfTaskLists);
     print("Created initial tasklist database");
   }
 
-  void createInitialReminderManager() {
-    updateDatabase();
+  Future<void> createInitialReminderManager() async {
+    reminderManager = ReminderManager();
+    await _myTaskBox.put("REMINDER_MANAGER", reminderManager);
+    print("Created initial ReminderManager");
   }
 
   //Load Data (from hive database)
@@ -48,14 +50,14 @@ class TodoDatabase {
   }
 
   //Update Data (to hive database)
-  void updateDatabase() {
-    _myTaskBox.put("TASK_LIST", listOfTaskLists);
+  Future<void> updateDatabase() async {
+    await _myTaskBox.put("TASK_LIST", listOfTaskLists);
     print("Stored ${listOfTaskLists.length} task lists:");
     for (final TaskList tlist in listOfTaskLists) {
       print("ID: ${tlist.listUUID}");
     }
 
-    _myTaskBox.put("REMINDER_MANAGER", reminderManager);
+    await _myTaskBox.put("REMINDER_MANAGER", reminderManager);
     print("Stored reminder manager");
   }
 }
