@@ -12,6 +12,7 @@ import 'package:test_app/data/tasklist_classes.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/utils/device/device_utility.dart';
 import 'package:test_app/data/database.dart';
+import 'package:test_app/data/reminders_class.dart';
 
 void main() async {
   // Initialize the Hive
@@ -26,16 +27,27 @@ void main() async {
   Hive.registerAdapter(TaskLabelAdapter());
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PomodoroTimerAdapter());
+  Hive.registerAdapter(ReminderManagerAdapter());
+  Hive.registerAdapter(ReminderAdapter());
 
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
   var taskbox = await Hive.openBox('taskbox');
   TodoDatabase db = TodoDatabase();
-  if (taskbox.get("TASK_LIST") == null) {
-    db.createInitialDatabase();
+  if (taskbox.get("TASK_LIST") == null || taskbox.get("TASK_LIST").isEmpty) {
+    await db.createInitialTasklist();
+  }
+  if (taskbox.get("REMINDER_MANAGER") == null) {
+    await db.createInitialReminderManager();
   }
   //Done when data already exists
   db.loadData();
+
+  /* Restore notifications and alarms if the app died before they fired
+     There should be no harm in doing this to an empty reminderManager
+     So we call it unconditionally */
+  db.reminderManager.rebuildReminders(db.listOfTaskLists);
+  await db.reminderManager.rebuildNotifications();
 
   // Firebase Initialization
   await Firebase.initializeApp(

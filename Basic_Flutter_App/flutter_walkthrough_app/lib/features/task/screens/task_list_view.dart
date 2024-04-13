@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:test_app/data/reminders_class.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
@@ -12,6 +13,7 @@ import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/common/widgets/confirm_dialog.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/features/task/screens/confirm_clockinout_dialogs.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -74,6 +76,9 @@ class _TaskListViewState extends State<TaskListView> {
                 // description
                 Text(currentTask.taskDescription ?? "Description"),
 
+                Text(currentTask.taskDeadline != null
+                    ? 'Deadline: ${currentTask.taskDeadline!.year}-${currentTask.taskDeadline!.month.toString().padLeft(2, '0')}-${currentTask.taskDeadline!.day.toString().padLeft(2, '0')} ${currentTask.taskDeadline!.hour.toString().padLeft(2, '0')}:${currentTask.taskDeadline!.minute.toString().padLeft(2, '0')}'
+                    : ""),
                 // total time
                 Text("Total Time: ${currentTask.totalTime_minutes} mins"),
 
@@ -98,7 +103,7 @@ class _TaskListViewState extends State<TaskListView> {
                   // onPressed has to wrap the async future function with a void function
                   onPressed: () async {
                     // Ask for user confirmation
-                    bool? confirmation = await confirmDialog(context);
+                    bool? confirmation = await confirmClockInDialog(context);
 
                     // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
                     if (!context.mounted) {
@@ -133,7 +138,7 @@ class _TaskListViewState extends State<TaskListView> {
                 TextButton(
                   onPressed: () async {
                     // Ask for user confirmation
-                    bool? confirmation = await confirmDialog(context);
+                    bool? confirmation = await confirmClockOutDialog(context);
 
                     // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
                     if (!context.mounted) {
@@ -176,6 +181,11 @@ class _TaskListViewState extends State<TaskListView> {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     if (currentTask.clockIn()) // if it succeeded
     {
+      Reminder reminder = db.reminderManager.createReminderForTimer(
+          Duration.zero,
+          persistentNotification: true,
+          timerEndNotification: false);
+      db.reminderManager.registerTaskWithReminder(reminder, currentTask);
       db.updateDatabase();
       return true;
     } else {
@@ -188,6 +198,14 @@ class _TaskListViewState extends State<TaskListView> {
   bool clockOut(int index) {
     Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
     if (currentTask.clockOut()) {
+      List<Reminder> ongoingReminders = db
+          .reminderManager.remindersWithPersistentNotifications
+          .where((reminder) => identical(
+              db.reminderManager.taskReminderMap[reminder], currentTask))
+          .toList();
+      ongoingReminders.forEach((reminder) {
+        db.reminderManager.cancelReminder(reminder);
+      });
       db.updateDatabase();
       return true;
     } else {
@@ -218,6 +236,7 @@ class _TaskListViewState extends State<TaskListView> {
       TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
       Task element = currentTaskList.list[index];
       currentTaskList.removeTask(element);
+      db.reminderManager.unregisterAllRemindersOfTask(element);
     });
     db.updateDatabase();
   }

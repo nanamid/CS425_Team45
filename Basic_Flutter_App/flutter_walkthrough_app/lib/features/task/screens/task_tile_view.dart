@@ -6,7 +6,6 @@ import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 
-// might be better do do this in a Form widget
 class TaskTileView extends StatefulWidget {
   final Task task;
   Function(bool?)? onChanged;

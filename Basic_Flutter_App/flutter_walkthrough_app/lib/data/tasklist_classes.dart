@@ -105,10 +105,7 @@ class Task {
 
   // @HiveField(5, defaultValue: DateTime(0))
   @HiveField(5) // requires defaultValue to be const, which DateTime isn't
-  DateTime? _taskDeadline; // has to be set alongside an alarm
-
-  @HiveField(6)
-  List<DateTime> _taskReminders = []; // has to be set alongside an alarm
+  DateTime? taskDeadline; // has to be set alongside an alarm
 
   @HiveField(7)
   List<List<DateTime?>> clockList = // TODO make private?
@@ -208,6 +205,7 @@ class Task {
     this.taskStatus = TaskStatus.TODO,
     this.taskLabel = TaskLabel.Default,
     this.taskDescription,
+    this.taskDeadline,
     // deadline, reminders, clocklist, subtasks, parenttask set with methods
   }) {
     Uuid uuid = Uuid();
