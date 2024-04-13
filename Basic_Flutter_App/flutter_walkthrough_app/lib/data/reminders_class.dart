@@ -150,6 +150,7 @@ class ReminderManager {
     _remindersWithEndNotifications
         .removeWhere((element) => identical(element, reminder));
     _remindersWithAlarms.removeWhere((element) => identical(element, reminder));
+    unregisterReminderTask(reminder);
   }
 
   void registerTaskWithReminder(Reminder reminder, Task task) {
@@ -166,6 +167,7 @@ class ReminderManager {
       return;
     }
     this._taskReminderMap.remove(reminder);
+    this.cancelReminder(reminder);
   }
 
   void unregisterAllRemindersOfTask(Task task) {
@@ -173,6 +175,11 @@ class ReminderManager {
       print('task has no reminders registered');
       return;
     }
+    this._taskReminderMap.forEach((key, value) {
+      if (identical(value, task)) {
+        this.cancelReminder(key);
+      }
+    });
     this._taskReminderMap.removeWhere((key, value) => identical(value, task));
   }
 
