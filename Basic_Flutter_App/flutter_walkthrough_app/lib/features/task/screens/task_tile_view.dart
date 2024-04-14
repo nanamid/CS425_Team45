@@ -84,7 +84,7 @@ class _TaskTileViewState extends State<TaskTileView> {
 
             //Edit or Delete Task
             trailing: SizedBox(
-              width: 75,
+              width: 80,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -180,21 +180,27 @@ class _TaskTileViewState extends State<TaskTileView> {
               padding: const EdgeInsets.only(bottom: 5, top: 5),
               child: Row(
                 children: [
-                  buildText(
-                      widget.task.taskStatus.label,
-                      AppColors.textWhite,
-                      AppSizes.textLarge,
-                      FontWeight.normal,
-                      TextAlign.start,
-                      TextOverflow.clip),
-                  5.width_space,
-                  buildText(
-                      widget.task.taskName,
-                      AppColors.textWhite,
-                      AppSizes.textMedium,
-                      FontWeight.normal,
-                      TextAlign.start,
-                      TextOverflow.clip),
+                  Expanded(
+                    child: buildText(
+                        widget.task.taskStatus.label,
+                        AppColors.textWhite,
+                        AppSizes.textLarge,
+                        FontWeight.normal,
+                        TextAlign.start,
+                        TextOverflow.clip,
+                        maxLines: 1),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: buildText(
+                        widget.task.taskName,
+                        AppColors.textWhite,
+                        AppSizes.textMedium,
+                        FontWeight.normal,
+                        TextAlign.start,
+                        TextOverflow.ellipsis,
+                        maxLines: 1),
+                  ),
                 ],
               ),
             ),
@@ -207,50 +213,53 @@ class _TaskTileViewState extends State<TaskTileView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   //DATE
-                  Container(
-                      width: 100,
-                      //padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(.1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5))),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today_rounded,
-                                  color: AppColors.primaryBackground),
-                              5.width_space,
-                              Expanded(
-                                child: buildText(
-                                    // TODO task date
-                                    'APR 1',
-                                    AppColors.lightGrey,
-                                    AppSizes.textSmall,
-                                    FontWeight.w400,
-                                    TextAlign.start,
-                                    TextOverflow.clip),
-                              )
-                            ],
-                          ),
-
-                          //CATEGORY
-                          Row(children: [
-                            Icon(
-                              Icons.label,
-                              color: AppColors.primaryBackground,
+                  Expanded(
+                    child: Container(
+                        //padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(.1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5))),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.calendar_today_rounded,
+                                    color: AppColors.primaryBackground),
+                                5.width_space,
+                                Expanded(
+                                  child: buildText(
+                                      // TODO task date
+                                      'APR 1',
+                                      AppColors.lightGrey,
+                                      AppSizes.textSmall,
+                                      FontWeight.w400,
+                                      TextAlign.start,
+                                      TextOverflow.clip,
+                                      maxLines: 1),
+                                )
+                              ],
                             ),
-                            5.width_space,
-                            buildText(
-                                widget.task.taskLabel.label,
-                                AppColors.lightGrey,
-                                AppSizes.textSmall,
-                                FontWeight.w400,
-                                TextAlign.start,
-                                TextOverflow.clip),
-                          ]),
-                        ],
-                      )),
+
+                            //CATEGORY
+                            Row(children: [
+                              Icon(
+                                Icons.label,
+                                color: AppColors.primaryBackground,
+                              ),
+                              5.width_space,
+                              buildText(
+                                  widget.task.taskLabel.label,
+                                  AppColors.lightGrey,
+                                  AppSizes.textSmall,
+                                  FontWeight.w400,
+                                  TextAlign.start,
+                                  TextOverflow.fade,
+                                  maxLines: 1),
+                            ]),
+                          ],
+                        )),
+                  ),
                 ],
               ),
             ),
