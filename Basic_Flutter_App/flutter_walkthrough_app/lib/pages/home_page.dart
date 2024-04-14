@@ -4,7 +4,7 @@ import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/pages/auth/user_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:test_app/pages/pomodoro_timer_widget.dart';
+import 'package:test_app/features/task/screens/pomodoro_timer_widget.dart';
 
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
 // then this https://docs.flutter.dev/cookbook/navigation/passing-data
@@ -50,8 +50,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
-  final PomodoroTimer pomodoroTimer =
-      PomodoroTimer(duration: Duration(seconds: 20));
+  final PomodoroTimer pomodoroTimer = PomodoroTimer();
 
   int screenIndex = 1; // default to Tasks view
 

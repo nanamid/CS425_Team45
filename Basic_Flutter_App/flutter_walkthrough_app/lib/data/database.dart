@@ -3,6 +3,7 @@
 // At this point, it's just his function names and served as an example
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:uuid/uuid.dart'; // https://pub.dev/packages/uuid
 import 'package:test_app/data/reminders_class.dart';

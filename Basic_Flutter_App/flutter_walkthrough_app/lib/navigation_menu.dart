@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/features/task/screens/pomodoro_page.dart';
+import 'package:test_app/features/task/screens/pomodoro_timer_widget.dart';
 import 'package:test_app/features/task/screens/task_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
@@ -27,11 +30,12 @@ class NavigationMenu extends StatelessWidget {
               label: "To Do",
             ),
             NavigationDestination(
-              icon: Image.asset(ImageStrings.battleIcon,width: 40, height: 40),
+              icon: Image.asset(ImageStrings.battleIcon, width: 40, height: 40),
               label: "Battle",
             ),
             NavigationDestination(
-              icon: Image.asset(ImageStrings.addTaskIcon, width: 50, height: 50),
+              icon:
+                  Image.asset(ImageStrings.addTaskIcon, width: 50, height: 50),
               label: "Add Task",
             ),
             NavigationDestination(
@@ -59,7 +63,7 @@ class NavigationController extends GetxController {
     TasksPage(),
     Container(color: Colors.red),
     AddTaskPage(),
-    Container(color: Colors.purple),
+    PomodoroPage(),
     Container(color: Colors.pink),
   ];
 }

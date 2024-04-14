@@ -11,7 +11,7 @@ import 'package:test_app/utils/todo_tile.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/confirm_dialog.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
-import 'package:test_app/pages/pomodoro_timer_widget.dart';
+import 'package:test_app/features/task/screens/pomodoro_timer_widget.dart';
 
 class TaskPage extends StatefulWidget {
   final PomodoroTimer pomodoroTimer;
@@ -174,10 +174,9 @@ class _TaskPageState extends State<TaskPage> {
                 ],
               ),
               content: Column(children: [
-                PomodoroTimerWidget(
-                  pomodoroTimer: widget.pomodoroTimer,
-                  task: currentTask,
-                ),
+                // PomodoroTimerWidget(
+                //   task: currentTask,
+                // ),
 
                 // description
                 Text(currentTask.taskDescription ?? "Description"),
