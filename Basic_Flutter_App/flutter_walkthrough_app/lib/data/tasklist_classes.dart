@@ -159,8 +159,7 @@ class Task {
       print("Couldn't add sub task, child already exists");
       return false;
     }
-    if (identical(this, newChild))
-    {
+    if (identical(this, newChild)) {
       print("Couldn't add subtask, is itself");
       return false;
     }

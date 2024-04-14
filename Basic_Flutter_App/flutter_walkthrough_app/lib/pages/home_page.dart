@@ -5,6 +5,7 @@ import 'package:test_app/pages/tasks_page.dart';
 import 'package:test_app/pages/auth/user_page.dart'; // TODO consider replacing this with 'isar' which can also store our objects nicesly, and has real noSql features
 //import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:test_app/pages/pomodoro_timer_widget.dart';
+import 'package:test_app/pages/tasks_page_DB.dart';
 
 // start with this https://api.flutter.dev/flutter/material/BottomAppBar-class.html
 // then this https://docs.flutter.dev/cookbook/navigation/passing-data
@@ -68,9 +69,7 @@ class _HomePageState extends State<HomePage> {
         label: 'Tasks',
         icon: Icon(Icons.task_outlined),
         selectedIcon: Icon(Icons.task),
-        widget: TaskPage(
-          pomodoroTimer: pomodoroTimer,
-        ),
+        widget: TaskPageDB(),
         wantAppBar: true,
       ),
       ViewDestination(

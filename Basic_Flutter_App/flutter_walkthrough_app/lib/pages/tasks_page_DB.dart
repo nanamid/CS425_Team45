@@ -65,8 +65,12 @@ class _TaskPageDBState extends State<TaskPageDB> {
 
   // Handler for clicking the checkbox
   // This changes the "completed" field between true and false
-  void checkBoxChanged(bool? value, String? docID) {
-    //
+  void checkBoxChanged(bool value, String? docID) {
+    if (value) {
+      firestoreService.isDone(docID!, true);
+    } else {
+      firestoreService.isDone(docID!, false);
+    }
   }
 
   @override
@@ -97,25 +101,29 @@ class _TaskPageDBState extends State<TaskPageDB> {
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
                 String noteText = data['taskName'];
-                Task currentTask = (noteText) as Task;
 
-                // Display the tasks as a list tile
+                // Causes error (can't cast String as Task)
+                //Task currentTask = (noteText) as Task;
+
+                // Display the tasks as a task tile
+                /*
                 return TaskTile(
                   task: currentTask,
-                  onChanged: (value) => checkBoxChanged(value, docID),
+                  onChanged: (value) => checkBoxChanged(value!, docID),
                   deleteFunction: (context) async {
                     bool? confirmation = await showDialog(
-                      context: context,
-                      builder: (context) {
-                      return ConfirmDialog();
-                    });
+                        context: context,
+                        builder: (context) {
+                          return ConfirmDialog();
+                        });
                     if (confirmation == true) {
                       firestoreService.deleteTask(docID);
                     }
                   },
                   detailDialogFunction: () {},
                 );
-                /*
+                */
+                /**/
                 return ListTile(
                   title: Text(noteText),
                   trailing: Row(
@@ -132,7 +140,6 @@ class _TaskPageDBState extends State<TaskPageDB> {
                     ],
                   ),
                 );
-                */
               },
             );
           } else {
