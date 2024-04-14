@@ -16,11 +16,13 @@ class ModifyTaskWidget extends StatefulWidget {
       {super.key,
       required this.saveTask,
       required this.cancelSaveTask,
-      required this.task});
+      required this.task,
+      required this.canCancel});
 
   final void Function() saveTask;
   final void Function() cancelSaveTask;
   final Task task;
+  final bool canCancel;
 
   @override
   State<ModifyTaskWidget> createState() => _ModifyTaskWidgetState();
@@ -50,6 +52,9 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
   @override
   Widget build(BuildContext context) {
+    taskNameController.value = TextEditingValue(text: widget.task.taskName);
+    taskDescriptionController.value =
+        TextEditingValue(text: widget.task.taskDescription ?? "");
     return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       // Name
       TextField(
@@ -64,7 +69,7 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
       // Status
       DropdownMenu(
-        initialSelection: TaskStatus.TODO,
+        initialSelection: widget.task.taskStatus,
         helperText: 'Task Status',
         inputDecorationTheme:
             InputDecorationTheme(fillColor: AppColors.primary, filled: true),
@@ -84,7 +89,7 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
       // Label
       DropdownMenu(
-        initialSelection: TaskLabel.Default,
+        initialSelection: widget.task.taskLabel,
         helperText: 'Task Label',
         inputDecorationTheme:
             InputDecorationTheme(fillColor: AppColors.primary, filled: true),
@@ -133,11 +138,18 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
                 null) // date has to be entered first
             {
               TimeOfDay? tempTime = await showTimePicker(
-                  context: context, initialTime: TimeOfDay(hour: 0, minute: 0));
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(widget.task.taskDeadline!)
+                  // TODO validate this
+                  );
               if (tempTime != null) {
                 setState(() {
-                  widget.task.taskDeadline = widget.task.taskDeadline!.add(
-                      Duration(hours: tempTime.hour, minutes: tempTime.minute));
+                  widget.task.taskDeadline = DateTime(
+                      widget.task.taskDeadline!.year,
+                      widget.task.taskDeadline!.month,
+                      widget.task.taskDeadline!.day,
+                      tempTime.hour,
+                      tempTime.minute);
                 });
               }
             }
@@ -168,18 +180,26 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
           const SizedBox(width: 8),
 
           //CANCEL
-          ElevatedButton(
-            style: TextButton.styleFrom(
-                backgroundColor: AppColors.buttonSecondary),
-            onPressed: () async {
-              bool? confirmation;
-              confirmation = await confirmCancelTaskDialog(context);
-              if (confirmation == true) {
-                _cancelSaveTask();
-              }
-            },
-            child: buildText('Cancel', AppColors.textWhite, AppSizes.textSmall,
-                FontWeight.normal, TextAlign.left, TextOverflow.clip),
+          Visibility(
+            visible: widget.canCancel,
+            child: ElevatedButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: AppColors.buttonSecondary),
+              onPressed: () async {
+                bool? confirmation;
+                confirmation = await confirmCancelTaskDialog(context);
+                if (confirmation == true) {
+                  _cancelSaveTask();
+                }
+              },
+              child: buildText(
+                  'Cancel',
+                  AppColors.textWhite,
+                  AppSizes.textSmall,
+                  FontWeight.normal,
+                  TextAlign.left,
+                  TextOverflow.clip),
+            ),
           ),
         ],
       )

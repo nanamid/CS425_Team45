@@ -47,6 +47,7 @@ class AddTaskPage extends StatelessWidget {
             saveTask: saveTask,
             cancelSaveTask: cancelSaveTask,
             task: newTask,
+            canCancel: true,
           ),
         ));
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:test_app/common/widgets/build_text.dart';
+import 'package:test_app/features/task/screens/task_edit_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/sizes.dart';
@@ -108,12 +110,19 @@ class _TaskTileViewState extends State<TaskTileView> {
                       switch (value) {
                         case 0:
                           {
-                            // TODO Push to Edit Page
+                            // Push to Edit Page
+                            Get.to(EditTaskPage(existingTask: widget.task))
+                                ?.then((_) {
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            });
                             break;
                           }
                         case 1:
                           {
                             // Push to Delete functionality
+                            // actually a showdialog
                             if (widget.deleteFunction != null) {
                               widget.deleteFunction!(context);
                             }
