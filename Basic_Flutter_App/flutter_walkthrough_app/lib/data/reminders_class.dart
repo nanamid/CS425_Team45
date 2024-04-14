@@ -290,17 +290,32 @@ class ReminderManager {
 
     // we still want this to run regardless of the timeout
     // would not conflict with a reminder in notificationIDToReminder.keys, but could possibly conflict with a notification created outside this class
-    final int newKey = existingNotificationIDs.isEmpty
-        ? 0
-        : existingNotificationIDs.reduce(max) + 1;
+    final int newKey;
+
+    if (existingNotificationIDs.isEmpty) {
+      newKey = 0;
+    } else {
+      int temp = 0;
+      while (existingNotificationIDs.contains(temp)) {
+        temp++;
+      }
+      newKey = temp;
+    }
 
     return newKey;
   }
 
   _findNextAvailableAlarmID() {
-    final int newKey = _alarmIDToReminder.isEmpty
-        ? 0
-        : _alarmIDToReminder.keys.reduce(max) + 1;
+    final int newKey;
+    if (_alarmIDToReminder.isEmpty) {
+      newKey = 0;
+    } else {
+      int temp = 0;
+      while (_alarmIDToReminder.keys.contains(temp)) {
+        temp++;
+      }
+      newKey = temp;
+    }
 
     return newKey;
   }
