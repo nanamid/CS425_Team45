@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/features/task/screens/task_edit_page.dart';
@@ -7,11 +8,12 @@ import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:test_app/data/tasklist_classes.dart';
+import 'package:test_app/utils/todo_tile.dart';
 
 class TaskTileView extends StatefulWidget {
   final Task task;
   Function(bool?)? onChanged;
-  Function(BuildContext)? deleteFunction;
+  Function(BuildContext, Task)? deleteFunction;
   Function()? detailDialogFunction;
   final int taskIndex;
 
@@ -38,11 +40,16 @@ class _TaskTileViewState extends State<TaskTileView> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: widget.detailDialogFunction,
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          if (widget.detailDialogFunction != null) {
+            widget.detailDialogFunction!();
+          }
+        },
         child: AnimatedContainer(
           //I'll eventually replace this with a custom card view or TaskTileView
           duration: const Duration(milliseconds: 600),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
               color: AppColors.accent,
               borderRadius: BorderRadius.circular(10),
@@ -53,7 +60,8 @@ class _TaskTileViewState extends State<TaskTileView> {
                   offset: const Offset(0, 4),
                 ),
               ]),
-          child: ListTile(
+          child: ExpansionTile(
+            backgroundColor: AppColors.primary,
             //Check Icon
             leading: Column(
               children: [
@@ -99,76 +107,116 @@ class _TaskTileViewState extends State<TaskTileView> {
                     height: 30,
                   ),
 
-                  //EDIT OR DELETE TASK BUTTON
-                  PopupMenuButton<int>(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    color: AppColors.light,
-                    elevation: 1,
-                    onSelected: (value) {
-                      switch (value) {
-                        case 0:
-                          {
-                            // Push to Edit Page
-                            Get.to(EditTaskPage(existingTask: widget.task))
-                                ?.then((_) {
-                              if (mounted) {
-                                setState(() {});
+                  //EDIT OR DELETE TASK BUTTON and Information Button
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: PopupMenuButton<int>(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            color: AppColors.light,
+                            elevation: 1,
+                            onSelected: (value) {
+                              switch (value) {
+                                case 0:
+                                  {
+                                    // Push to Edit Page
+                                    Get.to(EditTaskPage(
+                                            existingTask: widget.task))
+                                        ?.then((_) {
+                                      if (mounted) {
+                                        setState(() {});
+                                      }
+                                    });
+                                    break;
+                                  }
+                                case 1:
+                                  {
+                                    // Detail dialog
+                                    if (widget.detailDialogFunction != null) {
+                                      widget.detailDialogFunction!();
+                                    }
+                                    break;
+                                  }
+                                case 2:
+                                  {
+                                    // Push to Delete functionality
+                                    // actually a showdialog
+                                    if (widget.deleteFunction != null) {
+                                      widget.deleteFunction!(
+                                          context, widget.task);
+                                    }
+                                    break;
+                                  }
                               }
-                            });
-                            break;
-                          }
-                        case 1:
-                          {
-                            // Push to Delete functionality
-                            // actually a showdialog
-                            if (widget.deleteFunction != null) {
-                              widget.deleteFunction!(context);
-                            }
-                            break;
-                          }
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return [
-                        PopupMenuItem<int>(
-                          value: 0,
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit),
-                              10.width_space,
-                              buildText(
-                                  'Edit task',
-                                  AppColors.dark,
-                                  AppSizes.textMedium,
-                                  FontWeight.normal,
-                                  TextAlign.start,
-                                  TextOverflow.clip)
-                            ],
+                            },
+                            itemBuilder: (BuildContext context) {
+                              return [
+                                PopupMenuItem<int>(
+                                  value: 0,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit),
+                                      10.width_space,
+                                      buildText(
+                                          'Edit task',
+                                          AppColors.dark,
+                                          AppSizes.textMedium,
+                                          FontWeight.normal,
+                                          TextAlign.start,
+                                          TextOverflow.clip)
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<int>(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.info),
+                                      10.width_space,
+                                      buildText(
+                                          'Task Details',
+                                          AppColors.dark,
+                                          AppSizes.textMedium,
+                                          FontWeight.normal,
+                                          TextAlign.start,
+                                          TextOverflow.clip)
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<int>(
+                                  value: 2,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete),
+                                      10.width_space,
+                                      buildText(
+                                          'Delete task',
+                                          Colors.red.shade300,
+                                          AppSizes.textMedium,
+                                          FontWeight.normal,
+                                          TextAlign.start,
+                                          TextOverflow.clip)
+                                    ],
+                                  ),
+                                ),
+                              ];
+                            },
+                            child: Icon(
+                              Icons.more_vert,
+                              color: AppColors.primaryBackground,
+                            ),
                           ),
                         ),
-                        PopupMenuItem<int>(
-                          value: 1,
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete),
-                              10.width_space,
-                              buildText(
-                                  'Delete task',
-                                  Colors.red.shade300,
-                                  AppSizes.textMedium,
-                                  FontWeight.normal,
-                                  TextAlign.start,
-                                  TextOverflow.clip)
-                            ],
-                          ),
-                        ),
-                      ];
-                    },
-                    child: Icon(
-                      Icons.more_vert,
-                      color: AppColors.primaryBackground,
+                        Expanded(
+                            child: IconButton(
+                                onPressed: widget.detailDialogFunction,
+                                color: AppColors.buttonSecondary,
+                                icon: Icon(Icons.info_outline)))
+                      ],
                     ),
                   ),
                 ],
@@ -263,6 +311,16 @@ class _TaskTileViewState extends State<TaskTileView> {
                 ],
               ),
             ),
+
+            // Children tiles
+            children: [
+              for (final child in widget.task.taskSubtasks)
+                TaskTileView(
+                    task: child,
+                    onChanged: widget.onChanged,
+                    deleteFunction: widget.deleteFunction,
+                    taskIndex: widget.taskIndex)
+            ],
           ),
         ));
   }

@@ -231,12 +231,11 @@ class _TaskListViewState extends State<TaskListView> {
     db.updateDatabase();
   }
 
-  void deleteTask(int index) {
+  void deleteTask(Task task) {
     setState(() {
       TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
-      Task element = currentTaskList.list[index];
-      currentTaskList.removeTask(element);
-      db.reminderManager.unregisterAllRemindersOfTask(element);
+      currentTaskList.removeTask(task);
+      db.reminderManager.unregisterAllRemindersOfTask(task);
     });
     db.updateDatabase();
   }
@@ -246,6 +245,9 @@ class _TaskListViewState extends State<TaskListView> {
     //TextTheme textTheme = Theme.of(context).textTheme;
     TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
     List<Task> currentTaskListOfTasks = currentTaskList.list;
+    List<Task> listOfTopLevelTasks = currentTaskList.list
+        .where((element) => element.taskParentTask == null)
+        .toList(); // otherwise it shows parent tasks with their expansion list of children, as well as the children themselves later in the list
 
     return Container(
       decoration: BoxDecoration(
@@ -253,7 +255,7 @@ class _TaskListViewState extends State<TaskListView> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         color: AppColors.secondary,
       ),
-      child: currentTaskListOfTasks.isNotEmpty
+      child: listOfTopLevelTasks.isNotEmpty
 
           //Task List HAS ITEMS
           ? ListView.separated(
@@ -261,16 +263,15 @@ class _TaskListViewState extends State<TaskListView> {
               padding: EdgeInsets.all(15),
               separatorBuilder: (context, index) =>
                   10.height_space, //use space extenion here "15.height_space"
-              itemCount: currentTaskListOfTasks.length,
+              itemCount: listOfTopLevelTasks.length,
               itemBuilder: (context, index) {
-                Task currentTask = currentTaskListOfTasks[index];
+                Task currentTask = listOfTopLevelTasks[index];
                 return Dismissible(
                   key: UniqueKey(),
                   onDismissed: (direction) {
                     HapticFeedback.mediumImpact();
-                    //testing.deleteTask(index);
-
-                    deleteTask(index);
+                    deleteTask(
+                        currentTask); // TODO see if there's a way to dismiss child tasks, not the entire parent
                   },
                   background: Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
@@ -288,10 +289,10 @@ class _TaskListViewState extends State<TaskListView> {
                       task: currentTask,
                       taskIndex: index,
                       onChanged: (value) => checkBoxChanged(value, index),
-                      deleteFunction: (context) async {
+                      deleteFunction: (context, taskToDelete) async {
                         bool? confirmation = await confirmDialog(context);
                         if (confirmation == true) {
-                          deleteTask(index);
+                          deleteTask(taskToDelete);
                         }
                       },
                       detailDialogFunction: () =>
@@ -313,7 +314,7 @@ class _TaskListViewState extends State<TaskListView> {
                     width: 200,
                     height: 200,
                     child: Lottie.asset(ImageStrings.noTasksAnimation,
-                        animate: currentTaskListOfTasks.isNotEmpty
+                        animate: listOfTopLevelTasks.isNotEmpty
                             ? false
                             : true), //Conditional is saying, play animation if testing is empty
                   ),
