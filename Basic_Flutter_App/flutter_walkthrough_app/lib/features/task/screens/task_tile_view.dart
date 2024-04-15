@@ -8,7 +8,7 @@ import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:test_app/data/tasklist_classes.dart';
-import 'package:test_app/utils/todo_tile.dart';
+import 'package:intl/intl.dart';
 
 class TaskTileView extends StatefulWidget {
   final Task task;
@@ -229,14 +229,19 @@ class _TaskTileViewState extends State<TaskTileView> {
               child: Row(
                 children: [
                   Expanded(
-                    child: buildText(
-                        widget.task.taskStatus.label,
-                        AppColors.textWhite,
-                        AppSizes.textLarge,
-                        FontWeight.normal,
-                        TextAlign.start,
-                        TextOverflow.clip,
-                        maxLines: 1),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(.1),
+                      ),
+                      child: buildText(
+                          widget.task.taskStatus.label,
+                          AppColors.textWhite,
+                          AppSizes.textLarge,
+                          FontWeight.bold,
+                          TextAlign.start,
+                          TextOverflow.clip,
+                          maxLines: 1),
+                    ),
                   ),
                   Expanded(
                     flex: 2,
@@ -260,7 +265,6 @@ class _TaskTileViewState extends State<TaskTileView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  //DATE
                   Expanded(
                     child: Container(
                         //padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
@@ -270,23 +274,29 @@ class _TaskTileViewState extends State<TaskTileView> {
                                 const BorderRadius.all(Radius.circular(5))),
                         child: Column(
                           children: [
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today_rounded,
-                                    color: AppColors.primaryBackground),
-                                5.width_space,
-                                Expanded(
-                                  child: buildText(
-                                      // TODO task date
-                                      'APR 1',
-                                      AppColors.lightGrey,
-                                      AppSizes.textSmall,
-                                      FontWeight.w400,
-                                      TextAlign.start,
-                                      TextOverflow.clip,
-                                      maxLines: 1),
-                                )
-                              ],
+                            // Task Deadline
+                            Visibility(
+                              visible: widget.task.taskDeadline != null,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.calendar_today_rounded,
+                                      color: AppColors.primaryBackground),
+                                  5.width_space,
+                                  Expanded(
+                                    child: buildText(
+                                        DateFormat('MMM d').format(widget
+                                                .task.taskDeadline ??
+                                            DateTime
+                                                .now()), // won't show the null case because of Visibility widget above
+                                        AppColors.lightGrey,
+                                        AppSizes.textSmall,
+                                        FontWeight.w400,
+                                        TextAlign.start,
+                                        TextOverflow.clip,
+                                        maxLines: 1),
+                                  )
+                                ],
+                              ),
                             ),
 
                             //CATEGORY

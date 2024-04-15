@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:test_app/data/database.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 
 class TaskInfoView extends StatelessWidget {
   const TaskInfoView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // needs a listener for when task_list_view redraws
+    TodoDatabase db = TodoDatabase();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    db.loadData();
+    TaskList taskList = db.listOfTaskLists[taskListIndex];
     return Container(
       margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
       child: Row(
@@ -23,7 +30,7 @@ class TaskInfoView extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.center,
                         child: FittedBox(
-                          child: Text("3",
+                          child: Text(taskList.list.length.toString(),
                               style: TextStyle(
                                   fontSize: 28,
                                   color: Colors.black,
@@ -61,7 +68,13 @@ class TaskInfoView extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.center,
                         child: FittedBox(
-                          child: Text("5",
+                          child: Text(
+                              taskList.list
+                                  .where((element) =>
+                                      element.taskStatus != TaskStatus.DONE)
+                                  .toList()
+                                  .length
+                                  .toString(),
                               style: TextStyle(
                                   fontSize: 28,
                                   color: Colors.black,

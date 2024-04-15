@@ -9,6 +9,7 @@ import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:test_app/data/database.dart';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // Might be better to do this in a form widget
 class ModifyTaskWidget extends StatefulWidget {
@@ -82,21 +83,26 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
       // Name
       TextField(
         controller: taskNameController,
+        style: TextStyle(color: AppColors.textWhite),
         onChanged: (String text) => widget._workingTaskName = text,
         decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          fillColor: AppColors.primary,
-          filled: true,
-          hintText: "Task Name",
-        ),
+            border: OutlineInputBorder(),
+            fillColor: AppColors.secondary,
+            filled: true,
+            hintText: "Task Name",
+            hintStyle: TextStyle(color: AppColors.textWhite)),
       ),
 
       // Status
       DropdownMenu(
         initialSelection: widget._workingTaskStatus,
         helperText: 'Task Status',
-        inputDecorationTheme:
-            InputDecorationTheme(fillColor: AppColors.primary, filled: true),
+        textStyle: TextStyle(color: AppColors.textWhite),
+        inputDecorationTheme: InputDecorationTheme(
+          fillColor: AppColors.secondary,
+          filled: true,
+          helperStyle: TextStyle(color: AppColors.textWhite),
+        ),
         onSelected: (TaskStatus? status) {
           if (status != null) {
             setState(() => widget._workingTaskStatus = status);
@@ -115,8 +121,12 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
       DropdownMenu(
         initialSelection: widget._workingTaskLabel,
         helperText: 'Task Label',
-        inputDecorationTheme:
-            InputDecorationTheme(fillColor: AppColors.primary, filled: true),
+        textStyle: TextStyle(color: AppColors.textWhite),
+        inputDecorationTheme: InputDecorationTheme(
+          fillColor: AppColors.secondary,
+          filled: true,
+          helperStyle: TextStyle(color: AppColors.textWhite),
+        ),
         onSelected: (TaskLabel? label) {
           if (label != null) {
             setState(() => widget._workingTaskLabel = label);
@@ -134,55 +144,71 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
       // Description
       TextField(
         controller: taskDescriptionController,
+        style: TextStyle(color: AppColors.textWhite),
         onChanged: (String text) => widget._workingTaskDescription = text,
         decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          fillColor: AppColors.primary,
-          filled: true,
-          hintText: "Description",
-        ),
+            border: OutlineInputBorder(),
+            fillColor: AppColors.secondary,
+            filled: true,
+            hintText: "Task Description",
+            hintStyle: TextStyle(color: AppColors.textWhite)),
       ),
 
-      ElevatedButton(
-        onPressed: () async {
-          widget._workingTaskDeadline = await showDatePicker(
-              context: context,
-              initialDate: widget._workingTaskDeadline,
-              firstDate: DateTime.now(),
-              lastDate: DateTime.utc(9999, 01, 01));
-          setState(() {});
-        },
-        child: Text(widget._workingTaskDeadline == null
-            ? "Deadline Date"
-            : "${widget._workingTaskDeadline!.year}-${widget._workingTaskDeadline!.month}-${widget._workingTaskDeadline!.day}"),
-      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Date
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+                foregroundColor: AppColors.textWhite),
+            onPressed: () async {
+              widget._workingTaskDeadline = await showDatePicker(
+                  context: context,
+                  initialDate: widget._workingTaskDeadline,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.utc(9999, 01, 01));
+              setState(() {});
+            },
+            child: Text(widget._workingTaskDeadline == null
+                ? "Deadline Date"
+                : DateFormat('yMMMMd').format(widget.task.taskDeadline!)),
+          ),
 
-      ElevatedButton(
-        onPressed: () async {
-          if (widget._workingTaskDeadline !=
-              null) // date has to be entered first
-          {
-            TimeOfDay? tempTime = await showTimePicker(
-                context: context,
-                initialTime:
-                    TimeOfDay.fromDateTime(widget._workingTaskDeadline!)
-                // TODO validate this
-                );
-            if (tempTime != null) {
-              setState(() {
-                widget._workingTaskDeadline = DateTime(
-                    widget._workingTaskDeadline!.year,
-                    widget._workingTaskDeadline!.month,
-                    widget._workingTaskDeadline!.day,
-                    tempTime.hour,
-                    tempTime.minute);
-              });
-            }
-          }
-        },
-        child: Text(widget._workingTaskDeadline == null
-            ? "Time"
-            : "${widget._workingTaskDeadline!.hour.toString().padLeft(2, '0')}:${widget._workingTaskDeadline!.minute.toString().padLeft(2, '0')}"),
+          5.width_space,
+
+          // Time
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+                foregroundColor: AppColors.textWhite),
+            onPressed: () async {
+              if (widget._workingTaskDeadline !=
+                  null) // date has to be entered first
+              {
+                TimeOfDay? tempTime = await showTimePicker(
+                    context: context,
+                    initialTime:
+                        TimeOfDay.fromDateTime(widget._workingTaskDeadline!)
+                    // TODO validate this
+                    );
+                if (tempTime != null) {
+                  setState(() {
+                    widget._workingTaskDeadline = DateTime(
+                        widget._workingTaskDeadline!.year,
+                        widget._workingTaskDeadline!.month,
+                        widget._workingTaskDeadline!.day,
+                        tempTime.hour,
+                        tempTime.minute);
+                  });
+                }
+              }
+            },
+            child: Text(widget._workingTaskDeadline == null
+                ? "Time"
+                : DateFormat('Hm').format(widget.task.taskDeadline!)),
+          ),
+        ],
       ),
 
       // Set parent task
