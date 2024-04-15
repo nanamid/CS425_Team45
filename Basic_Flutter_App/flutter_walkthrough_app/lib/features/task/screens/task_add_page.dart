@@ -20,11 +20,12 @@ class AddTaskPage extends StatelessWidget {
     final NavigationController controller = Get.find();
     final Task newTask = Task(taskName: "");
 
+    TodoDatabase db = TodoDatabase();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    db.loadData();
+    TaskList taskList = db.listOfTaskLists[taskListIndex];
+
     void saveTask() {
-      TodoDatabase db = TodoDatabase();
-      final taskListIndex = 0; // hardcoded one tasklist for now
-      db.loadData();
-      TaskList taskList = db.listOfTaskLists[taskListIndex];
       taskList.addTask(newTask);
 
       if (newTask.taskDeadline != null) {
@@ -48,6 +49,7 @@ class AddTaskPage extends StatelessWidget {
             cancelSaveTask: cancelSaveTask,
             task: newTask,
             canCancel: true,
+            taskList: taskList,
           ),
         ));
   }
