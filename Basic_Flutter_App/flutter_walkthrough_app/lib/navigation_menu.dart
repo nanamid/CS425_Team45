@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:test_app/features/task/screens/task_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
+import 'package:test_app/features/task/screens/task_add_page.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -57,7 +58,7 @@ class NavigationController extends GetxController {
   final screens = [
     TasksPage(),
     Container(color: Colors.red),
-    Container(color: Colors.yellow),
+    AddTaskPage(),
     Container(color: Colors.purple),
     Container(color: Colors.pink),
   ];

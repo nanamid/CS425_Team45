@@ -50,13 +50,37 @@ class TaskList {
 @HiveType(typeId: 1)
 enum TaskStatus {
   @HiveField(0)
-  TODO,
+  TODO('TODO'),
 
   @HiveField(1)
-  DONE,
+  DONE('DONE'),
 
   @HiveField(2)
-  WAIT,
+  WAIT('WAIT');
+
+  const TaskStatus(this.label);
+  final String label;
+}
+
+@HiveType(typeId: 3)
+enum TaskLabel {
+  @HiveField(0)
+  Study('Study Hour'),
+
+  @HiveField(1)
+  Homework('Homework'),
+
+  @HiveField(2)
+  Project('Project'),
+
+  @HiveField(3)
+  Programming('Programming'),
+
+  @HiveField(4)
+  Default('Default');
+
+  const TaskLabel(this.label);
+  final String label;
 }
 
 // Task
@@ -67,24 +91,21 @@ class Task {
   String? _taskUUID;
   String? get taskUUID => _taskUUID;
 
-  @HiveField(1, defaultValue: "none")
+  @HiveField(1, defaultValue: "Default Task")
   String taskName;
 
   @HiveField(2, defaultValue: TaskStatus.TODO)
   TaskStatus taskStatus;
 
-  @HiveField(3, defaultValue: "none")
-  String? taskLabel;
+  @HiveField(3, defaultValue: TaskLabel.Default)
+  TaskLabel taskLabel;
 
-  @HiveField(4, defaultValue: "none")
+  @HiveField(4, defaultValue: "Default Description")
   String? taskDescription;
 
   // @HiveField(5, defaultValue: DateTime(0))
   @HiveField(5) // requires defaultValue to be const, which DateTime isn't
-  DateTime? _taskDeadline; // has to be set alongside an alarm
-
-  @HiveField(6)
-  List<DateTime> _taskReminders = []; // has to be set alongside an alarm
+  DateTime? taskDeadline; // has to be set alongside an alarm
 
   @HiveField(7)
   List<List<DateTime?>> clockList = // TODO make private?
@@ -159,8 +180,7 @@ class Task {
       print("Couldn't add sub task, child already exists");
       return false;
     }
-    if (identical(this, newChild))
-    {
+    if (identical(this, newChild)) {
       print("Couldn't add subtask, is itself");
       return false;
     }
@@ -183,8 +203,9 @@ class Task {
   Task({
     required this.taskName,
     this.taskStatus = TaskStatus.TODO,
-    this.taskLabel,
+    this.taskLabel = TaskLabel.Default,
     this.taskDescription,
+    this.taskDeadline,
     // deadline, reminders, clocklist, subtasks, parenttask set with methods
   }) {
     Uuid uuid = Uuid();

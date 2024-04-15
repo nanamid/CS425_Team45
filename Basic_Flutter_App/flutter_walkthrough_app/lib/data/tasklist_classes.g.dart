@@ -57,14 +57,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      taskName: fields[1] == null ? 'none' : fields[1] as String,
+      taskName: fields[1] == null ? 'Default Task' : fields[1] as String,
       taskStatus: fields[2] == null ? TaskStatus.TODO : fields[2] as TaskStatus,
-      taskLabel: fields[3] == null ? 'none' : fields[3] as String?,
-      taskDescription: fields[4] == null ? 'none' : fields[4] as String?,
+      taskLabel: fields[3] == null ? TaskLabel.Default : fields[3] as TaskLabel,
+      taskDescription:
+          fields[4] == null ? 'Default Description' : fields[4] as String?,
+      taskDeadline: fields[5] as DateTime?,
     )
       .._taskUUID = fields[0] as String?
-      .._taskDeadline = fields[5] as DateTime?
-      .._taskReminders = (fields[6] as List).cast<DateTime>()
       ..clockList = (fields[7] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
@@ -77,7 +77,7 @@ class TaskAdapter extends TypeAdapter<Task> {
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj._taskUUID)
       ..writeByte(1)
@@ -89,9 +89,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(4)
       ..write(obj.taskDescription)
       ..writeByte(5)
-      ..write(obj._taskDeadline)
-      ..writeByte(6)
-      ..write(obj._taskReminders)
+      ..write(obj.taskDeadline)
       ..writeByte(7)
       ..write(obj.clockList)
       ..writeByte(8)
@@ -155,6 +153,60 @@ class TaskStatusAdapter extends TypeAdapter<TaskStatus> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TaskStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class TaskLabelAdapter extends TypeAdapter<TaskLabel> {
+  @override
+  final int typeId = 3;
+
+  @override
+  TaskLabel read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return TaskLabel.Study;
+      case 1:
+        return TaskLabel.Homework;
+      case 2:
+        return TaskLabel.Project;
+      case 3:
+        return TaskLabel.Programming;
+      case 4:
+        return TaskLabel.Default;
+      default:
+        return TaskLabel.Study;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, TaskLabel obj) {
+    switch (obj) {
+      case TaskLabel.Study:
+        writer.writeByte(0);
+        break;
+      case TaskLabel.Homework:
+        writer.writeByte(1);
+        break;
+      case TaskLabel.Project:
+        writer.writeByte(2);
+        break;
+      case TaskLabel.Programming:
+        writer.writeByte(3);
+        break;
+      case TaskLabel.Default:
+        writer.writeByte(4);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TaskLabelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
