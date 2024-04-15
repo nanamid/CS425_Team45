@@ -20,10 +20,12 @@ class EditTaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void saveTask() {
-      TodoDatabase db = TodoDatabase();
-      db.loadData();
+    TodoDatabase db = TodoDatabase();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    db.loadData();
+    TaskList taskList = db.listOfTaskLists[taskListIndex];
 
+    void saveTask() {
       // the deadline may have changed, so we always delete the original notification
       // we do not touch the persistent notification
       for (final reminder
@@ -63,6 +65,7 @@ class EditTaskPage extends StatelessWidget {
             cancelSaveTask: cancelSaveTask,
             task: existingTask,
             canCancel: false,
+            taskList: taskList,
           ),
         ));
   }

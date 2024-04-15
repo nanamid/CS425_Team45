@@ -12,17 +12,34 @@ import 'package:get/get.dart';
 
 // Might be better to do this in a form widget
 class ModifyTaskWidget extends StatefulWidget {
-  const ModifyTaskWidget(
-      {super.key,
-      required this.saveTask,
-      required this.cancelSaveTask,
-      required this.task,
-      required this.canCancel});
+  ModifyTaskWidget({
+    super.key,
+    required this.saveTask,
+    required this.cancelSaveTask,
+    required this.task,
+    required this.canCancel,
+    required this.taskList,
+  })  : _workingTaskName = task.taskName,
+        _workingTaskStatus = task.taskStatus,
+        _workingTaskLabel = task.taskLabel,
+        _workingTaskDescription = task.taskDescription,
+        _workingTaskDeadline = task.taskDeadline,
+        _workingParentTask = task.taskParentTask;
 
   final void Function() saveTask;
   final void Function() cancelSaveTask;
   final Task task;
   final bool canCancel;
+  final TaskList taskList;
+
+  // temporary copies of task's fields that we can change without ruining the actual task
+  String _workingTaskName;
+  TaskStatus _workingTaskStatus;
+  TaskLabel _workingTaskLabel;
+  String? _workingTaskDescription;
+  DateTime? _workingTaskDeadline;
+  Task?
+      _workingParentTask; // On _saveTask() parentTask is what will become the parent of this newly created/modified task
 
   @override
   State<ModifyTaskWidget> createState() => _ModifyTaskWidgetState();
@@ -34,15 +51,20 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
   // final TextEditingController taskLabelController = TextEditingController();
   final TextEditingController taskDescriptionController =
       TextEditingController();
-  // TODO parent task
 
   /* tell the higher widget we are done modifying the task.
      this class just modifies the task its given,
      What the calling class does with it is its problem.
   */
   void _saveTask() {
-    widget.task.taskName = taskNameController.text;
-    widget.task.taskDescription = taskDescriptionController.text;
+    widget.task.taskName = widget._workingTaskName;
+    widget.task.taskStatus = widget._workingTaskStatus;
+    widget.task.taskLabel = widget._workingTaskLabel;
+    widget.task.taskDescription = widget._workingTaskDescription;
+    widget.task.taskDeadline = widget._workingTaskDeadline;
+
+    widget._workingParentTask?.setSubTask(widget.task);
+
     widget.saveTask();
   }
 
@@ -52,13 +74,15 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    taskNameController.value = TextEditingValue(text: widget.task.taskName);
+    taskNameController.value = TextEditingValue(text: widget._workingTaskName);
     taskDescriptionController.value =
-        TextEditingValue(text: widget.task.taskDescription ?? "");
+        TextEditingValue(text: widget._workingTaskDescription ?? "");
+
     return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       // Name
       TextField(
         controller: taskNameController,
+        onChanged: (String text) => widget._workingTaskName = text,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
           fillColor: AppColors.primary,
@@ -69,13 +93,13 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
       // Status
       DropdownMenu(
-        initialSelection: widget.task.taskStatus,
+        initialSelection: widget._workingTaskStatus,
         helperText: 'Task Status',
         inputDecorationTheme:
             InputDecorationTheme(fillColor: AppColors.primary, filled: true),
         onSelected: (TaskStatus? status) {
           if (status != null) {
-            setState(() => widget.task.taskStatus = status);
+            setState(() => widget._workingTaskStatus = status);
           }
         },
         dropdownMenuEntries: TaskStatus.values
@@ -89,13 +113,13 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
       // Label
       DropdownMenu(
-        initialSelection: widget.task.taskLabel,
+        initialSelection: widget._workingTaskLabel,
         helperText: 'Task Label',
         inputDecorationTheme:
             InputDecorationTheme(fillColor: AppColors.primary, filled: true),
         onSelected: (TaskLabel? label) {
           if (label != null) {
-            setState(() => widget.task.taskLabel = label);
+            setState(() => widget._workingTaskLabel = label);
           }
         },
         dropdownMenuEntries: TaskLabel.values
@@ -110,6 +134,7 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
       // Description
       TextField(
         controller: taskDescriptionController,
+        onChanged: (String text) => widget._workingTaskDescription = text,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
           fillColor: AppColors.primary,
@@ -120,43 +145,69 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
 
       ElevatedButton(
         onPressed: () async {
-          widget.task.taskDeadline = await showDatePicker(
+          widget._workingTaskDeadline = await showDatePicker(
               context: context,
-              initialDate: widget.task.taskDeadline,
+              initialDate: widget._workingTaskDeadline,
               firstDate: DateTime.now(),
               lastDate: DateTime.utc(9999, 01, 01));
           setState(() {});
         },
-        child: Text(widget.task.taskDeadline == null
+        child: Text(widget._workingTaskDeadline == null
             ? "Deadline Date"
-            : "${widget.task.taskDeadline!.year}-${widget.task.taskDeadline!.month}-${widget.task.taskDeadline!.day}"),
+            : "${widget._workingTaskDeadline!.year}-${widget._workingTaskDeadline!.month}-${widget._workingTaskDeadline!.day}"),
       ),
 
       ElevatedButton(
-          onPressed: () async {
-            if (widget.task.taskDeadline !=
-                null) // date has to be entered first
-            {
-              TimeOfDay? tempTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.fromDateTime(widget.task.taskDeadline!)
-                  // TODO validate this
-                  );
-              if (tempTime != null) {
-                setState(() {
-                  widget.task.taskDeadline = DateTime(
-                      widget.task.taskDeadline!.year,
-                      widget.task.taskDeadline!.month,
-                      widget.task.taskDeadline!.day,
-                      tempTime.hour,
-                      tempTime.minute);
-                });
-              }
+        onPressed: () async {
+          if (widget._workingTaskDeadline !=
+              null) // date has to be entered first
+          {
+            TimeOfDay? tempTime = await showTimePicker(
+                context: context,
+                initialTime:
+                    TimeOfDay.fromDateTime(widget._workingTaskDeadline!)
+                // TODO validate this
+                );
+            if (tempTime != null) {
+              setState(() {
+                widget._workingTaskDeadline = DateTime(
+                    widget._workingTaskDeadline!.year,
+                    widget._workingTaskDeadline!.month,
+                    widget._workingTaskDeadline!.day,
+                    tempTime.hour,
+                    tempTime.minute);
+              });
             }
-          },
-          child: Text(widget.task.taskDeadline == null
-              ? "Time"
-              : "${widget.task.taskDeadline!.hour.toString().padLeft(2, '0')}:${widget.task.taskDeadline!.minute.toString().padLeft(2, '0')}")),
+          }
+        },
+        child: Text(widget._workingTaskDeadline == null
+            ? "Time"
+            : "${widget._workingTaskDeadline!.hour.toString().padLeft(2, '0')}:${widget._workingTaskDeadline!.minute.toString().padLeft(2, '0')}"),
+      ),
+
+      // Set parent task
+      DropdownMenu(
+        initialSelection: widget._workingParentTask,
+        helperText: 'Set parent task',
+        inputDecorationTheme:
+            InputDecorationTheme(fillColor: AppColors.primary, filled: true),
+        onSelected: (Task? task) {
+          if (task != null) {
+            setState(() {
+              widget._workingParentTask = task;
+            });
+          }
+        },
+        dropdownMenuEntries: widget.taskList.list
+            .map<DropdownMenuEntry<Task>>((Task task) {
+              return DropdownMenuEntry<Task>(value: task, label: task.taskName);
+            })
+            .where((element) => !identical(
+                element.value,
+                widget
+                    .task)) // don't show this task in the list of potential parents
+            .toList(),
+      ),
 
       //Button to save or cancel input
       Row(
