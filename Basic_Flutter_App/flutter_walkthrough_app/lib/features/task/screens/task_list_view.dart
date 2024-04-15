@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/data/reminders_class.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
+import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 import 'package:lottie/lottie.dart';
@@ -47,6 +50,7 @@ class _TaskListViewState extends State<TaskListView> {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
+              backgroundColor: Colors.grey.shade100,
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -74,13 +78,35 @@ class _TaskListViewState extends State<TaskListView> {
               ),
               content: Column(children: [
                 // description
-                Text(currentTask.taskDescription ?? "Description"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: buildText(
+                      currentTask.taskDeadline != null
+                          ? 'Deadline: ${DateFormat('yMMMMd').format(currentTask.taskDeadline!)} ${DateFormat('Hm').format(currentTask.taskDeadline!)}'
+                          : "",
+                      AppColors.textPrimary,
+                      AppSizes.textMedium,
+                      FontWeight.normal,
+                      TextAlign.center,
+                      TextOverflow.ellipsis),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: buildText(
+                      "Description: ${currentTask.taskDescription}",
+                      AppColors.textPrimary,
+                      AppSizes.textMedium,
+                      FontWeight.normal,
+                      TextAlign.center,
+                      TextOverflow.ellipsis),
+                ),
 
-                Text(currentTask.taskDeadline != null
-                    ? 'Deadline: ${currentTask.taskDeadline!.year}-${currentTask.taskDeadline!.month.toString().padLeft(2, '0')}-${currentTask.taskDeadline!.day.toString().padLeft(2, '0')} ${currentTask.taskDeadline!.hour.toString().padLeft(2, '0')}:${currentTask.taskDeadline!.minute.toString().padLeft(2, '0')}'
-                    : ""),
                 // total time
-                Text("Total Time: ${currentTask.totalTime_minutes} mins"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:
+                      Text("Total Time: ${currentTask.totalTime_minutes} mins"),
+                ),
 
                 // clock entries
                 for (List<DateTime?> clockPair in currentTask.clockList)
