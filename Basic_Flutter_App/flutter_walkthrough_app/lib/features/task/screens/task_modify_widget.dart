@@ -215,8 +215,14 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
       DropdownMenu(
         initialSelection: widget._workingParentTask,
         helperText: 'Set parent task',
-        inputDecorationTheme:
-            InputDecorationTheme(fillColor: AppColors.primary, filled: true),
+        hintText: "No Parent",
+        textStyle: TextStyle(color: AppColors.textWhite),
+        inputDecorationTheme: InputDecorationTheme(
+          fillColor: AppColors.secondary,
+          filled: true,
+          helperStyle: TextStyle(color: AppColors.textWhite),
+          hintStyle: TextStyle(color: AppColors.textWhite),
+        ),
         onSelected: (Task? task) {
           if (task != null) {
             setState(() {
