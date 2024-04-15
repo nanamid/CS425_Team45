@@ -50,7 +50,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
+  //final _myBox = Hive.box('taskbox'); // TODO pass this in as an argument
   final PomodoroTimer pomodoroTimer =
       PomodoroTimer(duration: Duration(seconds: 20));
 

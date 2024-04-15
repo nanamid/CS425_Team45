@@ -19,7 +19,7 @@ void main() async {
 
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
-  var taskbox = await Hive.openBox('taskbox');
+  //var taskbox = await Hive.openBox('taskbox');
 
   // Firebase Initialization
   await Firebase.initializeApp(
