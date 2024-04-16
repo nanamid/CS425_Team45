@@ -5,7 +5,7 @@ import 'package:uuid/validation.dart';
 
 void main() {
   group('Test TaskList Class', () {
-    test('Initializer', (){
+    test('Initializer', () {
       final TaskList taskList = TaskList(listName: "name");
       expect(taskList.listName, "name");
     });
@@ -68,12 +68,16 @@ void main() {
     });
   });
 
-  group("Test Task Class", (){
-    test('Initializer', (){
-      final Task task1 = Task(taskName: "name", taskStatus: TaskStatus.DONE, taskLabel: "label", taskDescription: "desc");
+  group("Test Task Class", () {
+    test('Initializer', () {
+      final Task task1 = Task(
+          taskName: "name",
+          taskStatus: TaskStatus.DONE,
+          taskLabel: TaskLabel.Default,
+          taskDescription: "desc");
       expect(task1.taskName, "name");
       expect(task1.taskStatus, TaskStatus.DONE);
-      expect(task1.taskLabel, "label");
+      expect(task1.taskLabel, TaskLabel.Default);
       expect(task1.taskDescription, "desc");
       expect(task1.clockList.length, 0);
       expect(task1.totalTime_minutes, 0);
@@ -82,7 +86,7 @@ void main() {
       expect(task1.taskSubtasks.length, 0);
       expect(task1.taskParentTask, null);
     });
-    test('Initialize Task with a uuid', (){
+    test('Initialize Task with a uuid', () {
       final Task task = Task(taskName: "name");
       expect(task.taskUUID != null, true);
       expect(UuidValidation.isValidUUID(fromString: task.taskUUID!), true);
@@ -92,7 +96,7 @@ void main() {
       final Task task2 = Task(taskName: "name");
       expect(task1.taskUUID != task2.taskUUID, true);
     });
-    test('Open clock entry', (){
+    test('Open clock entry', () {
       final Task task = Task(taskName: "name");
       task.clockIn();
       expect(task.clockRunning, true);
@@ -100,7 +104,7 @@ void main() {
       expect(task.clockList.last[0] != null, true);
       expect(task.clockList.last[1] == null, true);
     });
-    test('Close clock entry', (){
+    test('Close clock entry', () {
       final Task task = Task(taskName: "name");
       task.clockIn();
       task.clockOut();
@@ -109,13 +113,13 @@ void main() {
       expect(task.clockList.last[0] != null, true);
       expect(task.clockList.last[1] != null, true);
     });
-    test('Setting task to DONE closes running clock', (){
+    test('Setting task to DONE closes running clock', () {
       final Task task = Task(taskName: "name", taskStatus: TaskStatus.TODO);
       task.clockIn();
       task.taskStatus = TaskStatus.DONE;
       expect(task.clockRunning, false);
     }, skip: 'TODO should this be checked in the widget, or in the class?');
-    test('Set subtask', (){
+    test('Set subtask', () {
       final Task parent = Task(taskName: "name");
       final Task child = Task(taskName: "name");
       parent.setSubTask(child);
@@ -161,9 +165,10 @@ void main() {
       expect(taskList.list.contains(parent), true);
       expect(taskList.list.contains(child), true);
       taskList.removeTask(parent);
-      expect(true,
-          false);
-    }, skip: 'TODO decide whether removing parent task should kill children, or if parent of parent inherits children');
+      expect(true, false);
+    },
+        skip:
+            'TODO decide whether removing parent task should kill children, or if parent of parent inherits children');
   });
   test('add parent as own subtask', () {
     final Task parent = Task(taskName: "name");

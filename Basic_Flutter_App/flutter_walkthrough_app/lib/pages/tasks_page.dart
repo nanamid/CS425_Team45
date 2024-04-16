@@ -32,7 +32,7 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     //First-Time Opening Function
     if (_myBox.get("TASK_LIST") == null) {
-      db.createInitialDatabase();
+      db.createInitialTasklist();
     } else {
       //Done when data already exists
       db.loadData();
@@ -156,7 +156,7 @@ class _TaskPageState extends State<TaskPage> {
                       // status
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus.name}"),
+                        child: Text("${currentTask.taskStatus.label}"),
                       ),
 
                       Padding(

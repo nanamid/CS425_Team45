@@ -1,0 +1,69 @@
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/common/widgets/build_text.dart';
+import 'package:test_app/features/task/views/confirm_addtask_dialogs.dart';
+import 'package:test_app/features/task/views/task_modify_widget.dart';
+import 'package:test_app/navigation_menu.dart';
+import 'package:test_app/utils/constants/colors.dart';
+import 'package:test_app/utils/constants/image_strings.dart';
+import 'package:test_app/utils/constants/sizes.dart';
+import 'package:test_app/utils/formatters/space_extension.dart';
+import 'package:test_app/data/database.dart';
+import 'package:test_app/data/tasklist_classes.dart';
+import 'package:get/get.dart';
+
+// Might be better to do this in a form widget
+class EditTaskPage extends StatelessWidget {
+  const EditTaskPage({super.key, required this.existingTask});
+
+  final Task existingTask;
+
+  @override
+  Widget build(BuildContext context) {
+    void saveTask() {
+      TodoDatabase db = TodoDatabase();
+      db.loadData();
+
+      // the deadline may have changed, so we always delete the original notification
+      // we do not touch the persistent notification
+      for (final reminder
+          in db.reminderManager.getAllRemindersOfTask(existingTask)) {
+        if (db.reminderManager.remindersWithEndNotifications
+            .contains(reminder)) {
+          db.reminderManager.unregisterReminderTask(reminder);
+        }
+      }
+      if (existingTask.taskDeadline != null) {
+        db.reminderManager.registerTaskWithReminder(
+            db.reminderManager
+                .createReminderForDeadline(existingTask.taskDeadline!),
+            existingTask);
+      }
+      // if (existingTask.clockRunning == true) {
+      //   db.reminderManager.createReminderForTimer(Duration.zero,
+      //       persistentNotification: true,
+      //       timerEndNotification: false,
+      //       alarm: false);
+      // }
+      db.updateDatabase();
+      Get.back();
+    }
+
+    void cancelSaveTask() {
+      // TODO store unedited version of task
+      // Dart does everything by reference, and there is no easy copy() function...
+      Get.back();
+    }
+
+    return Scaffold(
+        backgroundColor: AppColors.accent,
+        body: SafeArea(
+          child: ModifyTaskWidget(
+            saveTask: saveTask,
+            cancelSaveTask: cancelSaveTask,
+            task: existingTask,
+            canCancel: false,
+          ),
+        ));
+  }
+}
