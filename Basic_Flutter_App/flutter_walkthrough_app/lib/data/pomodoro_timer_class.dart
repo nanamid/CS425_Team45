@@ -31,7 +31,7 @@ class PomodoroTimer {
 
   // The pomodoro timer is really just a glorified task, which we use to track its associated reminders in reminderManager
   @HiveField(5)
-  Task internalTask = Task(taskName: "private pomodoro");
+  Task internalTask = Task(taskName: "Pomodoro Timer");
 
   @HiveField(6)
   int numberOfTomatoes;

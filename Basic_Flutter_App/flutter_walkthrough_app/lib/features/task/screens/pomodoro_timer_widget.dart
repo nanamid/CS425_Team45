@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/sizes.dart';
+import 'package:test_app/utils/formatters/space_extension.dart';
 
 class PomodoroTimerWidget extends StatefulWidget {
   PomodoroTimerWidget({super.key, this.task, required this.pomodoroTimer});
@@ -43,54 +44,83 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
     TaskList taskList = db.listOfTaskLists[taskListIndex];
 
     PomodoroTimer pomodoroTimer = widget.pomodoroTimer; // alias
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        buildText(
-            "Time: ${getCurrentTimerTime().inMinutes.toString().padLeft(2, '0')}:${(getCurrentTimerTime().inSeconds % 60).toString().padLeft(2, '0')}",
-            AppColors.textPrimary,
-            AppSizes.textLarge,
-            FontWeight.bold,
-            TextAlign.center,
-            TextOverflow.clip),
-        // associate pomodoro timer with task, so we can clock in on that task
-        DropdownMenu(
-            // initialSelection: widget.task,
-            helperText: 'Associate task with pomodoro timer',
-            inputDecorationTheme: InputDecorationTheme(
-                fillColor: AppColors.primary, filled: true),
-            onSelected: (Task? task) {
-              if (task != null) {
-                setState(() {
-                  pomodoroTimer.associatedTask = task;
-                });
-              }
-            },
-            dropdownMenuEntries:
-                taskList.list.map<DropdownMenuEntry<Task>>((Task task) {
-              return DropdownMenuEntry<Task>(value: task, label: task.taskName);
-            }).toList()),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-                onPressed: () {
+    return Container(
+      decoration: BoxDecoration(color: AppColors.accent),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          buildText(
+              "Time: ${getCurrentTimerTime().inMinutes.toString().padLeft(2, '0')}:${(getCurrentTimerTime().inSeconds % 60).toString().padLeft(2, '0')}",
+              AppColors.textWhite,
+              AppSizes.textLarge,
+              FontWeight.bold,
+              TextAlign.center,
+              TextOverflow.clip),
+
+          5.height_space,
+
+          // associate pomodoro timer with task, so we can clock in on that task
+          DropdownMenu(
+              // initialSelection: widget.task,
+              helperText: 'Associate task with timer',
+              textStyle: TextStyle(color: AppColors.textWhite),
+              inputDecorationTheme: InputDecorationTheme(
+                fillColor: AppColors.secondary,
+                filled: true,
+                helperStyle: TextStyle(color: AppColors.textWhite),
+              ),
+              onSelected: (Task? task) {
+                if (task != null) {
                   setState(() {
-                    pomodoroTimer.startTimer();
+                    pomodoroTimer.associatedTask = task;
                   });
-                },
-                child: Text("Start")),
-            ElevatedButton(
-                onPressed: () {
-                  pomodoroTimer.stopTimer();
-                },
-                child: Text("Stop Timer")),
-          ],
-        ),
-        ElevatedButton(
-            onPressed: () => pomodoroTimer.clearTimer(),
-            child: Text('Clear Timer'))
-      ],
+                }
+              },
+              dropdownMenuEntries:
+                  taskList.list.map<DropdownMenuEntry<Task>>((Task task) {
+                return DropdownMenuEntry<Task>(
+                    value: task, label: task.taskName);
+              }).toList()),
+
+          20.height_space,
+
+          // Start Stop buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Start
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: AppColors.textWhite),
+                  onPressed: () {
+                    setState(() {
+                      pomodoroTimer.startTimer();
+                    });
+                  },
+                  child: Text("Start")),
+
+              5.width_space,
+
+              // Stop
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: AppColors.textWhite),
+                  onPressed: () {
+                    pomodoroTimer.stopTimer();
+                  },
+                  child: Text("Stop Timer")),
+            ],
+          ),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: AppColors.textWhite),
+              onPressed: () => pomodoroTimer.clearTimer(),
+              child: Text('Clear Timer'))
+        ],
+      ),
     );
   }
 
