@@ -3,11 +3,17 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:test_app/pages/auth/forgot_pass_page.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback showRegisterPage;
-  const LoginPage({super.key, required this.showRegisterPage});
+  final VoidCallback? showRegisterPage;
+  const LoginPage({
+    super.key,
+    required this.title,
+    required this.showRegisterPage,
+  });
+
+  final String title;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,13 +25,50 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  //This function checks if the inputted email
-  // and password exist in the database
+  //This function attempts to sign in with the given credentials
+  //It returns an error message if no credentials were given or invalid
+  // credentials (e.g., malformed email) were used
   Future signIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+        // ignore: use_build_context_synchronously
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text('No Login Credentials Found!'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // ignore: use_build_context_synchronously
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(e.message.toString()),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -38,6 +81,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey[300],
+      ),
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
@@ -48,7 +94,8 @@ class _LoginPageState extends State<LoginPage> {
                 //Main header text, "Hello Again!
                 Text(
                   'Hello Again!',
-                  style: GoogleFonts.bebasNeue(
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
                     fontSize: 45,
                   ),
                 ),
@@ -104,6 +151,36 @@ class _LoginPageState extends State<LoginPage> {
                       fillColor: Colors.grey[200],
                       filled: true,
                     ),
+                  ),
+                ),
+                SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ForgotPasswordPage(
+                                    title: 'Forgot Password');
+                              },
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 10),
