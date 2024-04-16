@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:test_app/data/reminders_class.dart';
-import 'package:test_app/features/task/screens/task_tile_view.dart';
+import 'package:test_app/features/task/views/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
@@ -13,7 +13,7 @@ import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/common/widgets/confirm_dialog.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:test_app/features/task/screens/confirm_clockinout_dialogs.dart';
+import 'package:test_app/features/task/views/confirm_clockinout_dialogs.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});

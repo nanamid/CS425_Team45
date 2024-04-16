@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/common/widgets/build_text.dart';
-import 'package:test_app/features/task/screens/confirm_addtask_dialogs.dart';
-import 'package:test_app/features/task/screens/task_modify_widget.dart';
+import 'package:test_app/features/task/views/confirm_addtask_dialogs.dart';
+import 'package:test_app/features/task/views/task_modify_widget.dart';
 import 'package:test_app/navigation_menu.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
