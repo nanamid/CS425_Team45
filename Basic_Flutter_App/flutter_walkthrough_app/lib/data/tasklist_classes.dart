@@ -166,8 +166,8 @@ class Task {
     clockList.last[1] = DateTime.now();
     _clockRunning = false;
     print("Clocked out at ${clockList.last[1]}");
-    totalTime_minutes += (clockList.last[1]!.difference(clockList.last[0]!))
-        .inSeconds; // TODO change this back to minutes after the demo
+    totalTime_minutes +=
+        (clockList.last[1]!.difference(clockList.last[0]!)).inMinutes;
     totalTime_secs +=
         (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");

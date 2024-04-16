@@ -172,7 +172,7 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
             },
             child: Text(widget._workingTaskDeadline == null
                 ? "Deadline Date"
-                : DateFormat('yMMMMd').format(widget.task.taskDeadline!)),
+                : DateFormat('yMMMMd').format(widget._workingTaskDeadline!)),
           ),
 
           5.width_space,
@@ -206,7 +206,7 @@ class _ModifyTaskWidgetState extends State<ModifyTaskWidget> {
             },
             child: Text(widget._workingTaskDeadline == null
                 ? "Time"
-                : DateFormat('Hm').format(widget.task.taskDeadline!)),
+                : DateFormat('Hm').format(widget._workingTaskDeadline!)),
           ),
         ],
       ),

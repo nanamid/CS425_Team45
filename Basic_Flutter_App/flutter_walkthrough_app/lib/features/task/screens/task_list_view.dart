@@ -77,7 +77,7 @@ class _TaskListViewState extends State<TaskListView> {
                 ],
               ),
               content: Column(children: [
-                // description
+                // Deadline
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: buildText(
@@ -90,15 +90,20 @@ class _TaskListViewState extends State<TaskListView> {
                       TextAlign.center,
                       TextOverflow.ellipsis),
                 ),
+
+                // Description
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: buildText(
-                      "Description: ${currentTask.taskDescription}",
-                      AppColors.textPrimary,
-                      AppSizes.textMedium,
-                      FontWeight.normal,
-                      TextAlign.center,
-                      TextOverflow.ellipsis),
+                  child: Expanded(
+                    child: buildText(
+                        "Description: ${currentTask.taskDescription}",
+                        AppColors.textPrimary,
+                        AppSizes.textMedium,
+                        FontWeight.normal,
+                        TextAlign.center,
+                        TextOverflow
+                            .visible), // by default, wraps to multiple lines
+                  ),
                 ),
 
                 // total time
