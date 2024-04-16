@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/data/database.dart';
@@ -49,25 +50,45 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          buildText(
-              "Time: ${getCurrentTimerTime().inMinutes.toString().padLeft(2, '0')}:${(getCurrentTimerTime().inSeconds % 60).toString().padLeft(2, '0')}",
-              AppColors.textWhite,
-              AppSizes.textLarge,
-              FontWeight.bold,
-              TextAlign.center,
-              TextOverflow.clip),
+          Row(
+            children: [
+              // Updating timer
+              Expanded(
+                child: buildText(
+                    "Time Remaining:\n${getCurrentTimerTime().inMinutes.toString().padLeft(2, '0')}:${(getCurrentTimerTime().inSeconds % 60).toString().padLeft(2, '0')}",
+                    AppColors.textWhite,
+                    AppSizes.textLarge,
+                    FontWeight.bold,
+                    TextAlign.center,
+                    TextOverflow.clip),
+              ),
 
-          5.height_space,
+              // Tomatoes remaining
+              Expanded(
+                child: buildText(
+                    "Tomatoes Completed:\n${pomodoroTimer.numberOfTomatoes}",
+                    AppColors.textWhite,
+                    AppSizes.textLarge,
+                    FontWeight.bold,
+                    TextAlign.center,
+                    TextOverflow.clip),
+              ),
+            ],
+          ),
+
+          20.height_space,
 
           // associate pomodoro timer with task, so we can clock in on that task
           DropdownMenu(
               // initialSelection: widget.task,
               helperText: 'Associate task with timer',
+              hintText: 'No Task',
               textStyle: TextStyle(color: AppColors.textWhite),
               inputDecorationTheme: InputDecorationTheme(
                 fillColor: AppColors.secondary,
                 filled: true,
                 helperStyle: TextStyle(color: AppColors.textWhite),
+                hintStyle: TextStyle(color: AppColors.textSecondary),
               ),
               onSelected: (Task? task) {
                 if (task != null) {
