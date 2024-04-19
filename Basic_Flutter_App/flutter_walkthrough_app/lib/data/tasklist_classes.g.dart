@@ -70,14 +70,13 @@ class TaskAdapter extends TypeAdapter<Task> {
           .toList()
       ..totalTime_minutes = fields[8] as int
       .._clockRunning = fields[9] as bool
-      ..taskSubtasks = (fields[10] as List).cast<Task>()
       ..taskParentTask = fields[11] as Task?;
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj._taskUUID)
       ..writeByte(1)
@@ -96,8 +95,6 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..write(obj.totalTime_minutes)
       ..writeByte(9)
       ..write(obj._clockRunning)
-      ..writeByte(10)
-      ..write(obj.taskSubtasks)
       ..writeByte(11)
       ..write(obj.taskParentTask);
   }

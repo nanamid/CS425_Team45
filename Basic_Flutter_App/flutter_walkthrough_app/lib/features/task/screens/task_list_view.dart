@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/data/reminders_class.dart';
+import 'package:test_app/features/task/screens/confirm_addtask_dialogs.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
@@ -40,11 +41,10 @@ class _TaskListViewState extends State<TaskListView> {
   /// index is index of the selected task in the current task list
   /// refreshParent() will tell parent to redraw (usually pass setState) itself
   // TODO notifications may be a more correct way to do this https://api.flutter.dev/flutter/widgets/NotificationListener-class.html
-  void showTaskDetail(int index, Function() refreshParent) {
+  void showTaskDetail(Task currentTask, Function() refreshParent) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
           // you have to wrap the alert dialog in a stateful builder to setState() correctly
           // normally AlertDialogs are stateless widgets
           return StatefulBuilder(
@@ -145,7 +145,7 @@ class _TaskListViewState extends State<TaskListView> {
                       setState(() {
                         // not necessarily best practice to setState such a big function
                         refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                        bool success = clockIn(index);
+                        bool success = clockIn(currentTask);
                         if (success == false) {
                           showDialog(
                               context: context,
@@ -180,7 +180,7 @@ class _TaskListViewState extends State<TaskListView> {
                       setState(() {
                         // not necessarily best practice to setState such a big function
                         refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                        bool success = clockOut(index);
+                        bool success = clockOut(currentTask);
                         if (success == false) {
                           showDialog(
                               context: context,
@@ -208,8 +208,7 @@ class _TaskListViewState extends State<TaskListView> {
 
   /// Handler for pressing the 'clock in' button in task detail view
   /// returns false if the clock entry could not be added, see task clockIn method
-  bool clockIn(int index) {
-    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
+  bool clockIn(Task currentTask) {
     if (currentTask.clockIn()) // if it succeeded
     {
       Reminder reminder = db.reminderManager.createReminderForTimer(
@@ -226,8 +225,7 @@ class _TaskListViewState extends State<TaskListView> {
 
   /// Handler for pressing the 'clock out' button in task detail view
   /// returns false if the clock entry could not be completed, see task clockOut method
-  bool clockOut(int index) {
-    Task currentTask = db.listOfTaskLists[taskListIndex].list[index];
+  bool clockOut(Task currentTask) {
     if (currentTask.clockOut()) {
       List<Reminder> ongoingReminders = db
           .reminderManager.remindersWithPersistentNotifications
@@ -244,19 +242,16 @@ class _TaskListViewState extends State<TaskListView> {
     }
   }
 
-  void checkBoxChanged(bool? value, int index) {
-    Task changedTask = db.listOfTaskLists[taskListIndex].list[index];
+  void checkBoxChanged(bool? value, Task changedTask) {
     setState(() {
       final prevState = changedTask.taskStatus;
       if (prevState !=
           TaskStatus
               .DONE) // Suppose we have other statuses, like TODO, WAIT, DONE, etc.
       {
-        changedTask.taskStatus =
-            TaskStatus.DONE; // TODO should be TaskStatus object
+        changedTask.taskStatus = TaskStatus.DONE;
       } else {
-        changedTask.taskStatus =
-            TaskStatus.TODO; // TODO should be TaskStatus object
+        changedTask.taskStatus = TaskStatus.TODO;
       }
     });
     db.updateDatabase();
@@ -297,39 +292,19 @@ class _TaskListViewState extends State<TaskListView> {
               itemCount: listOfTopLevelTasks.length,
               itemBuilder: (context, index) {
                 Task currentTask = listOfTopLevelTasks[index];
-                return Dismissible(
-                  key: UniqueKey(),
-                  onDismissed: (direction) {
-                    HapticFeedback.mediumImpact();
-                    deleteTask(
-                        currentTask); // TODO see if there's a way to dismiss child tasks, not the entire parent
+                return TaskTileView(
+                  task: currentTask,
+                  taskIndex: index,
+                  onChanged: (value, taskToChange) =>
+                      checkBoxChanged(value, taskToChange),
+                  deleteFunction: (context, taskToDelete) async {
+                    bool? confirmation = await confirmDialog(context);
+                    if (confirmation == true) {
+                      deleteTask(taskToDelete);
+                    }
                   },
-                  background: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    decoration: BoxDecoration(
-                        color: Colors.red.shade300,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                        child: Icon(Icons.delete, color: Colors.red.shade700)),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        //color: testing.clrLvl1,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: TaskTileView(
-                      task: currentTask,
-                      taskIndex: index,
-                      onChanged: (value) => checkBoxChanged(value, index),
-                      deleteFunction: (context, taskToDelete) async {
-                        bool? confirmation = await confirmDialog(context);
-                        if (confirmation == true) {
-                          deleteTask(taskToDelete);
-                        }
-                      },
-                      detailDialogFunction: () =>
-                          showTaskDetail(index, () => setState(() {})),
-                    ),
-                  ),
+                  detailDialogFunction: (Task task) =>
+                      showTaskDetail(task, () => setState(() {})),
                 );
               },
             )

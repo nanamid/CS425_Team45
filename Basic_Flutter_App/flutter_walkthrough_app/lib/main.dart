@@ -43,6 +43,11 @@ void main() async {
   //Done when data already exists
   db.loadData();
 
+  /* Restore task subtasks parent-child relationship */
+  for (final TaskList taskList in db.listOfTaskLists) {
+    taskList.rebuildSubtasks();
+  }
+
   /* Restore notifications and alarms if the app died before they fired
      There should be no harm in doing this to an empty reminderManager
      So we call it unconditionally */

@@ -42,7 +42,7 @@ class TodoDatabase {
     listOfTaskLists = _myTaskBox.get("TASK_LIST");
     print("Loaded ${listOfTaskLists.length} task lists:");
     for (final TaskList tlist in listOfTaskLists) {
-      print("ID: ${tlist.listUUID}");
+      print("ID: ${tlist.listUUID} with ${tlist.list.length} tasks");
     }
     // TODO check list was added to box correctly
 
@@ -54,7 +54,7 @@ class TodoDatabase {
     await _myTaskBox.put("TASK_LIST", listOfTaskLists);
     print("Stored ${listOfTaskLists.length} task lists:");
     for (final TaskList tlist in listOfTaskLists) {
-      print("ID: ${tlist.listUUID}");
+      print("ID: ${tlist.listUUID} with ${tlist.list.length} tasks");
     }
 
     await _myTaskBox.put("REMINDER_MANAGER", reminderManager);

@@ -7,7 +7,7 @@ class TaskInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // needs a listener for when task_list_view redraws
+    // TODO needs a listener for when task_list_view redraws
     TodoDatabase db = TodoDatabase();
     final taskListIndex = 0; // hardcoded one tasklist for now
     db.loadData();

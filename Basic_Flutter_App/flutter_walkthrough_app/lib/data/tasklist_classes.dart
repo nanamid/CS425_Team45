@@ -34,10 +34,42 @@ class TaskList {
 
   bool removeTask(Task removedTask) {
     bool result = _list.remove(removedTask);
+    for (final child in removedTask.taskSubtasks) {
+      if (_list.remove(child) == false) {
+        result = false;
+      }
+    }
     if (result == false) {
-      print("Could not remove task");
+      print("Could not remove task(s)");
     }
     return result;
+  }
+
+  /// To avoid an infinite loop, Hive needs to only store Task parent field, not parent and subtasks[]
+  ///
+  /// We fix this by storing only the parent field, and rebuilding each task on initial app load
+  /// with this function
+  void rebuildSubtasks() {
+    // Enter assuming all tasks have parent == null or some Task. Assume all parents do not have children in subtasks[]
+    int children = 0;
+    for (final task
+        in _list.where((element) => element.taskParentTask != null)) {
+      /* Technically, Hive constructs new instances of Tasks everytime they appear.
+         This means the task as it appears in the TaskList.list is not referenced by
+         it's children's Task.taskParentTask. This is the same problem that we solve
+         in ReminderManager's rebuild functions by using the UUID to rebuild that reference.
+      */
+      task.taskParentTask = _list.firstWhere(
+          (element) => element.taskUUID == task.taskParentTask?.taskUUID);
+      if (task.taskParentTask == null) {
+        print(
+            "rebuildSubtasks set a child's parent to null when it should've had a parent");
+      }
+
+      task.taskParentTask!.setSubTask(task);
+      children++;
+    }
+    print("Restored $children subtasks");
   }
 
   TaskList({this.listName}) {
@@ -119,7 +151,8 @@ class Task {
   bool _clockRunning = false;
   bool get clockRunning => _clockRunning; // allow read but no write
 
-  @HiveField(10)
+  // @HiveField(10) Having both this list and taskParentTask creates infinite loops when hive stores the task
+  // We rebuild this in TaskList.rebuildSubtasks();
   List<Task> taskSubtasks = [];
 
   @HiveField(11)

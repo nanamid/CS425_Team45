@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-Future<dynamic> confirmDialog(BuildContext context,
+Future<bool?> confirmDialog(BuildContext context,
     {String prompt = 'Are you sure you want to delete?',
     String yesText = 'Yes',
     String noText = 'No'}) {
-  return showDialog(
+  return showDialog<bool?>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
