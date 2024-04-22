@@ -1,10 +1,13 @@
 //CODE FROM Mitch Koko (YouTube)
 //WEB: https://www.youtube.com/watch?v=Mfa3u3naQew, https://www.youtube.com/watch?v=PBxbWZZTG2Q
 
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/data/password_checker.dart';
+import 'package:test_app/pages/auth/email_validation.dart';
 import 'package:test_app/utils/constants/colors.dart';
 
 //RegisterPage class declaration
@@ -55,6 +58,11 @@ class _RegisterPageState extends State<RegisterPage> {
             ));
   }
 
+  //
+  Future checkEmailVerified() async {
+    //
+  }
+
   //This function confirms the new account and sends it to the database
   Future signUp() async {
     //Before attempting to confirm the account, we check that...
@@ -68,6 +76,13 @@ class _RegisterPageState extends State<RegisterPage> {
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
+          if (FirebaseAuth.instance.currentUser != null) {
+            // ignore: use_build_context_synchronously
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (ctx) => const EmailVerificationScreen()));
+          }
         } on FirebaseAuthException catch (e) {
           if (_emailController.text.isEmpty ||
               _passwordController.text.isEmpty) {
