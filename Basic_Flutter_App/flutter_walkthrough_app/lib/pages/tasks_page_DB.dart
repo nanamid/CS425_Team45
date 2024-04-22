@@ -23,7 +23,7 @@ class _TaskPageDBState extends State<TaskPageDB> {
 
   // Text controllers for the task name and task description
   final _taskNameController = TextEditingController();
-  //final _taskDescController = TextEditingController();  //Maybe?
+  //final _controller = TextEditingController();
 
   // Dialog box for creating a new task
   // This function is only for creating a new task
@@ -67,10 +67,25 @@ class _TaskPageDBState extends State<TaskPageDB> {
   // This changes the "completed" field between true and false
   void checkBoxChanged(bool value, String? docID) {
     if (value) {
-      firestoreService.isDone(docID!, true);
+      firestoreService.isDone(docID!, 1);
     } else {
-      firestoreService.isDone(docID!, false);
+      firestoreService.isDone(docID!, 0);
     }
+  }
+
+  // Handler for translating the taskStatus field
+  // This reads the
+  TaskStatus taskStatusTranslation(Map<String, dynamic> firebaseTask) {
+    TaskStatus currentStatus = TaskStatus.TODO;
+    if (firebaseTask['completed'] == 0 || firebaseTask['completed'] == Null) {
+      currentStatus = TaskStatus.TODO;
+    } else if (firebaseTask['completed'] == 1) {
+      currentStatus = TaskStatus.DONE;
+    } else if (firebaseTask['completed'] == 2) {
+      currentStatus = TaskStatus.WAIT;
+    }
+    //
+    return currentStatus;
   }
 
   @override
@@ -94,21 +109,23 @@ class _TaskPageDBState extends State<TaskPageDB> {
               itemBuilder: (context, index) {
                 // Retrieve the document from Firestore
                 DocumentSnapshot document = notesList[index];
-                //Task currentTask = (document) as Task;
                 String docID = document.id;
 
                 // Get the tasks from the document
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
-                String noteText = data['taskName'];
-
-                // Causes error (can't cast String as Task)
-                //Task currentTask = (noteText) as Task;
+                Task myTask = Task(
+                  taskName: data['taskName'],
+                  taskStatus: taskStatusTranslation(data),
+                  taskDescription: data['taskDesc'],
+                  taskLabel: 'NEW',
+                  //taskDeadline: DateTime(),
+                );
 
                 // Display the tasks as a task tile
-                /*
+                /**/
                 return TaskTile(
-                  task: currentTask,
+                  task: myTask,
                   onChanged: (value) => checkBoxChanged(value!, docID),
                   deleteFunction: (context) async {
                     bool? confirmation = await showDialog(
@@ -122,8 +139,8 @@ class _TaskPageDBState extends State<TaskPageDB> {
                   },
                   detailDialogFunction: () {},
                 );
-                */
-                /**/
+
+                /*
                 return ListTile(
                   title: Text(noteText),
                   trailing: Row(
@@ -140,6 +157,7 @@ class _TaskPageDBState extends State<TaskPageDB> {
                     ],
                   ),
                 );
+                */
               },
             );
           } else {

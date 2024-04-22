@@ -42,13 +42,13 @@ class FirestoreService {
   }
 
   // Function for marking if a task is done
-  Future<void> isDone(String docID, bool isTaskDone) async {
+  Future<void> isDone(String docID, int isTaskDone) async {
     userTasks
         .doc(docID)
         .update({"completed": isTaskDone})
         .then((value) => print(
-            "Marked task done from ${FirebaseAuth.instance.currentUser?.email}"))
-        .catchError((error) => print("Failed to mark as done: $error"));
+            "Changed task status for ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to change task status: $error"));
   }
 
   // Function for deleting a task
