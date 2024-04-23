@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/data/duration_adapter.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,6 +30,7 @@ void main() async {
   Hive.registerAdapter(PomodoroTimerAdapter());
   Hive.registerAdapter(ReminderManagerAdapter());
   Hive.registerAdapter(ReminderAdapter());
+  Hive.registerAdapter(DurationAdapter());
 
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
@@ -40,6 +42,9 @@ void main() async {
   if (taskbox.get("REMINDER_MANAGER") == null) {
     await db.createInitialReminderManager();
   }
+  if (taskbox.get("POMODORO_TIMER") == null) {
+    await db.createInitialPomodoroTimer();
+  }
   //Done when data already exists
   db.loadData();
 
@@ -48,6 +53,9 @@ void main() async {
      So we call it unconditionally */
   db.reminderManager.rebuildReminders(db.listOfTaskLists);
   await db.reminderManager.rebuildNotifications();
+
+  // same reason as rebuildReminders
+  db.pomodoroTimer.rebuild();
 
   // Firebase Initialization
   await Firebase.initializeApp(

@@ -17,6 +17,8 @@ class TodoDatabase {
 
   late ReminderManager reminderManager;
 
+  late PomodoroTimer pomodoroTimer;
+
   final _myTaskBox =
       Hive.box('taskbox'); // refers to box named 'taskbox' opened in main.dart
 
@@ -38,6 +40,12 @@ class TodoDatabase {
     print("Created initial ReminderManager");
   }
 
+  Future<void> createInitialPomodoroTimer() async {
+    pomodoroTimer = PomodoroTimer();
+    await _myTaskBox.put("POMODORO_TIMER", pomodoroTimer);
+    print("Created initial PomodoroTimer");
+  }
+
   //Load Data (from hive database)
   void loadData() {
     listOfTaskLists = _myTaskBox.get("TASK_LIST");
@@ -48,6 +56,7 @@ class TodoDatabase {
     // TODO check list was added to box correctly
 
     reminderManager = _myTaskBox.get("REMINDER_MANAGER");
+    pomodoroTimer = _myTaskBox.get("POMODORO_TIMER");
   }
 
   //Update Data (to hive database)
@@ -60,5 +69,8 @@ class TodoDatabase {
 
     await _myTaskBox.put("REMINDER_MANAGER", reminderManager);
     print("Stored reminder manager");
+
+    await _myTaskBox.put("POMODORO_TIMER", pomodoroTimer);
+    print("Stored pomodoro timer");
   }
 }

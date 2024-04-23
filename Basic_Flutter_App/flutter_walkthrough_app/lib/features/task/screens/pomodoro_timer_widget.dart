@@ -11,40 +11,48 @@ import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 
 class PomodoroTimerWidget extends StatefulWidget {
-  PomodoroTimerWidget({super.key, this.task, required this.pomodoroTimer});
+  PomodoroTimerWidget({super.key, this.task});
 
-  final PomodoroTimer pomodoroTimer;
+  /// was used to instantiate the pomodoro timer with a task,
+  /// like for creating a new pomodoro timer from the the task
+  /// detail view. We aren't really doing that anymore
   final Task? task;
   @override
   State<PomodoroTimerWidget> createState() => _PomodoroTimerWidgetState();
 }
 
 class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
+  //References the Hive Box
+  final TodoDatabase _db = TodoDatabase();
+  late final PomodoroTimer _pomodoroTimer;
+  late TaskList taskList;
+
   Duration getCurrentTimerTime() {
-    return widget.pomodoroTimer.getRemainingTime();
+    return _pomodoroTimer.getRemainingTime();
   }
 
   late Timer nativeTimer;
 
   @override
   void initState() {
-    super.initState();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    _db.loadData();
+    taskList = _db.listOfTaskLists[taskListIndex];
+
+    _pomodoroTimer = _db.pomodoroTimer;
     nativeTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      print(
-          'Update: ${getCurrentTimerTime().inMinutes}:${getCurrentTimerTime().inSeconds}');
+      // print(
+      //     'Update: ${getCurrentTimerTime().inMinutes}:${getCurrentTimerTime().inSeconds % 60}');
       setState(() {});
     });
-    widget.pomodoroTimer.associatedTask = widget.task;
+    // _pomodoroTimer.associatedTask = widget.task;
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext scontext) {
-    TodoDatabase db = TodoDatabase();
-    final taskListIndex = 0; // hardcoded one tasklist for now
-    db.loadData();
-    TaskList taskList = db.listOfTaskLists[taskListIndex];
-
-    PomodoroTimer pomodoroTimer = widget.pomodoroTimer; // alias
+    PomodoroTimer pomodoroTimer = _pomodoroTimer; // alias
     return Container(
       decoration: BoxDecoration(color: AppColors.accent),
       child: Column(
@@ -84,6 +92,9 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
               helperText: 'Associate task with timer',
               hintText: 'No Task',
               textStyle: TextStyle(color: AppColors.textWhite),
+              initialSelection: pomodoroTimer.associatedTask,
+              enabled: !pomodoroTimer
+                  .timerIsRunning, // can't change the associated task while it's runing
               inputDecorationTheme: InputDecorationTheme(
                 fillColor: AppColors.secondary,
                 filled: true,
@@ -118,6 +129,7 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
                     setState(() {
                       pomodoroTimer.startTimer();
                     });
+                    _db.updateDatabase();
                   },
                   child: Text("Start")),
 
@@ -130,6 +142,7 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
                       foregroundColor: AppColors.textWhite),
                   onPressed: () {
                     pomodoroTimer.stopTimer();
+                    _db.updateDatabase();
                   },
                   child: Text("Stop Timer")),
             ],
@@ -138,7 +151,10 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondary,
                   foregroundColor: AppColors.textWhite),
-              onPressed: () => pomodoroTimer.clearTimer(),
+              onPressed: () {
+                pomodoroTimer.clearTimer();
+                _db.updateDatabase();
+              },
               child: Text('Clear Timer'))
         ],
       ),
@@ -147,8 +163,7 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
 
   @override
   void dispose() {
-    nativeTimer?.cancel();
-    widget.pomodoroTimer.associatedTask = null;
+    nativeTimer.cancel();
     super.dispose();
   }
 }

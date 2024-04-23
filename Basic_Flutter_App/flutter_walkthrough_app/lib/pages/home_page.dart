@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
             appBar: AppBar(
               title: Text("Pomodoro Timer"),
             ),
-            body: PomodoroTimerWidget(pomodoroTimer: pomodoroTimer)),
+            body: PomodoroTimerWidget()),
       ),
       // ViewDestination(
       //   // show an example of a full screen page, using navigator push instead

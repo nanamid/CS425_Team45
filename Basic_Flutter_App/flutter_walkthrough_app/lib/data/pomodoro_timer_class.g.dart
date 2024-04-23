@@ -17,6 +17,7 @@ class PomodoroTimerAdapter extends TypeAdapter<PomodoroTimer> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PomodoroTimer(
+      associatedTask: fields[8] as Task?,
       numberOfTomatoes: fields[6] as int,
     )
       ..duration = fields[0] as Duration
@@ -31,7 +32,7 @@ class PomodoroTimerAdapter extends TypeAdapter<PomodoroTimer> {
   @override
   void write(BinaryWriter writer, PomodoroTimer obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.duration)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class PomodoroTimerAdapter extends TypeAdapter<PomodoroTimer> {
       ..writeByte(6)
       ..write(obj.numberOfTomatoes)
       ..writeByte(7)
-      ..write(obj.onBreak);
+      ..write(obj.onBreak)
+      ..writeByte(8)
+      ..write(obj.associatedTask);
   }
 
   @override

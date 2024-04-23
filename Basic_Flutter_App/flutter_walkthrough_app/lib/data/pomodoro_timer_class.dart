@@ -26,6 +26,10 @@ class PomodoroTimer {
   DateTime? _timerEndTime;
   DateTime? get timerEndTime => _timerEndTime;
 
+  /// How much time was left on the clock from last time
+  ///
+  /// This is not how much time is currently remaining when the timer is
+  /// running, use getRemainingTime() for that
   @HiveField(4)
   Duration remainingTime;
 
@@ -39,6 +43,7 @@ class PomodoroTimer {
   @HiveField(7)
   bool onBreak = false;
 
+  @HiveField(8)
   Task? associatedTask;
 
   static const Duration pomodoroLength = Duration(minutes: 25);
@@ -141,38 +146,56 @@ class PomodoroTimer {
     print('Started Pomodoro Timer');
   }
 
-  // // intended to follow a call to ReminderManager.rebuildReminders
-  // Future<void> rebuild() async {
-  //   TodoDatabase db = TodoDatabase();
-  //   db.loadData();
-  //   if (_timerIsRunning == true &&
-  //       db.reminderManager.taskReminderMap.values.contains(this.internalTask) ==
-  //           false) // we have to reassociate with the task in hive
-  //   {
-  //     List<Reminder> newReminders = [];
-  //     db.reminderManager.taskReminderMap.forEach((reminder, task) {
-  //       if (task.taskUUID == this.internalTask.taskUUID) {
-  //         newReminders.add(reminder);
-  //       }
-  //     });
-  //     for (final newReminder in newReminders) {
-  //       db.reminderManager.taskReminderMap.forEach((_, task) {
-  //         if (!identical(
-  //             db.reminderManager.taskReminderMap[newReminder], task)) {
-  //           print(
-  //               "old pomodoro timer reminder-task associations are actually different. This is likely not what you expected.");
-  //         }
-  //       });
-  //     }
-  //     if (newReminders.length == 0) {
-  //       print("No old pomodoro timer task, despite _timerIsRunning == true");
-  //     } else {
-  //       this.internalTask =
-  //           db.reminderManager.taskReminderMap[newReminders[0]]!;
-  //     }
-  //     await db.updateDatabase();
-  //   }
-  // }
+  /// Once again, since hive constructs new instances of every object, this.internalTask
+  /// does not reference the task in the ReminderManager correctly. We reassociate based
+  /// on uuid.
+  ///
+  /// intended to follow a call to ReminderManager.rebuildReminders
+  Future<void> rebuild() async {
+    TodoDatabase db = TodoDatabase();
+    db.loadData();
+    if (_timerIsRunning == true &&
+        db.reminderManager.taskReminderMap.values.contains(this.internalTask) ==
+            false) // we had a timer running but the reminder manager is missing our internal task, we have to reassociate with the task in hive
+    {
+      List<Reminder> newReminders =
+          []; // list of reminders that match internalTask's uuid (should only be 1?)
+      db.reminderManager.taskReminderMap.forEach((reminder, task) {
+        if (task.taskUUID == this.internalTask.taskUUID) {
+          newReminders.add(reminder);
+        }
+      });
+      // for (final newReminder in newReminders) {
+      //   db.reminderManager.taskReminderMap.forEach((_, task) {
+      //     if (!identical(
+      //         db.reminderManager.taskReminderMap[newReminder], task)) {
+      //       print(
+      //           "old pomodoro timer reminder-task associations are actually different. This is likely not what you expected.");
+      //     }
+      //   });
+      // }
+      if (newReminders.isEmpty) {
+        print("No old pomodoro timer task, despite _timerIsRunning == true");
+      } else {
+        this.internalTask =
+            db.reminderManager.taskReminderMap[newReminders[0]]!;
+      }
+      await db.updateDatabase();
+    } else if (_timerIsRunning == false) {
+      print(
+          "Tried to reassociate the pomodoro timer internal task when it was already in reminder manager");
+    }
+
+    // we need to do the same for the associated task
+    for (final tasklist in db.listOfTaskLists) {
+      for (final newTask in tasklist.list) {
+        if (newTask.taskUUID == this.associatedTask?.taskUUID) {
+          this.associatedTask = newTask;
+        }
+      }
+    }
+    await db.updateDatabase();
+  }
 
   PomodoroTimer({this.associatedTask, this.numberOfTomatoes = 0})
       : this.duration = pomodoroLength,
