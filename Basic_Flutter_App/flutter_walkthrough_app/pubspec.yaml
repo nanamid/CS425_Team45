@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  #GAME ENGINER - Flame
+  flame: ^1.17.0
+
   #LOCAL STORAGE - Hive
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -34,6 +37,7 @@ dependencies:
 
   #ANIMATION
   animate_do: ^2.0.0
+  flutter_animate: ^4.5.0
 
   #Dialogs
   panara_dialogs: ^0.1.4
@@ -78,7 +82,6 @@ flutter:
   assets:
     - assets/
     - assets/icons/
-    - assets/images/
     - assets/images/backgrounds/
     - assets/images/avatars/
     - assets/animations/lottie/

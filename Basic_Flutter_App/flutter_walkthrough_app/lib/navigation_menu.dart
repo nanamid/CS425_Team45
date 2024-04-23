@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_app/features/game/views/game_start_view.dart';
+import 'package:test_app/features/game/screens/game_start_screen.dart';
 import 'package:test_app/features/task/views/task_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';

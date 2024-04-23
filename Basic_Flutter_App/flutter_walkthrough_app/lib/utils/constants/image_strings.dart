@@ -29,6 +29,11 @@ class ImageStrings {
   static const String avatarAnnoyed = "assets/images/avatars/Avatar_1_5(Annoyed).svg";
   static const String avatarAngry = "assets/images/avatars/Avatar_1_6(Angry).svg";
 
+  // -- Avatars - PNG
+  static const String botHappy = "avatars/Bot(happy).png";
+  static const String botSad = "avatars/Bot(sad).png";
+  static const String botWorried = "avatars/Bot(worried).png";
+
   // -- Animations
 
 
