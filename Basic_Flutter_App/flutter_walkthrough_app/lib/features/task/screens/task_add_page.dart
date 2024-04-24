@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/common/widgets/build_text.dart';
+import 'package:test_app/data/firestore.dart';
 import 'package:test_app/features/task/screens/confirm_addtask_dialogs.dart';
 import 'package:test_app/features/task/screens/task_modify_widget.dart';
 import 'package:test_app/navigation_menu.dart';
@@ -34,6 +35,12 @@ class AddTaskPage extends StatelessWidget {
       }
       db.updateDatabase();
       controller.selectedIndex.value = 0; // hardcoded task list page index
+    }
+
+    //NEW saveTask() function w/ Firestore
+    void addTaskDB(String? docID, Task taskToSave) {
+      final FirestoreService firestoreService = FirestoreService();
+      firestoreService.addTask_v2(docID!);
     }
 
     void cancelSaveTask() {
