@@ -153,6 +153,9 @@ class _PomodoroTimerWidgetState extends State<PomodoroTimerWidget> {
                   foregroundColor: AppColors.textWhite),
               onPressed: () {
                 pomodoroTimer.clearTimer();
+                setState(() {
+                  pomodoroTimer.associatedTask = null;
+                });
                 _db.updateDatabase();
               },
               child: Text('Clear Timer'))

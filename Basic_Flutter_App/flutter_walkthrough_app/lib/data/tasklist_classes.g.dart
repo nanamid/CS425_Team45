@@ -58,13 +58,14 @@ class TaskAdapter extends TypeAdapter<Task> {
     };
     return Task(
       taskName: fields[1] == null ? 'Default Task' : fields[1] as String,
-      taskStatus: fields[2] == null ? TaskStatus.TODO : fields[2] as TaskStatus,
       taskLabel: fields[3] == null ? TaskLabel.Default : fields[3] as TaskLabel,
       taskDescription:
           fields[4] == null ? 'Default Description' : fields[4] as String?,
       taskDeadline: fields[5] as DateTime?,
     )
       .._taskUUID = fields[0] as String?
+      .._taskStatus =
+          fields[2] == null ? TaskStatus.TODO : fields[2] as TaskStatus
       ..clockList = (fields[7] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
@@ -82,7 +83,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(1)
       ..write(obj.taskName)
       ..writeByte(2)
-      ..write(obj.taskStatus)
+      ..write(obj._taskStatus)
       ..writeByte(3)
       ..write(obj.taskLabel)
       ..writeByte(4)

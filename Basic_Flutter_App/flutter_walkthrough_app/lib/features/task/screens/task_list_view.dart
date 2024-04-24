@@ -18,6 +18,7 @@ import 'package:test_app/utils/timeclock_tile.dart';
 import 'package:test_app/common/widgets/confirm_dialog.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/features/task/screens/confirm_clockinout_dialogs.dart';
+import 'package:test_app/features/task/screens/task_detail_dialog.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -35,175 +36,6 @@ class _TaskListViewState extends State<TaskListView> {
   void initState() {
     db.loadData();
     super.initState();
-  }
-
-  /// Spawns a dialog showing all task details
-  /// index is index of the selected task in the current task list
-  /// refreshParent() will tell parent to redraw (usually pass setState) itself
-  // TODO notifications may be a more correct way to do this https://api.flutter.dev/flutter/widgets/NotificationListener-class.html
-  void showTaskDetail(Task currentTask, Function() refreshParent) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          // you have to wrap the alert dialog in a stateful builder to setState() correctly
-          // normally AlertDialogs are stateless widgets
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              backgroundColor: Colors.grey.shade100,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // status
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("${currentTask.taskStatus.label}"),
-                      ),
-
-                      Padding(
-                        // name
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(currentTask.taskName ?? "Name"),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    currentTask.clockRunning ? 'Clocked In' : 'Clocked Out',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary),
-                  ),
-                ],
-              ),
-              content: Column(children: [
-                // Deadline
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: buildText(
-                      currentTask.taskDeadline != null
-                          ? 'Deadline: ${DateFormat('yMMMMd').format(currentTask.taskDeadline!)} ${DateFormat('Hm').format(currentTask.taskDeadline!)}'
-                          : "",
-                      AppColors.textPrimary,
-                      AppSizes.textMedium,
-                      FontWeight.normal,
-                      TextAlign.center,
-                      TextOverflow.ellipsis),
-                ),
-
-                // Description
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Expanded(
-                    child: buildText(
-                        "Description: ${currentTask.taskDescription}",
-                        AppColors.textPrimary,
-                        AppSizes.textMedium,
-                        FontWeight.normal,
-                        TextAlign.center,
-                        TextOverflow
-                            .visible), // by default, wraps to multiple lines
-                  ),
-                ),
-
-                // total time
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child:
-                      Text("Total Time: ${currentTask.totalTime_minutes} mins"),
-                ),
-
-                // clock entries
-                for (List<DateTime?> clockPair in currentTask.clockList)
-                  TimeclockTile(clockPair: clockPair)
-
-                // TODO use ListView.separated below when we move showTaskDetail() away from an alert dialog
-                // ListView.separated(
-                //   padding: const EdgeInsets.all(8),
-                //   itemCount: currentTask.clockList.length,
-                //   itemBuilder: (context, index) {
-                //     return TimeclockTile(
-                //         clockPair: currentTask.clockList[index]);
-                //   },
-                //   separatorBuilder: (context, index) => const Divider(),
-                // )
-              ]),
-              actions: [
-                // clock in/out
-                TextButton(
-                  // onPressed has to wrap the async future function with a void function
-                  onPressed: () async {
-                    // Ask for user confirmation
-                    bool? confirmation = await confirmClockInDialog(context);
-
-                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
-                    if (!context.mounted) {
-                      return;
-                    }
-
-                    if (confirmation == true) {
-                      setState(() {
-                        // not necessarily best practice to setState such a big function
-                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                        bool success = clockIn(currentTask);
-                        if (success == false) {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Text('Cannot Add Clock Entry'),
-                                    content: Text('Already Clocked In'),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text('Okay'))
-                                    ],
-                                  ));
-                        }
-                      });
-                    }
-                  },
-                  child: Text("Clock In"),
-                ),
-
-                TextButton(
-                  onPressed: () async {
-                    // Ask for user confirmation
-                    bool? confirmation = await confirmClockOutDialog(context);
-
-                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
-                    if (!context.mounted) {
-                      return;
-                    }
-
-                    if (confirmation == true) {
-                      setState(() {
-                        // not necessarily best practice to setState such a big function
-                        refreshParent(); // makes the timeclock icon visible on list of tasks below this alert
-                        bool success = clockOut(currentTask);
-                        if (success == false) {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Text('Cannot Add Clock Entry'),
-                                    content: Text('Not Clocked In'),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text('Okay'))
-                                    ],
-                                  ));
-                        }
-                      });
-                    }
-                  },
-                  child: Text("Clock Out"),
-                ),
-              ],
-            );
-          });
-        });
   }
 
   /// Handler for pressing the 'clock in' button in task detail view
@@ -275,66 +107,70 @@ class _TaskListViewState extends State<TaskListView> {
         .where((element) => element.taskParentTask == null)
         .toList(); // otherwise it shows parent tasks with their expansion list of children, as well as the children themselves later in the list
 
-    return Container(
-      decoration: BoxDecoration(
-        //color: testing.clrLvl2,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        color: AppColors.secondary,
-      ),
-      child: listOfTopLevelTasks.isNotEmpty
-
-          //Task List HAS ITEMS
-          ? ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.all(15),
-              separatorBuilder: (context, index) =>
-                  10.height_space, //use space extenion here "15.height_space"
-              itemCount: listOfTopLevelTasks.length,
-              itemBuilder: (context, index) {
-                Task currentTask = listOfTopLevelTasks[index];
-                return TaskTileView(
-                  task: currentTask,
-                  taskIndex: index,
-                  onChanged: (value, taskToChange) =>
-                      checkBoxChanged(value, taskToChange),
-                  deleteFunction: (context, taskToDelete) async {
-                    bool? confirmation = await confirmDialog(context);
-                    if (confirmation == true) {
-                      deleteTask(taskToDelete);
-                    }
-                  },
-                  detailDialogFunction: (Task task) =>
-                      showTaskDetail(task, () => setState(() {})),
-                );
-              },
-            )
-          :
-          //Task List IS EMPTY -> Lottie Animation | if All Tasks Done Show this Widgets
-          Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              //Output if the list IS EMPTY
-              children: [
-                //Lottie Animation
-                FadeIn(
-                  child: SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Lottie.asset(ImageStrings.noTasksAnimation,
-                        animate: listOfTopLevelTasks.isNotEmpty
-                            ? false
-                            : true), //Conditional is saying, play animation if testing is empty
-                  ),
-                ),
-
-                //Sub Text (under Lottie Animation)
-                FadeInUp(
-                  from: 30,
-                  child: const Text(
-                    AppTexts.doneAllTask,
-                  ),
-                ),
-              ],
+    return ListenableBuilder(
+        listenable: Listenable.merge(
+            <Listenable>[currentTaskList] + currentTaskListOfTasks),
+        builder: (BuildContext context, Widget? child) {
+          return Container(
+            decoration: BoxDecoration(
+              //color: testing.clrLvl2,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              color: AppColors.secondary,
             ),
-    );
+            child: listOfTopLevelTasks.isNotEmpty
+
+                //Task List HAS ITEMS
+                ? ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.all(15),
+                    separatorBuilder: (context, index) => 10
+                        .height_space, //use space extenion here "15.height_space"
+                    itemCount: listOfTopLevelTasks.length,
+                    itemBuilder: (context, index) {
+                      Task currentTask = listOfTopLevelTasks[index];
+                      return TaskTileView(
+                        task: currentTask,
+                        taskIndex: index,
+                        onChanged: (value, taskToChange) =>
+                            checkBoxChanged(value, taskToChange),
+                        deleteFunction: (context, taskToDelete) async {
+                          bool? confirmation = await confirmDialog(context);
+                          if (confirmation == true) {
+                            deleteTask(taskToDelete);
+                          }
+                        },
+                        detailDialogFunction: (Task task) =>
+                            showTaskDetail(context, task, clockIn, clockOut),
+                      );
+                    })
+                :
+                //Task List IS EMPTY -> Lottie Animation | if All Tasks Done Show this Widgets
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    //Output if the list IS EMPTY
+                    children: [
+                      //Lottie Animation
+                      FadeIn(
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Lottie.asset(ImageStrings.noTasksAnimation,
+                              animate: listOfTopLevelTasks.isNotEmpty
+                                  ? false
+                                  : true), //Conditional is saying, play animation if testing is empty
+                        ),
+                      ),
+
+                      //Sub Text (under Lottie Animation)
+                      FadeInUp(
+                        from: 30,
+                        child: const Text(
+                          AppTexts.doneAllTask,
+                        ),
+                      ),
+                    ],
+                  ),
+          );
+        });
   }
 }

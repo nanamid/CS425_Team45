@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
 
 part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
 // try first a: `dart run build_runner build`
@@ -8,7 +9,7 @@ part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dar
 
 // TaskList: list of tasks
 @HiveType(typeId: 0)
-class TaskList {
+class TaskList with ChangeNotifier {
   @HiveField(0)
   String?
       _listUUID; // This really should be a late final String, but hive had problems // TODO fix this
@@ -29,15 +30,20 @@ class TaskList {
     }
     _list.add(newTask);
     print("Added Task UUID: ${newTask.taskUUID}");
+
+    notifyListeners();
     return true;
   }
 
   bool removeTask(Task removedTask) {
     bool result = _list.remove(removedTask);
+    notifyListeners();
+
     for (final child in removedTask.taskSubtasks) {
       if (_list.remove(child) == false) {
         result = false;
       }
+      notifyListeners();
     }
     if (result == false) {
       print("Could not remove task(s)");
@@ -70,6 +76,7 @@ class TaskList {
       children++;
     }
     print("Restored $children subtasks");
+    notifyListeners();
   }
 
   TaskList({this.listName}) {
@@ -117,7 +124,7 @@ enum TaskLabel {
 
 // Task
 @HiveType(typeId: 2)
-class Task {
+class Task with ChangeNotifier {
   // @HiveField(0, defaultValue: "-1")
   @HiveField(0)
   String? _taskUUID;
@@ -127,8 +134,14 @@ class Task {
   String taskName;
 
   @HiveField(2, defaultValue: TaskStatus.TODO)
-  TaskStatus taskStatus;
+  TaskStatus _taskStatus;
+  TaskStatus get taskStatus => _taskStatus;
+  set taskStatus(TaskStatus value) {
+    _taskStatus = value;
+    notifyListeners();
+  }
 
+  // TODO do any other fields need a setter with notifyListeners?
   @HiveField(3, defaultValue: TaskLabel.Default)
   TaskLabel taskLabel;
 
@@ -171,13 +184,16 @@ class Task {
       return false;
     }
 
-    assert(clockList.isEmpty ||
-        (clockList.last[0] != null &&
-            clockList.last[1] != null)); // No previously open timeclock
+    if (clockList.isEmpty ||
+        (clockList.last[0] != null && clockList.last[1] != null)) {
+      print("No previously open timeclock");
+    }
 
     clockList.add([DateTime.now(), null]);
     _clockRunning = true;
     print("Clocked in at ${clockList.last[0]}");
+
+    notifyListeners();
     return true;
   }
 
@@ -194,7 +210,9 @@ class Task {
       return false;
     }
 
-    assert(clockList.last[1] == null);
+    if (clockList.last[1] != null) {
+      print("clockList.last not null when we tried to clockout");
+    }
 
     clockList.last[1] = DateTime.now();
     _clockRunning = false;
@@ -204,6 +222,8 @@ class Task {
     totalTime_secs +=
         (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
     print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
+
+    notifyListeners();
     return true;
   }
 
@@ -219,6 +239,8 @@ class Task {
     }
     newChild.taskParentTask = this;
     taskSubtasks.add(newChild);
+
+    notifyListeners();
     return true;
   }
 
@@ -230,17 +252,19 @@ class Task {
     }
     separatedChild.taskParentTask = this.taskParentTask;
     taskSubtasks.remove(separatedChild);
+
+    notifyListeners();
     return true;
   }
 
   Task({
     required this.taskName,
-    this.taskStatus = TaskStatus.TODO,
+    TaskStatus taskStatus = TaskStatus.TODO,
     this.taskLabel = TaskLabel.Default,
     this.taskDescription,
     this.taskDeadline,
     // deadline, reminders, clocklist, subtasks, parenttask set with methods
-  }) {
+  }) : _taskStatus = taskStatus {
     Uuid uuid = Uuid();
     _taskUUID = uuid.v4();
   }

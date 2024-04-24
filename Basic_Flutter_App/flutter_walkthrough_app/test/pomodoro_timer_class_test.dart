@@ -13,7 +13,7 @@ void main() {
         expect(pomo.timerStartTime, isNull);
         expect(pomo.timerEndTime, isNull);
         expect(pomo.timerIsRunning, false);
-        expect(pomo.remainingTime, Duration.zero);
+        expect(pomo.remainingTime, PomodoroTimer.pomodoroLength);
       });
       test('startTimer', () {
         final Duration dura = Duration(seconds: 1);
