@@ -2,6 +2,7 @@
 //WEB: https://www.youtube.com/watch?v=HQ_ytw58tC4&t=1s
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
@@ -72,8 +73,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue, brightness: Brightness.light),
+            seedColor: Colors.deepPurple, brightness: Brightness.light),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'), //English
+        Locale('es'), //Spanish
+        Locale('fr'), //French
+        Locale('zh'), //Chinese
+        Locale('hi'), //Hindi
+      ],
     );
   }
 }
