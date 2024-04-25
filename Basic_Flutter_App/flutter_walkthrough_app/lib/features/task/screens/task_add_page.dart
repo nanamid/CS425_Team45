@@ -38,9 +38,9 @@ class AddTaskPage extends StatelessWidget {
     }
 
     //NEW saveTask() function w/ Firestore
-    void addTaskDB(String? docID, Task taskToSave) {
+    void addTaskDB(String? docID) {
       final FirestoreService firestoreService = FirestoreService();
-      firestoreService.addTask_v2(docID!);
+      firestoreService.addTask_v3(newTask);
     }
 
     void cancelSaveTask() {

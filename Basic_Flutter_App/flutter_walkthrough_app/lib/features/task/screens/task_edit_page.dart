@@ -53,7 +53,7 @@ class EditTaskPage extends StatelessWidget {
     //NEW saveTask() function w/ Firestore
     void editTaskDB(String? docID, Task taskToSave) {
       final FirestoreService firestoreService = FirestoreService();
-      firestoreService.updateTask(docID!, taskToSave.taskName);
+      firestoreService.updateTask_v2(docID!, taskToSave);
     }
 
     void cancelSaveTask() {
