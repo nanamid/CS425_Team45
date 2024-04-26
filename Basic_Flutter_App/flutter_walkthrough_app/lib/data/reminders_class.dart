@@ -339,6 +339,11 @@ class ReminderManager {
   }
 
   void _scheduleEndNotification(Reminder reminder, DateTime deadline) async {
+    // If we're trying to show a reminder for a deadline in the past
+    if (DateTime.now().compareTo(deadline) >= 0) {
+      return;
+    }
+
     // CRITICAL SECTION
     await this._notificationIDMutex.acquire();
     final int newKey = await _findNextAvailableNotificationID();

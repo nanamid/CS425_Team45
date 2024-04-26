@@ -41,12 +41,6 @@ class EditTaskPage extends StatelessWidget {
                 .createReminderForDeadline(existingTask.taskDeadline!),
             existingTask);
       }
-      // if (existingTask.clockRunning == true) {
-      //   db.reminderManager.createReminderForTimer(Duration.zero,
-      //       persistentNotification: true,
-      //       timerEndNotification: false,
-      //       alarm: false);
-      // }
       db.updateDatabase();
       Get.back();
     }
@@ -64,7 +58,7 @@ class EditTaskPage extends StatelessWidget {
             saveTask: saveTask,
             cancelSaveTask: cancelSaveTask,
             task: existingTask,
-            canCancel: false,
+            canCancel: true,
             taskList: taskList,
           ),
         ));

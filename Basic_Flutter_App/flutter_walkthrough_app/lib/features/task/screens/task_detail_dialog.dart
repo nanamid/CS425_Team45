@@ -30,143 +30,221 @@ void showTaskDetail(BuildContext context, Task currentTask,
                   children: [
                     // status
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("${currentTask.taskStatus.label}"),
+                      padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+                      child: buildText(
+                          currentTask.taskStatus.label,
+                          AppColors.textPrimary,
+                          20,
+                          FontWeight.normal,
+                          TextAlign.start,
+                          TextOverflow.fade,
+                          maxLines: 1),
                     ),
 
-                    Padding(
-                      // name
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(currentTask.taskName ?? "Name"),
+                    Expanded(
+                      child: Padding(
+                        // name
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: buildText(
+                            currentTask.taskName,
+                            AppColors.textPrimary,
+                            24,
+                            FontWeight.normal,
+                            TextAlign.start,
+                            TextOverflow.ellipsis,
+                            maxLines: 1),
+                      ),
                     ),
                   ],
                 ),
-                Text(
-                  currentTask.clockRunning ? 'Clocked In' : 'Clocked Out',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.secondary),
-                ),
+                buildText(
+                    currentTask.clockRunning ? 'Clocked In' : 'Clocked Out',
+                    AppColors.textPrimary,
+                    24,
+                    FontWeight.normal,
+                    TextAlign.start,
+                    TextOverflow.fade,
+                    maxLines: 1),
+                Row(children: [
+                  Icon(
+                    Icons.label,
+                    color: AppColors.secondary,
+                  ),
+                  5.width_space,
+                  buildText(
+                      currentTask.taskLabel.label,
+                      AppColors.textPrimary,
+                      AppSizes.textLarge,
+                      FontWeight.bold,
+                      TextAlign.start,
+                      TextOverflow.fade,
+                      maxLines: 1),
+                ]),
               ],
             ),
-            content: Column(children: [
-              // Deadline
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: buildText(
-                    currentTask.taskDeadline != null
-                        ? 'Deadline: ${DateFormat('yMMMMd').format(currentTask.taskDeadline!)} ${DateFormat('Hm').format(currentTask.taskDeadline!)}'
-                        : "",
-                    AppColors.textPrimary,
-                    AppSizes.textMedium,
-                    FontWeight.normal,
-                    TextAlign.center,
-                    TextOverflow.ellipsis),
-              ),
+            content: Container(
+              width: double.maxFinite,
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                // Deadline
+                Visibility(
+                  visible: currentTask.taskDeadline != null,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: buildText(
+                        currentTask.taskDeadline != null
+                            ? 'Deadline: ${DateFormat('yMMMMd').format(currentTask.taskDeadline!)} ${DateFormat('Hm').format(currentTask.taskDeadline!)}'
+                            : "",
+                        AppColors.textPrimary,
+                        AppSizes.textMedium,
+                        FontWeight.normal,
+                        TextAlign.center,
+                        TextOverflow.ellipsis),
+                  ),
+                ),
 
-              // Description
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Expanded(
+                Divider(),
+
+                // Description
+                Visibility(
+                  visible: currentTask.taskDescription != null,
+                  child: Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: buildText(
+                          "${currentTask.taskDescription}",
+                          AppColors.textPrimary,
+                          AppSizes.textMedium,
+                          FontWeight.normal,
+                          TextAlign.left,
+                          TextOverflow.ellipsis),
+                    ),
+                  ),
+                ),
+
+                // total time
+                Divider(),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: buildText(
-                      "Description: ${currentTask.taskDescription}",
+                      "Total Time: ${currentTask.totalTime.inHours.toString().padLeft(2, '0')}:${(currentTask.totalTime.inMinutes % 60).toString().padLeft(2, '0')}",
                       AppColors.textPrimary,
-                      AppSizes.textMedium,
+                      AppSizes.textLarge,
                       FontWeight.normal,
-                      TextAlign.center,
-                      TextOverflow
-                          .visible), // by default, wraps to multiple lines
+                      TextAlign.start,
+                      TextOverflow.fade,
+                      maxLines: 1),
+                ),
+
+                // clock entries
+                // see https://stackoverflow.com/a/56355962 for how to make
+                // this work in a showDialog
+                Expanded(
+                  flex: 3,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: currentTask.clockList.length,
+                    separatorBuilder: (context, index) => 10.height_space,
+                    itemBuilder: (context, index) => TimeclockTile(
+                        clockPair:
+                            currentTask.clockList.reversed.toList()[index]),
+                  ),
+                ),
+              ]),
+            ),
+            actions: [
+              // clock in/out
+              Visibility(
+                visible: currentTask.clockRunning ==
+                    false, // can't clock in if we're already clocked in
+                child: ElevatedButton(
+                  // onPressed has to wrap the async future function with a void function
+                  onPressed: () async {
+                    // Ask for user confirmation
+                    bool? confirmation = await confirmClockInDialog(context);
+
+                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
+                    if (!context.mounted) {
+                      return;
+                    }
+
+                    if (confirmation == true) {
+                      setState(() {
+                        // not necessarily best practice to setState such a big function
+                        bool success = clockIn(currentTask);
+                        if (success == false) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text('Cannot Add Clock Entry'),
+                                    content: Text('Already Clocked In'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('Okay'))
+                                    ],
+                                  ));
+                        }
+                      });
+                    }
+                  },
+                  child: buildText(
+                      "Clock In",
+                      AppColors.buttonPrimary,
+                      AppSizes.textLarge,
+                      FontWeight.bold,
+                      TextAlign.start,
+                      TextOverflow.fade,
+                      maxLines: 1),
                 ),
               ),
 
-              // total time
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:
-                    Text("Total Time: ${currentTask.totalTime_minutes} mins"),
-              ),
+              Visibility(
+                visible: currentTask
+                    .clockRunning, // can't clock out unless we're clocked in
+                child: ElevatedButton(
+                  onPressed: () async {
+                    // Ask for user confirmation
+                    bool? confirmation = await confirmClockOutDialog(context);
 
-              // clock entries
-              for (List<DateTime?> clockPair in currentTask.clockList)
-                TimeclockTile(clockPair: clockPair)
+                    // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
+                    if (!context.mounted) {
+                      return;
+                    }
 
-              // TODO use ListView.separated below when we move showTaskDetail() away from an alert dialog
-              // ListView.separated(
-              //   padding: const EdgeInsets.all(8),
-              //   itemCount: currentTask.clockList.length,
-              //   itemBuilder: (context, index) {
-              //     return TimeclockTile(
-              //         clockPair: currentTask.clockList[index]);
-              //   },
-              //   separatorBuilder: (context, index) => const Divider(),
-              // )
-            ]),
-            actions: [
-              // clock in/out
-              TextButton(
-                // onPressed has to wrap the async future function with a void function
-                onPressed: () async {
-                  // Ask for user confirmation
-                  bool? confirmation = await confirmClockInDialog(context);
-
-                  // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (confirmation == true) {
-                    setState(() {
-                      // not necessarily best practice to setState such a big function
-                      bool success = clockIn(currentTask);
-                      if (success == false) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: Text('Cannot Add Clock Entry'),
-                                  content: Text('Already Clocked In'),
-                                  actions: <Widget>[
-                                    ElevatedButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('Okay'))
-                                  ],
-                                ));
-                      }
-                    });
-                  }
-                },
-                child: Text("Clock In"),
-              ),
-
-              TextButton(
-                onPressed: () async {
-                  // Ask for user confirmation
-                  bool? confirmation = await confirmClockOutDialog(context);
-
-                  // catch async gap: https://dart.dev/tools/linter-rules/use_build_context_synchronously
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (confirmation == true) {
-                    setState(() {
-                      // not necessarily best practice to setState such a big function
-                      bool success = clockOut(currentTask);
-                      if (success == false) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: Text('Cannot Add Clock Entry'),
-                                  content: Text('Not Clocked In'),
-                                  actions: <Widget>[
-                                    ElevatedButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('Okay'))
-                                  ],
-                                ));
-                      }
-                    });
-                  }
-                },
-                child: Text("Clock Out"),
+                    if (confirmation == true) {
+                      setState(() {
+                        // not necessarily best practice to setState such a big function
+                        bool success = clockOut(currentTask);
+                        if (success == false) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text('Cannot Add Clock Entry'),
+                                    content: Text('Not Clocked In'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('Okay'))
+                                    ],
+                                  ));
+                        }
+                      });
+                    }
+                  },
+                  child: buildText(
+                      "Clock Out",
+                      AppColors.buttonPrimary,
+                      AppSizes.textLarge,
+                      FontWeight.bold,
+                      TextAlign.start,
+                      TextOverflow.fade,
+                      maxLines: 1),
+                ),
               ),
             ],
           );

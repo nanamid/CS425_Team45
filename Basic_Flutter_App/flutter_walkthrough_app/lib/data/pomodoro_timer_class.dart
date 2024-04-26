@@ -100,6 +100,7 @@ class PomodoroTimer {
 
   // reset the timer
   Duration clearTimer() {
+    internalTask.taskName = "Pomodoro Timer";
     if (_timerIsRunning) {
       stopTimer();
     }
@@ -130,18 +131,22 @@ class PomodoroTimer {
       _timerEndTime = _timerStartTime!.add(shortBreakTimeLength);
     }
 
+    internalTask.taskName = "Pomodoro Break";
     _timerIsRunning = true;
 
     TodoDatabase db = TodoDatabase();
     db.loadData();
-    db.reminderManager.createReminderForDeadline(_timerEndTime!,
+    Reminder reminder = db.reminderManager.createReminderForDeadline(
+        _timerEndTime!,
         persistentNotification: true,
         timerEndNotification: true, timerCallback: () {
       stopTimer();
       this.remainingTime = pomodoroLength;
+      internalTask.taskName = "Pomodoro Timer";
       startTimer();
     });
 
+    db.reminderManager.registerTaskWithReminder(reminder, internalTask);
     db.updateDatabase();
     print('Started Pomodoro Timer');
   }

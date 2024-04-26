@@ -182,7 +182,8 @@ class _TaskPageState extends State<TaskPage> {
                 Text(currentTask.taskDescription ?? "Description"),
 
                 // total time
-                Text("Total Time: ${currentTask.totalTime_minutes} mins"),
+                Text(
+                    "Total Time: ${currentTask.totalTime.inHours.toString().padLeft(2, '0')}:${(currentTask.totalTime.inMinutes % 60).toString().padLeft(2, '0')}"),
 
                 // clock entries
                 for (List<DateTime?> clockPair in currentTask.clockList)

@@ -23,6 +23,8 @@ class TaskList with ChangeNotifier {
   List<Task> get list => List.unmodifiable(
       _list); // the list itself is unmodifiable, but the tasks inside should be modifiable
 
+  List<Task> _listOfTasksToBeRemoved = <Task>[];
+
   bool addTask(Task newTask) {
     if (_list.where((task) => task == newTask).isNotEmpty) {
       print("Couldn't add task, child already exists");
@@ -35,20 +37,19 @@ class TaskList with ChangeNotifier {
     return true;
   }
 
-  bool removeTask(Task removedTask) {
-    bool result = _list.remove(removedTask);
-    notifyListeners();
-
+  void _findTasksToRemove(Task removedTask) {
+    _listOfTasksToBeRemoved.add(removedTask);
     for (final child in removedTask.taskSubtasks) {
-      if (_list.remove(child) == false) {
-        result = false;
-      }
-      notifyListeners();
+      _findTasksToRemove(child);
     }
-    if (result == false) {
-      print("Could not remove task(s)");
-    }
-    return result;
+  }
+
+  void removeTask(Task removedTask) {
+    removedTask.makeTopLevelTask();
+    _findTasksToRemove(removedTask);
+    _list.removeWhere((element) => _listOfTasksToBeRemoved.contains(element));
+    _listOfTasksToBeRemoved = [];
+    notifyListeners();
   }
 
   /// To avoid an infinite loop, Hive needs to only store Task parent field, not parent and subtasks[]
@@ -157,8 +158,7 @@ class Task with ChangeNotifier {
       []; // intended as mutable list of mutable [DateTime, DateTime?]
 
   @HiveField(8)
-  int totalTime_minutes = 0; // 0
-  int totalTime_secs = 0; // for testing
+  Duration totalTime = Duration.zero;
 
   @HiveField(9)
   bool _clockRunning = false;
@@ -170,6 +170,11 @@ class Task with ChangeNotifier {
 
   @HiveField(11)
   Task? taskParentTask;
+
+  /// Used by the checkbox in TaskListView to remember what the state was before
+  /// setting the status to done was. So you can uncheck and go back to what it was.
+  @HiveField(12)
+  TaskStatus? taskStatusBeforeDone;
 
   /// adds a clock entry to the task structure
   /// returns false when cannot add entry, like when a clock is already open.
@@ -217,11 +222,8 @@ class Task with ChangeNotifier {
     clockList.last[1] = DateTime.now();
     _clockRunning = false;
     print("Clocked out at ${clockList.last[1]}");
-    totalTime_minutes +=
-        (clockList.last[1]!.difference(clockList.last[0]!)).inMinutes;
-    totalTime_secs +=
-        (clockList.last[1]!.difference(clockList.last[0]!)).inSeconds;
-    print("totalTime = $totalTime_minutes ($totalTime_secs secs)");
+    totalTime += clockList.last[1]!.difference(clockList.last[0]!);
+    print("totalTime = ${totalTime.toString()}");
 
     notifyListeners();
     return true;
@@ -237,6 +239,13 @@ class Task with ChangeNotifier {
       print("Couldn't add subtask, is itself");
       return false;
     }
+
+    // test if newChild is an ancestor
+    if (testIfTaskIsAncestor(newChild) == true) {
+      print("Tried setting a task as child of one of its children");
+      return false;
+    }
+
     newChild.taskParentTask = this;
     taskSubtasks.add(newChild);
 
@@ -250,11 +259,35 @@ class Task with ChangeNotifier {
       print("Couldn't separate child from parent, task not a child");
       return false;
     }
-    separatedChild.taskParentTask = this.taskParentTask;
+    this.taskParentTask?.setSubTask(separatedChild);
+    separatedChild.taskParentTask = this
+        .taskParentTask; // sometimes when this.parent is null, this is necessary
     taskSubtasks.remove(separatedChild);
 
     notifyListeners();
     return true;
+  }
+
+  void makeTopLevelTask() {
+    while (this.taskParentTask != null) {
+      this.taskParentTask!.unsetSubTask(this);
+    }
+  }
+
+  /// Asks, 'Is task an ancestor of me?'
+  ///
+  /// True means 'task' is some distant parent of me
+  ///
+  /// False means 'task' is not an ancestor
+  bool testIfTaskIsAncestor(Task task) {
+    Task ancestor = this;
+    while (ancestor.taskParentTask != null) {
+      ancestor = ancestor.taskParentTask!;
+      if (identical(ancestor, task)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Task({
