@@ -1,7 +1,10 @@
 //WEB: https://github.com/flutter-devs/email_verification_using_firebase/blob/master/lib/views/auth/email_verification_page.dart
+
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:test_app/pages/user_page.dart';
+import 'package:test_app/utils/constants/text_strings.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -31,11 +34,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
 
     if (isEmailVerified) {
-      // TODO: implement your code after email verification
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Email Successfully Verified")));
-
-      timer?.cancel();
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => const UserPage(),
+        ),
+      );
     }
   }
 
@@ -53,7 +58,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         body: isEmailVerified
             ? const Center(
                 child: Text(
-                    "Email Successfully Verified \n Please Reload the App",
+                    "Email Successfully Verified! \n Please reload the app",
                     style: TextStyle(fontWeight: FontWeight.w600)),
               )
             : SingleChildScrollView(
@@ -62,19 +67,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   children: [
                     const SizedBox(height: 35),
                     const SizedBox(height: 30),
-                    const Center(
-                      child: Text(
-                        'Check your \n Email',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 110),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Center(
                         child: Text(
-                          'We have sent you a Email on  ${FirebaseAuth.instance.currentUser?.email}',
+                          'We have sent you an email at ${FirebaseAuth.instance.currentUser?.email}',
                           textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
                         ),
                       ),
                     ),
@@ -85,24 +85,53 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 32.0),
                       child: Center(
                         child: Text(
-                          'Verifying email....',
+                          'Verifying email...',
                           textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 57),
+                    const SizedBox(height: 90),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Center(
+                        child: Text(
+                          'Please follow the instructions in the email',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 90),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: ElevatedButton(
-                        child: const Text('Resend'),
+                        child: const Text(AppTexts.resendEmail),
                         onPressed: () {
                           try {
                             FirebaseAuth.instance.currentUser
                                 ?.sendEmailVerification();
+                            if (isEmailVerified) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (ctx) => const UserPage()));
+                            }
                           } catch (e) {
                             debugPrint('$e');
                           }
                         },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Center(
+                        child: Text(
+                          AppTexts.emailNotReceivedMessage,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15),
+                        ),
                       ),
                     ),
                   ],
@@ -112,3 +141,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
   }
 }
+
+
+/*
+if (isEmailVerified) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (ctx) => const UserPage()));
+                            }
+*/

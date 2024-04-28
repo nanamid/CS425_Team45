@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:test_app/data/password_checker.dart';
 import 'package:test_app/pages/auth/email_validation.dart';
 import 'package:test_app/utils/constants/colors.dart';
+import 'package:test_app/utils/constants/text_strings.dart';
 
 //RegisterPage class declaration
 class RegisterPage extends StatefulWidget {
@@ -194,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const Text(
-                  'Create an account with your email',
+                  AppTexts.signupTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,

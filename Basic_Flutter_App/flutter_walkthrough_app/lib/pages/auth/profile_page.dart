@@ -8,7 +8,6 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';  //Working on it!
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -32,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome, USER!"),
+        title: Text("Welcome to Task Titans!"),
         backgroundColor: Theme.of(context).colorScheme.background,
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -51,12 +50,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: Text('Language'),
                 onPressed: (BuildContext context) {},
               ),
+              /*
               SettingsTile.switchTile(
                 title: Text('Dark Mode'),
                 leading: Icon(Icons.dark_mode),
                 onToggle: (value) {},
                 initialValue: false,
               ),
+              */
             ],
           ),
         ],

@@ -67,7 +67,7 @@ class AppTexts {
   static const String confirmEmailSubTitle =
       "Congratulations! Your Account Awaits: Verify Your Email to Start your world of Productivity.";
   static const String emailNotReceivedMessage =
-      "Didn’t get the email? Check your junk/spam or resend it.";
+      "Didn’t get the email? Check your junk/spam or use the resend button above.";
   static const String yourAccountCreatedTitle =
       "Your account successfully created!";
   static const String yourAccountCreatedSubTitle = "Welcome to Task Titans!";
