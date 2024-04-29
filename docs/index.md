@@ -16,19 +16,19 @@ Task Titans’ unique approach, combining gamification and academic task managem
 
 | Initial Task View | Add Task Page | Confirmation Dialog |
 | ------------- | ------------- | ------------- |
-| <img src="/docs/assets/images/1 Initial Task View.png" width="300"/> | <img src="/docs/assets/images/2 add task.png" width="300"/> | <img src="/docs/assets/images/3 confirmation.png" width="300"/> |
+| <img src="/CS425_Team45/assets/images/1 Initial Task View.png" width="300"/> | <img src="/CS425_Team45/assets/images/2 add task.png" width="300"/> | <img src="/CS425_Team45/assets/images/3 confirmation.png" width="300"/> |
 
 | Filled In Task View | Timeclock | Subtasks |
 | ------------- | ------------- | ------------- |
-| <img src="/docs/assets/images/4 filledin.png" width="300"/> | <img src="/docs/assets/images/5 clockedin.png" width="300"/> | <img src="/docs/assets/images/6 subtask.png" width="300"/> |
+| <img src="/CS425_Team45/assets/images/4 filledin.png" width="300"/> | <img src="/CS425_Team45/assets/images/5 clockedin.png" width="300"/> | <img src="/CS425_Team45/assets/images/6 subtask.png" width="300"/> |
 
 | Slide to Delete | Pomodoro Timer |
 | ------------- | ------------- |
-| <img src="/docs/assets/images/7 slidetodelete.png" width="300"/> | <img src="/docs/assets/images/8 pomodoro.png" width="300"/> |
+| <img src="/CS425_Team45/assets/images/7 slidetodelete.png" width="300"/> | <img src="/CS425_Team45/assets/images/8 pomodoro.png" width="300"/> |
 
 | Login Page | Settings Page |
 | ------------- | ------------- |
-| <img src="/docs/assets/images/Login Page.png" width="300"/> | <img src="/docs/assets/images/Settings Page.png" width="300"/> |
+| <img src="/CS425_Team45/assets/images/Login Page.png" width="300"/> | <img src="/CS425_Team45/assets/images/Settings Page.png" width="300"/> |
 
 ## Project Related Resources
 ### Problem Domain Book
