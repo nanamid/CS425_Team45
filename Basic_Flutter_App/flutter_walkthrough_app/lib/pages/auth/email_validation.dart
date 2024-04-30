@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:test_app/pages/user_page.dart';
+import 'package:test_app/navigation_menu.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -32,16 +32,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
+  }
 
-    if (isEmailVerified) {
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (ctx) => const UserPage(),
-        ),
-      );
-    }
+  Future returnToProfile() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => const NavigationMenu(),
+      ),
+    );
   }
 
   @override
@@ -56,10 +55,30 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return SafeArea(
       child: Scaffold(
         body: isEmailVerified
-            ? const Center(
-                child: Text(
-                    "Email Successfully Verified! \n Please reload the app",
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Email Successfully Verified!",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    MaterialButton(
+                      onPressed: returnToProfile,
+                      color: Colors.deepPurple,
+                      child: Text(
+                        'Return',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               )
             : SingleChildScrollView(
                 child: Column(
@@ -111,12 +130,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           try {
                             FirebaseAuth.instance.currentUser
                                 ?.sendEmailVerification();
-                            if (isEmailVerified) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (ctx) => const UserPage()));
-                            }
                           } catch (e) {
                             debugPrint('$e');
                           }
@@ -141,13 +154,3 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
   }
 }
-
-
-/*
-if (isEmailVerified) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (ctx) => const UserPage()));
-                            }
-*/
