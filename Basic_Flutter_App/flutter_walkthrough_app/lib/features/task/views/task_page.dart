@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:test_app/features/task/controllers/task_controller.dart';
 import 'package:test_app/features/task/views/task_avatar_page.dart';
 import 'package:test_app/features/task/views/task_list_view.dart';
-import 'package:test_app/features/task/views/task_stats_view.dart';
+import 'package:test_app/features/task/views/task_info_view.dart';
 
 class TasksPage extends StatelessWidget {
-  const TasksPage({super.key});
+
+  final TaskController controller = Get.put(TaskController());
+  
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +19,13 @@ class TasksPage extends StatelessWidget {
       child: Column(
         children: [
           //Avatar View
-          Expanded(flex: 6, child: TaskAvatarView()),
+          Expanded(flex: 20, child: TaskAvatarView()),
 
           //Task Stats
-          Expanded(flex: 1, child: TaskInfoView()),
+          Expanded(flex: 5, child: TaskInfoView()),
 
           //Task List
-          Expanded(flex: 6, child: TaskListView()),
+          Expanded(flex: 20, child: TaskListView()),
         ],
       ),
     ));

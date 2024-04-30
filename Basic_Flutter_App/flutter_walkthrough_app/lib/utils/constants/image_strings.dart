@@ -11,6 +11,11 @@ class ImageStrings {
   static const String timerIcon = "assets/icons/timer_icon.png";
   static const String slimeIcon = "assets/icons/slime_icon.png";
 
+  // -- Filter Icons
+  static const String todayFilter = "assets/icons/today_filter.png";
+  static const String weekFilter = "assets/icons/week_filter.png";
+  static const String doneFilter = "assets/icons/done_filter.png";
+
 
   // -- Misc Icons
   static const String categoryIcon = "assets/icons/category_icon.png";

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
 import 'package:test_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,7 +40,7 @@ void main() async {
   // );
 
   //Run the App
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

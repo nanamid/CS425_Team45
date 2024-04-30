@@ -1,22 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/common/widgets/confirm_dialog.dart';
+import 'package:test_app/features/task/controllers/task_controller.dart';
+import 'package:test_app/features/task/models/example_task_model.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
 
+
+
 class TaskTileView extends StatefulWidget {
-  const TaskTileView({super.key});
+  final ExampleTask taskInstance;
+  final int index;
+
+  TaskTileView({super.key, required this.taskInstance, required this.index});
 
   @override
   State<TaskTileView> createState() => _TaskTileViewState();
 }
 
 class _TaskTileViewState extends State<TaskTileView> {
-  bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
+    final TaskController controller = Get.find<TaskController>();
     return GestureDetector(
         onTap: () {
           //Navigate to TaskDetailsView to see Task Details
@@ -46,11 +56,17 @@ class _TaskTileViewState extends State<TaskTileView> {
                   side: BorderSide(color: Colors.white, width: 2),
                   activeColor: Colors.white,
                   checkColor: AppColors.primary,
-                    value: isChecked,
+                  value: widget.taskInstance.isCompleted, //isChecked
                     onChanged: (bool? value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
+                      controller.toggleTaskStatus(widget.taskInstance);
+                      // setState(() {
+                      //   isChecked = value!;
+                      //   viewModel.setTaskValue(widget.index, value!);
+                      //   //widget.task.complete = isChecked;
+                      //   //Provider.of<AppViewModel>(context, listen: false).setTaskValue(index, value!);
+                      // });
+                      
+                      
                       //Change the value of the checkbox
                     }),
               ),
@@ -63,7 +79,7 @@ class _TaskTileViewState extends State<TaskTileView> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   //SWORD NUMBER
-                  buildText('1', AppColors.textWhite, AppSizes.textLarge,
+                  buildText("${widget.taskInstance.sword}", AppColors.textWhite, AppSizes.textLarge,
                       FontWeight.normal, TextAlign.start, TextOverflow.clip),
                   10.width_space,
                   //SWORD ICON
@@ -91,6 +107,7 @@ class _TaskTileViewState extends State<TaskTileView> {
                           {
                             // Push to Delete functionality
                             confirmDialog(context);
+                            //If Yes, controller.deleteTask(index);
                             break;
                           }
                       }
@@ -140,7 +157,7 @@ class _TaskTileViewState extends State<TaskTileView> {
             //Task Title
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5, top: 5),
-              child: buildText('DONE', AppColors.textWhite, AppSizes.textLarge,
+              child: buildText(widget.taskInstance.title, AppColors.textWhite, AppSizes.textLarge,
                       FontWeight.normal, TextAlign.start, TextOverflow.clip), //Text('Task $index'),
             ),
 
@@ -156,16 +173,15 @@ class _TaskTileViewState extends State<TaskTileView> {
                       width: 80,
                       //padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(.1),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(5))),
                       child: Row(
                         children: [
-                          Icon(Icons.calendar_today_rounded, color: AppColors.primaryBackground),
+                          Icon(Icons.calendar_today_rounded, color: AppColors.primaryBackground, size: 20,),
                           5.width_space,
                           Expanded(
                             child: buildText(
-                                'APR 1',
+                                DateFormat.MMMMd().format(widget.taskInstance.dueDate),
                                 AppColors.lightGrey,
                                 AppSizes.textSmall,
                                 FontWeight.w400,
@@ -174,13 +190,13 @@ class _TaskTileViewState extends State<TaskTileView> {
                           )
                         ],
                       )),
-
+                  5.width_space,
                   //CATEGORY
                   Row(children: [
                     Icon(Icons.label, color: AppColors.primaryBackground,),
-                    5.width_space,
+                    3.width_space,
                     buildText(
-                        'CATEGORY',
+                        widget.taskInstance.category,
                         AppColors.lightGrey,
                         AppSizes.textSmall,
                         FontWeight.w400,
@@ -193,5 +209,7 @@ class _TaskTileViewState extends State<TaskTileView> {
             ),
           ),
         ));
+    }
   }
-}
+
+
