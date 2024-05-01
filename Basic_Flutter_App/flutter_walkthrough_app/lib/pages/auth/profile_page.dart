@@ -190,6 +190,86 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Function for building the options in the pop-out dialog under "Credits"
+  GestureDetector buildCreditsOption(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+              content: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                        "Made For the 2024 UNR Computer Science & Engineering Senior Project",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic)),
+                    Divider(height: 20, thickness: 5),
+                    SizedBox(height: 15),
+                    Text(
+                      "Our Team:",
+                      style:
+                          TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+                    ),
+                    Text("Nanami Duncan \n Stosh Peterson \n Jazz Radaza",
+                        style: TextStyle(fontSize: 15)),
+                    Divider(height: 20, thickness: 2),
+                    SizedBox(height: 15),
+                    Text("The Teaching Team:",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic)),
+                    Text("Sara Davis \n David Feil-Seifer \n Devrin Lee",
+                        style: TextStyle(fontSize: 15)),
+                    Divider(height: 20, thickness: 2),
+                    SizedBox(height: 15),
+                    Text("Our Advisor:",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic)),
+                    Text("Erin Keith, CSE Instructor"),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    loadUserData();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Close"),
+                )
+              ],
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_outlined,
+              color: Colors.black,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   // Function for building the switch for settings below "Notifications" block
   Padding buildNotificationOption(
       String title, bool value, Function onChangeMethod) {
@@ -229,10 +309,6 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text(
           "Welcome to Task Titans!",
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
       ),
       body: Container(
@@ -276,6 +352,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
+            buildCreditsOption(context, "Made By"),
             //
           ],
         ),
