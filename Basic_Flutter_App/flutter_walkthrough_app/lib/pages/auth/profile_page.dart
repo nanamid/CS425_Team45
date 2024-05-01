@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 //import 'package:settings_ui/settings_ui.dart';  //Looking into this!
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:test_app/data/firestore.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -20,46 +19,81 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // Variables
-  final FirestoreService firestoreService = FirestoreService();
+  // Firestore Variables
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final String? currentUser = FirebaseAuth.instance.currentUser?.email;
+  final CollectionReference firestoreInstance =
+      FirebaseFirestore.instance.collection("users");
 
   //TEST VARIABLES
-  bool valNot1 = false;
+  bool darkMode = false;
   String currentUsername = '';
+  String currentEmail = '';
+  //TEST VARIABLES
 
   // Placeholder function
   onChangeFunction1(bool newValue1) {
     setState(() {
-      valNot1 = newValue1;
+      darkMode = newValue1;
     });
   }
 
-  // Function for building the options in the pop-out dialog under "Accounts"
+  // Function for retrieving the username and email of the current user
+  Future<Map<String, dynamic>> firebaseGet(String docID) async {
+    DocumentSnapshot docSnap =
+        await firebaseFirestore.collection("users").doc(docID).get();
+    Map<String, dynamic> data = docSnap.data() as Map<String, dynamic>;
+    return data;
+  }
+
+  void loadUserData() async {
+    await firestoreInstance.doc(currentUser).get().then(
+      (event) {
+        currentUsername = event["username"];
+        currentEmail = event["email"];
+      },
+    );
+  }
+
+  // Function for building the options in the pop-out dialog under "General"
   GestureDetector buildAccountOption(BuildContext context, String title) {
     return GestureDetector(
       onTap: () {
         showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(title),
-                content: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+              content: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text("OPT_1"),
-                    Text("OPT_2"),
+                    Text("Username:",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600)),
+                    Text(currentUsername),
+                    Divider(height: 20, thickness: 1),
+                    Text("Email:",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600)),
+                    Text(currentEmail),
                   ],
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Close"),
-                  )
-                ],
-              );
-            });
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    loadUserData();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Close"),
+                )
+              ],
+            );
+          },
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -71,12 +105,84 @@ class _ProfilePageState extends State<ProfilePage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
             ),
             Icon(
-              Icons.arrow_forward,
-              color: Colors.grey,
+              Icons.arrow_forward_ios_outlined,
+              color: Colors.black,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector buildLanguageOption(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+              content: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("English", style: TextStyle(fontSize: 20)),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Spanish", style: TextStyle(fontSize: 20)),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("French", style: TextStyle(fontSize: 20)),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Chinese", style: TextStyle(fontSize: 20)),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Hindi", style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Close"),
+                )
+              ],
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_outlined,
+              color: Colors.black,
             )
           ],
         ),
@@ -97,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+              color: Colors.black,
             ),
           ),
           Transform.scale(
@@ -116,14 +222,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function to retrieve the username of the currently signed in user
-  //
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome to Task Titans!"),
+        title: Text(
+          "Welcome to Task Titans!",
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           onPressed: () {},
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -138,36 +244,39 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Icon(
                   Icons.person,
-                  color: Colors.blue,
+                  color: Colors.purple,
+                  size: 30,
                 ),
                 SizedBox(width: 10),
                 Text(
-                  "Account",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  "General",
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
-            buildAccountOption(context, "Languages"),
-            buildAccountOption(context, "Accessibility"),
-            SizedBox(height: 40),
+            buildAccountOption(context, "Account"),
+            buildLanguageOption(context, "Languages"),
+            buildNotificationOption("Dark Mode", darkMode, onChangeFunction1),
+            SizedBox(height: 100),
             Row(
               children: [
-                Icon(Icons.notifications, color: Colors.blue),
+                Icon(
+                  Icons.people_alt_outlined,
+                  color: Colors.purple,
+                  size: 30,
+                ),
                 SizedBox(width: 10),
                 Text(
-                  "Notifications",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  "Credits",
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
-            buildNotificationOption("Dark Mode", valNot1, onChangeFunction1),
+            //
           ],
         ),
       ),
