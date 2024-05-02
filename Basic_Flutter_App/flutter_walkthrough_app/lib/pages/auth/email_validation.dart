@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/navigation_menu.dart';
+import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -54,6 +55,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.primary,
         body: isEmailVerified
             ? Center(
                 child: Column(
@@ -66,13 +68,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    SizedBox(height: 10),
                     MaterialButton(
                       onPressed: returnToProfile,
                       color: Colors.deepPurple,
+                      height: 50,
                       child: Text(
                         'Return',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           color: Colors.white,
                         ),
                       ),

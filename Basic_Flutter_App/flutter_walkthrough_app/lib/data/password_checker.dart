@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_app/utils/constants/colors.dart';
 
 //PasswordStrengthChecker class declaration
 //This class is the password strength checker, which checks the features of the password
@@ -64,13 +65,13 @@ class _PasswordStrengthCheckerState extends State<PasswordStrengthChecker> {
           //Based on the match, we'll show the validation message in green or
           // red color
           final color =
-              hasValue ? (hasMatch ? Colors.green : Colors.red) : null;
+              hasValue ? (hasMatch ? AppColors.secondaryAccent : Colors.red) : Colors.white;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: Text(
               entry.value,
-              style: TextStyle(color: color),
+              style: TextStyle(color: color, fontSize: 15),
             ),
           );
         },

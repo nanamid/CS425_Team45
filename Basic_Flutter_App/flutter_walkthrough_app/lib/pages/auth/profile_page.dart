@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 //import 'package:settings_ui/settings_ui.dart';  //Looking into this!
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_app/utils/constants/colors.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -370,11 +371,13 @@ class _ProfilePageState extends State<ProfilePage> {
     loadUserData();
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.primary,
         title: Text(
           "Welcome to Task Titans!",
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
+      backgroundColor: AppColors.primary,
       body: Container(
         padding: const EdgeInsets.all(10),
         child: ListView(

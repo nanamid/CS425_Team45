@@ -4,6 +4,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/pages/auth/forgot_pass_page.dart';
+import 'package:test_app/utils/constants/colors.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? showRegisterPage;
@@ -82,9 +83,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: AppColors.secondary,
       ),
-      backgroundColor: Colors.grey[300],
+      backgroundColor: AppColors.secondary,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -95,6 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Hello Again!',
                   style: TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 45,
                   ),
@@ -103,6 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Text(
                   'Log In to Resume Your Journey',
                   style: TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -117,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _emailController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.black),
+                        borderSide: const BorderSide(color: AppColors.accent),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -140,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _passwordController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.black),
+                        borderSide: const BorderSide(color: AppColors.accent),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -220,6 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'Not a member?',
                       style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
