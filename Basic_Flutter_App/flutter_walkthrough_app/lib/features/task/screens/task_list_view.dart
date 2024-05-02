@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:test_app/data/firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:test_app/common/widgets/build_text.dart';
 import 'package:test_app/data/reminders_class.dart';
@@ -105,6 +107,8 @@ class _TaskListViewState extends State<TaskListView> {
   }
 
   //NEW checkBoxChanged() function w/ Firestore
+  //CURRENTLY OUT OF USE (looking for new implementation)
+  /*
   void checkBoxChangedDB(bool value, String? docID) {
     if (value) {
       firestoreService.isDone(docID!, 1);
@@ -112,8 +116,11 @@ class _TaskListViewState extends State<TaskListView> {
       firestoreService.isDone(docID!, 0);
     }
   }
+  */
 
   //NEW Translation function for checkbox mapping
+  //CURRENTLY OUT OF USE (may no longer need it)
+  /*
   TaskStatus taskStatusTranslation(Map<String, dynamic> firebaseTask) {
     TaskStatus currentStatus = TaskStatus.TODO;
     if (firebaseTask['completed'] == 0 || firebaseTask['completed'] == Null) {
@@ -126,6 +133,7 @@ class _TaskListViewState extends State<TaskListView> {
     //
     return currentStatus;
   }
+  */
 
   void deleteTask(Task task) {
     setState(() {
@@ -146,6 +154,13 @@ class _TaskListViewState extends State<TaskListView> {
     //TextTheme textTheme = Theme.of(context).textTheme;
     TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
     List<Task> currentTaskListOfTasks = currentTaskList.list;
+
+    //Firestore Variables
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    final docRef = firebaseFirestore
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .collection("tasks");
 
     return ListenableBuilder(
         listenable: Listenable.merge(
@@ -169,6 +184,7 @@ class _TaskListViewState extends State<TaskListView> {
                     separatorBuilder: (context, index) => 10
                         .height_space, //use space extenion here "15.height_space"
                     itemCount: listOfTopLevelTasks.length,
+                    //https://github.com/nanamid/CS425_Team45/blob/61bab05a883eefbe9d02fca429866e2ab78a1b4d/Basic_Flutter_App/flutter_walkthrough_app/lib/pages/tasks_page_DB.dart#L102
                     itemBuilder: (context, index) {
                       Task currentTask = listOfTopLevelTasks[index];
                       return TaskTileView(

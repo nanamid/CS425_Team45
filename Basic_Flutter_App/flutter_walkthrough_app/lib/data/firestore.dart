@@ -84,9 +84,9 @@ class FirestoreService {
         .then((value) => print(
             "Note Updated for ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to update note: $error"));
-    ;
   }
 
+  /*
   // Function for marking if a task is done
   Future<void> isDone(String docID, int isTaskDone) async {
     userTasks
@@ -96,6 +96,7 @@ class FirestoreService {
             "Changed task status for ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to change task status: $error"));
   }
+  */
 
   // Function for deleting a task
   Future<void> deleteTask(String docID) async {
