@@ -16,12 +16,14 @@ class TaskController extends GetxController {
   var filteredTasks = <ExampleTask>[].obs;
   var filter = TaskFilter.today.obs; // Use TaskFilter enum
 
+  int totalSwordCount = 0;
+
 
   // Reactive calculation of total swords
   int get totalSwords => allTasks.where((task) => task.isCompleted).fold(
       0,
       (sum, task) =>
-          sum + (task.sword ?? 0)); // Ensure to handle nullable sword count
+          sum + (task.sword ?? 0)) - totalSwordCount; // Ensure to handle nullable sword count
 
 
   // Reactive Avatar Path
@@ -82,23 +84,23 @@ class TaskController extends GetxController {
       ),
       ExampleTask(
         id: 4,
-        title: 'Review the new submissions',
+        title: 'Submit History Homework',
         dueDate: DateTime.now().add(Duration(days: 3)), // Later this week
-        category: 'Project',
+        category: 'Homework',
         isCompleted: true,
       ),
       ExampleTask(
         id: 5,
-        title: 'Plan the budget for next quarter',
+        title: 'Merge Code Changes',
         dueDate: DateTime.now().subtract(Duration(days: 7)), // Last week
         category: 'Project',
         isCompleted: true,
       ),
       ExampleTask(
         id: 6,
-        title: 'Send out the client newsletters',
+        title: 'Write Submission for Essay Competition',
         dueDate: DateTime.now().add(Duration(days: 4)), // Later this week
-        category: 'Project',
+        category: 'Essay',
         isCompleted: true,
       ),
       ExampleTask(
@@ -192,6 +194,15 @@ class TaskController extends GetxController {
     }else{
       return ImageStrings.todayFilter;
     }
+
+  }
+
+  void setTotalSwords(int totalSwordCount){
+    totalSwordCount = totalSwordCount;
+    //totalSwords = allTasks.where((task) => task.isCompleted).fold(
+    //  0,
+    //  (sum, task) =>
+    //      sum + (task.sword ?? 0)); // Ensure to handle nullable sword count
 
   }
 

@@ -49,8 +49,8 @@ class GameMainScreen extends Component with HasGameRef<TitanGame> {
           //game.bot.botAttack();
           //
         },
-        color: const Color(0xff758f9a),
-        borderColor: const Color(0xff60d5ff),
+        color: Color.fromARGB(255, 220, 30, 30),
+        borderColor: Color.fromARGB(255, 220, 30, 30),
       )..position = game.size / 2,
     );
   }

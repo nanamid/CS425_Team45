@@ -22,12 +22,12 @@ class Level1Page extends Component with HasGameReference<TitanGame> {
 
     addAll([
       BackgroundOverlay(Color.fromARGB(101, 42, 7, 79)),
-      AttackBox(const Color(0xff758f9a)),
+      AttackBox(Color.fromARGB(255, 228, 155, 27)),
       scoreboard, // Add the scoreboard to the game
 
       // Define buttons with updated actions
       RoundedButton(
-        text: 'Back',
+        text: 'Damage',
         action: () async {
           game.checkGameOver();
           applyBotDamage();
@@ -40,31 +40,31 @@ class Level1Page extends Component with HasGameReference<TitanGame> {
           game.router.pushNamed('enemy-attack');
           game.checkGameOver();
         },
-        color: const Color(0xff758f9a),
-        borderColor: const Color(0xff60d5ff),
+        color: Color.fromARGB(255, 228, 60, 14),
+        borderColor: Color.fromARGB(255, 250, 254, 255),
       )..position = (game.size / 2) + Vector2(0, 60),
 
-      RoundedButton(
-        text: 'Play',
-        action: () {
-          sword.startMovement();
-          //sword.startMoving();
-        },
-        color: Color.fromARGB(255, 97, 225, 86),
-        borderColor: const Color(0xff60d5ff),
-      )..position = (game.size / 2) + Vector2(-100, 50),
+      // RoundedButton(
+      //   text: 'Play',
+      //   action: () {
+      //     sword.startMovement();
+      //     //sword.startMoving();
+      //   },
+      //   color: Color.fromARGB(255, 97, 225, 86),
+      //   borderColor: const Color(0xff60d5ff),
+      // )..position = (game.size / 2) + Vector2(-100, 50),
 
-      RoundedButton(
-        text: 'Stop',
-        action: () {
-          sword.stopMovement();
-          //sword.stopMoving();
-          // Print out the current x position of the sword
-          //print('Sword stopped at x position: ${sword.position.x}');
-        },
-        color: Color.fromARGB(255, 220, 30, 30),
-        borderColor: const Color(0xff60d5ff),
-      )..position = (game.size / 2) + Vector2(100, 50),
+      // RoundedButton(
+      //   text: 'Stop',
+      //   action: () {
+      //     sword.stopMovement();
+      //     //sword.stopMoving();
+      //     // Print out the current x position of the sword
+      //     //print('Sword stopped at x position: ${sword.position.x}');
+      //   },
+      //   color: Color.fromARGB(255, 220, 30, 30),
+      //   borderColor: const Color(0xff60d5ff),
+      // )..position = (game.size / 2) + Vector2(100, 50),
     ]);
     add(sword);
     sword.startMovement();
@@ -89,6 +89,6 @@ class AttackBox extends Component {
   void render(Canvas canvas) {
     //canvas.drawColor(color, BlendMode.srcATop);
     //(left, top, width, height)
-    canvas.drawRect(Rect.fromLTWH(15, 350, 400, 220), Paint()..color = color);
+    canvas.drawRect(Rect.fromLTWH(15, 350, 400, 200), Paint()..color = color);
   }
 }

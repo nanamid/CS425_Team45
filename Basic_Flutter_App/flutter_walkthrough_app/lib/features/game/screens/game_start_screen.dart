@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
@@ -43,6 +45,16 @@ class StartBattleView extends StatelessWidget {
                 },
               ),
             ),
+            Positioned(
+                    top: 580,
+                    left: 250,
+                    child: Obx(() =>Text("${controller.totalSwords}",
+                      style: TextStyle(
+                          fontSize: 45,
+                          color: Colors.white,
+                          //fontFamily: 'Bebas Neue',
+                          fontWeight: FontWeight.w800,))),
+                  ),
             Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -59,7 +71,7 @@ class StartBattleView extends StatelessWidget {
                   30.height_space,
 
                   //Avatar View
-                  Obx(() =>SvgPicture.asset(
+                  Obx(() => SvgPicture.asset(
                     //Create a function that gets the total tasks and remaining tasks
                     controller.avatarImagePath.value,
                     height: 200,
@@ -68,10 +80,11 @@ class StartBattleView extends StatelessWidget {
 
                   //Swords Left
                   SvgPicture.asset(
-                    'assets/images/backgrounds/swords_left.svg',
+                    'assets/images/backgrounds/swords_left1.svg',
                     height: 120,
                     width: 120,
                   ),
+                  
                   50.height_space,
 
                   //Text("Swords Left: 3"),
@@ -91,6 +104,8 @@ class StartBattleView extends StatelessWidget {
       ),
     );
   }
+
+  
 
   void showBattleLoadingOverlay(BuildContext context) {
     OverlayEntry loadingOverlay;

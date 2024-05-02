@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
@@ -10,6 +12,7 @@ import 'package:test_app/features/game/screens/game_main_screen.dart';
 import 'package:test_app/features/game/screens/game_over_screen.dart';
 import 'package:test_app/features/game/screens/game_win_screen.dart';
 import 'package:test_app/features/game/screens/trial_screen.dart';
+import 'package:test_app/features/task/controllers/task_controller.dart';
 // other imports as necessary
 
 /*
@@ -44,6 +47,8 @@ class TitanGame extends FlameGame {
 
   bool gameOver = false;
   bool showingGameOverScreen = false;
+
+  final TaskController controller = Get.find<TaskController>();
 
   @override
   Future<void> onLoad() async {
@@ -116,32 +121,26 @@ class TitanGame extends FlameGame {
   }
 
   void gameOverScreen(String message) {
-    
     // reset();
     // gameOver = false;
     router.pushNamed('gameover');
-    
+    controller.setTotalSwords(1);
+
     //await Future.delayed(Duration(seconds: 5)); // Wait for 1 second
     Future.delayed(Duration(seconds: 2), () {
       Navigator.pop(Get.context!);
       //router.pushNamed('gameover');
       //Navigator.pop(Get.context!);
     });
-    
 
     //Get.snackbar("Game Over", message, snackPosition: SnackPosition.BOTTOM);
+  }
 
-    // await Future.delayed(Duration(seconds: 1)); // Wait for 1 second
-    // //router.pushNamed('gameover');
-    // gameOver = false;
-    // reset();
-    // Navigator.pop(Get.context!);
-
-    // router.pop();
-    // router.pop();
-    //game.router.pop();
-    //Get.offAll(() => StartBattleView());
-    //Navigator.of(context).pop();
+  int getXP() {
+    Random random = Random();
+    return 50 +
+        random.nextInt(
+            51); // random.nextInt(51) generates a random number from 0 to 50
   }
 
   void showGameOverOverlay(BuildContext context) {

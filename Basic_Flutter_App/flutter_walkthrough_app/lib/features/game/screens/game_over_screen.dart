@@ -32,7 +32,7 @@ class GameOverScreen extends PositionComponent
     addAll([
       attackText =
       TextComponent(
-        text: "You've earned 90 xP", //${gameRef.bot.getBotAttack()}
+        text: "You've earned ${gameRef.getXP()} xP", //${gameRef.bot.getBotAttack()}
         textRenderer: TextPaint(
         style: TextStyle(
           fontSize: 50.0, // Specify the font size
