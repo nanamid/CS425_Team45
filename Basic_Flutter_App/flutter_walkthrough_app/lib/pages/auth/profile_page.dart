@@ -184,8 +184,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function for building the options in the pop-out dialog under "Credits"
-  GestureDetector buildCreditsOption(BuildContext context, String title) {
+  // Function for building the dialog for project credits
+  GestureDetector buildCreditsDialog(BuildContext context, String title) {
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -199,9 +199,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                        "Made For the UNR Computer Science & Engineering 2024 Senior Project",
-                        style: TextStyle(
-                            fontSize: 19, fontStyle: FontStyle.italic)),
+                      "Made For the UNR Computer Science & Engineering 2024 Senior Project",
+                      style:
+                          TextStyle(fontSize: 19, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
                     Divider(height: 20, thickness: 5),
                     SizedBox(height: 15),
                     Text(
@@ -225,6 +227,73 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontSize: 20, fontStyle: FontStyle.italic)),
                     Text("Erin Keith, CSE Instructor",
                         style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    loadUserData();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Close"),
+                )
+              ],
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_outlined,
+              color: Colors.black,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Function for building the dialog for project credits
+  GestureDetector buildPrivacyPolicyDialog(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+              content: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Divider(height: 20, thickness: 5),
+                    SizedBox(height: 15),
+                    Text(
+                        "Hi! We're Task Titans, a gamified productivity tool designed to empower students with effective task management and motivational features rooted in habit formation and psychology.",
+                        style: TextStyle(fontSize: 15)),
+                    SizedBox(height: 10),
+                    Text(
+                        "In order to provide the best experience, we collect information from you, such as your email for account creation. We also collect analytics data for Firebase Analytics. Analytics data does not contain information that can directly, but it does contain information unique to your device."),
+                    SizedBox(height: 10),
+                    Text(
+                        "This information will never be sold or shared publicly. We only use this data for Firebase development to track the app's health."),
+                    SizedBox(height: 10),
+                    Text(
+                        "For more information, please contact us at levitatingplasma479@gmail.com"),
                   ],
                 ),
               ),
@@ -329,26 +398,26 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 10),
             buildAccountOption(context, "Account"),
             buildLanguageOption(context, "Languages"),
-            buildNotificationOption("Dark Mode", darkMode, onChangeFunction1),
+            //buildNotificationOption("Dark Mode", darkMode, onChangeFunction1),
             SizedBox(height: 100),
             Row(
               children: [
                 Icon(
-                  Icons.people_alt_outlined,
+                  Icons.info_outline,
                   color: Colors.purple,
                   size: 30,
                 ),
                 SizedBox(width: 10),
                 Text(
-                  "Credits",
+                  "Acknowledgments",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
-            buildCreditsOption(context, "Made By"),
-            //
+            buildCreditsDialog(context, "Developers"),
+            buildPrivacyPolicyDialog(context, "Privacy Statement"),
           ],
         ),
       ),
@@ -361,50 +430,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
-
-/*
-  // Variables
-  double selectedThemeColor = 0.0;
-  double userTextSize = 0.5;
-  ColorBlindnessType typeSelected = ColorBlindnessType.none;
-  int seed = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Welcome, USER!"),
-        backgroundColor: Theme.of(context).colorScheme.background,
-      ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SettingsList(
-        sections: [
-          SettingsSection(
-            title: Text('General'),
-            tiles: [
-              SettingsTile.navigation(
-                leading: Icon(Icons.person),
-                title: Text('Account'),
-                onPressed: (BuildContext context) {},
-              ),
-              SettingsTile.switchTile(
-                title: Text('Dark Mode'),
-                leading: Icon(Icons.dark_mode),
-                onToggle: (bool value) {},
-                initialValue: false,
-              ),
-            ],
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          FirebaseAuth.instance.signOut();
-        },
-        //
-        child: const Icon(Icons.logout),
-      ),
-    );
-  }
-*/
