@@ -80,8 +80,7 @@ void main() {
       expect(task1.taskLabel, TaskLabel.Default);
       expect(task1.taskDescription, "desc");
       expect(task1.clockList.length, 0);
-      expect(task1.totalTime_minutes, 0);
-      expect(task1.totalTime_secs, 0);
+      expect(task1.totalTime, Duration.zero);
       expect(task1.clockRunning, false);
       expect(task1.taskSubtasks.length, 0);
       expect(task1.taskParentTask, null);
@@ -151,29 +150,102 @@ void main() {
       expect(parent.taskSubtasks.length, 0);
       expect(child.taskParentTask, null);
     });
-    test('remove task in middle of nested subtasks', () {
+    test(
+      'remove task in middle of nested subtasks',
+      () {
+        final TaskList taskList = TaskList();
+        final Task grandParent = Task(taskName: "name");
+        final Task parent = Task(taskName: "name");
+        final Task child = Task(taskName: "name");
+        taskList.addTask(grandParent);
+        taskList.addTask(parent);
+        taskList.addTask(child);
+        grandParent.setSubTask(parent);
+        parent.setSubTask(child);
+        expect(taskList.list.contains(grandParent), true);
+        expect(taskList.list.contains(parent), true);
+        expect(taskList.list.contains(child), true);
+        taskList.removeTask(parent);
+        expect(taskList.list, contains(grandParent));
+        expect(taskList.list, isNot(contains(parent)));
+        expect(taskList.list, isNot(contains(child)));
+      },
+    );
+    test('remove grandparent of nested subtasks', () {
       final TaskList taskList = TaskList();
       final Task grandParent = Task(taskName: "name");
       final Task parent = Task(taskName: "name");
-      final Task child = Task(taskName: "name");
+      final Task child1 = Task(taskName: "name");
+      final Task child11 = Task(taskName: "name");
+
       taskList.addTask(grandParent);
       taskList.addTask(parent);
-      taskList.addTask(child);
       grandParent.setSubTask(parent);
-      parent.setSubTask(child);
-      expect(taskList.list.contains(grandParent), true);
-      expect(taskList.list.contains(parent), true);
-      expect(taskList.list.contains(child), true);
-      taskList.removeTask(parent);
-      expect(true, false);
-    },
-        skip:
-            'TODO decide whether removing parent task should kill children, or if parent of parent inherits children');
+      parent.setSubTask(child1);
+      child1.setSubTask(child11);
+      taskList.removeTask(grandParent);
+      expect(taskList.list, isEmpty);
+    });
   });
   test('add parent as own subtask', () {
     final Task parent = Task(taskName: "name");
     parent.setSubTask(parent);
     expect(parent.taskSubtasks.isEmpty, true);
     expect(parent.taskParentTask, parent.taskParentTask);
+  });
+  test('set child to new parent', () {
+    // children can only have one parent
+    // otherwise we end up with duplicate tasks in the taskView page
+    final TaskList taskList = TaskList();
+    final Task task1 = Task(taskName: "foo");
+    final Task task2 = Task(taskName: "foo");
+    final Task task3 = Task(taskName: "foo");
+    task2.setSubTask(task3);
+    task2.unsetSubTask(task3);
+    task1.setSubTask(task3);
+    expect(task3.taskParentTask, task1);
+    expect(task2.taskSubtasks, isNot(contains(task3)));
+    expect(task1.taskSubtasks, contains(task3));
+  });
+  test('unset subtasks in grandparent-parent-child tree', () {
+    // children can only have one parent
+    // otherwise we end up with duplicate tasks in the taskView page
+    final TaskList taskList = TaskList();
+    final Task grandParent = Task(taskName: "name");
+    final Task parent = Task(taskName: "name");
+    final Task child = Task(taskName: "name");
+    taskList.addTask(grandParent);
+    taskList.addTask(parent);
+    taskList.addTask(child);
+    grandParent.setSubTask(parent);
+    parent.setSubTask(child);
+    parent.unsetSubTask(child);
+    expect(parent.taskSubtasks, isNot(contains(child)));
+    expect(child.taskParentTask, grandParent);
+    expect(grandParent.taskSubtasks, contains(parent));
+    expect(grandParent.taskSubtasks, contains(child));
+  });
+  test('set parent as child of child', () {
+    final TaskList taskList = TaskList();
+    final Task parent = Task(taskName: "name");
+    final Task child = Task(taskName: "name");
+    taskList.addTask(parent);
+    taskList.addTask(child);
+    parent.setSubTask(child);
+    child.setSubTask(parent);
+    expect(parent.taskSubtasks, contains(child));
+    expect(child.taskParentTask, parent);
+    expect(parent.taskParentTask, null);
+    expect(child.taskSubtasks, isNot(contains(parent)));
+    final Task childchild = Task(taskName: "name");
+    child.setSubTask(childchild);
+    childchild.setSubTask(parent);
+    expect(parent.taskSubtasks, contains(child));
+    expect(child.taskParentTask, parent);
+    expect(childchild.taskParentTask, child);
+    expect(parent.taskParentTask, null);
+    expect(child.taskSubtasks, contains(childchild));
+    expect(child.taskSubtasks, isNot(contains(parent)));
+    expect(childchild.taskSubtasks, isNot(contains(parent)));
   });
 }
