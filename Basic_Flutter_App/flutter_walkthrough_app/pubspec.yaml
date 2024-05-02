@@ -85,8 +85,9 @@ flutter:
   assets:
     - assets/
     - assets/icons/
-    - assets/images/backgrounds/
     - assets/images/avatars/
+    - assets/images/backgrounds/
+    - assets/images/components/
     - assets/animations/lottie/
 
   #--------------- LOCAL FONTS ------------------#

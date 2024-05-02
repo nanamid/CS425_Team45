@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:test_app/features/game/titan_game.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
@@ -23,6 +25,8 @@ enum BotStatus { happy, sad, worried }
 class BotAvatar extends SpriteGroupComponent<BotStatus>
     with HasGameRef<TitanGame> {
   int health = 100;
+  int botAttack = 0;
+  int damageToBot = 0;
 
   BotAvatar();
 
@@ -33,10 +37,11 @@ class BotAvatar extends SpriteGroupComponent<BotStatus>
     final botWorried = await gameRef.loadSprite(ImageStrings.botWorried);
 
     gameRef.bot; //implemented in Titan Game: `late BotAvatar bot`
+    //gameRef.defenseWindow = DefenseWindow(); // Instantiate the defense window
 
     //size = Vector2(80, 80);
-    scale = Vector2(0.25, 0.25);
-    position = Vector2(200, 50); //left; top
+    scale = Vector2(0.22, 0.22);
+    position = Vector2(210, 130); //left; top
     //position = Vector2(50, gameRef.size.y / 2 - size.y / 2);
     current = BotStatus.happy;
 
@@ -53,6 +58,11 @@ class BotAvatar extends SpriteGroupComponent<BotStatus>
 
     //Change the bot appearance based on health
     changeBotAppearance();
+
+    // //If game is over through user health = 0 or bot health = 0, remove the bot from the game
+    // if (gameRef.bot.getHealth() <= 0 || gameRef.userHealth <= 0) {
+    //   removeFromParent();
+    // }
   }
 
   void changeBotAppearance() {
@@ -66,13 +76,99 @@ class BotAvatar extends SpriteGroupComponent<BotStatus>
     }
   }
 
-  void setHealth(int newHealth) {
-    health -= newHealth;
+  int botAttackAction() {
+    final List<int> choices = [5, 10, 15]; // List of possible choices
+    final random = Random();
+    int index = random.nextInt(choices.length); // Generate a random index
+    //choices[index] => the number at the random index
+
+    final choiceRandom = Random();
+    bool shouldAdd = choiceRandom.nextBool(); // Randomly returns true or false
+
+    int newBotDamage = getBotDamage();
+
+    // Get the current health status
+    int userHealth = gameRef.user.getHealth();
+    int botHealth = gameRef.bot.getBotHealth();
+
+    // Check the difference in health
+    if ((userHealth - botHealth).abs() > 20) {
+        botAttack = 25;
+        setBotAttack(botAttack);
+        print('Bot Attack (Health difference > 20): $botAttack');
+        return botAttack;
+    }
+
+
+    if (shouldAdd) {
+      botAttack = newBotDamage + choices[index];
+      setBotAttack(botAttack);
+      print('Bot Attack (from bot_avatar.dart): $botAttack');
+      return botAttack; // Perform addition
+    } else {
+          // Check if subtracting would result in a negative number
+          if (newBotDamage - choices[index] > 0) {
+            botAttack = newBotDamage - choices[index];
+          } else {
+            // Ensure botAttack is never zero by using the smallest choice
+            botAttack = choices[2]; // This assumes the list is sorted and 5 is the smallest
+          }
+          setBotAttack(botAttack);
+          print('Bot Attack (from bot_avatar.dart): $botAttack');
+          return botAttack; // Ensure it's always a positive attack
+          
+      // // Check if subtracting would result in a negative number
+      // if (newBotDamage - choices[index] >= 0) {
+      //   botAttack = newBotDamage - choices[index];
+      //   setBotAttack(botAttack);
+      //   print('Bot Attack (from bot_avatar.dart): $botAttack');
+      //   return botAttack; // Perform subtraction
+
+      // } else {
+      //   // Optionally set botAttack to zero or just skip the subtraction
+      //   botAttack = choices[index]; // or keep botAttack = newBotDamage;
+      //   setBotAttack(botAttack);
+      //   print('Bot Attack (from bot_avatar.dart): $botAttack');
+      //   return botAttack; // Perform subtraction
+      // }
+    }
+  }
+
+  void subtractBotHealth(int newBotDamage) {
+    health -= newBotDamage;
+    setBotDamage(newBotDamage);
     // Force the component to update its sprite
     update(0);
   }
 
-  int getHealth() {
+  int getBotHealth() {
     return health;
+  }
+
+  void setBotHealth(int newHealth) {
+    health = newHealth;
+    // Force the component to update its sprite
+    update(0);
+  }
+
+  int getBotDamage() {
+    return damageToBot;
+  }
+
+  void setBotDamage(int newBotDamage) {
+    damageToBot = newBotDamage;
+    // Force the component to update its sprite
+    update(0);
+  }
+
+  int getBotAttack() {
+    print('Bot Damage to user: $botAttack');
+    return botAttack;
+  }
+
+  void setBotAttack(int newBotAttack) {
+    botAttack = newBotAttack;
+    // Force the component to update its sprite
+    update(0);
   }
 }

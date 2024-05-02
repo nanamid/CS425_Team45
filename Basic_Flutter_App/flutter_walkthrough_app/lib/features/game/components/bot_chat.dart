@@ -38,16 +38,19 @@ class BotChat extends SpriteGroupComponent<ChatStatus>
   void update(double dt) {
     super.update(dt);
     updateChat();
+    //  if (gameRef.bot.getHealth() <= 0 || gameRef.userHealth <= 0) {
+    //   removeFromParent();
+    // }
   }
 
   void updateChat() {
     //Eventually replace with if(gameRef.currentTurn == 0) -> meaning it's user's turn
 
-    if (gameRef.bot.getHealth() > 50) {
+    if (gameRef.bot.getBotHealth() > 50) {
       current = ChatStatus.healthy;
       chatText = TextComponent(
         text: "Going strong", position: Vector2(10, 10), anchor: Anchor.topLeft);
-    } else if (gameRef.bot.getHealth() > 30) {
+    } else if (gameRef.bot.getBotHealth() > 30) {
       current = ChatStatus.healthy;
       chatText = TextComponent(
         text: "I'm about to die", position: Vector2(10, 10), anchor: Anchor.topLeft);

@@ -14,9 +14,9 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("My Game"),
-      ),
+      // appBar: AppBar(
+      //   title: Text("My Game"),
+      // ),
       body: GameWidget<TitanGame>(
         game: game,
         //initialActiveOverlays: const [MainMenuScreen.id],

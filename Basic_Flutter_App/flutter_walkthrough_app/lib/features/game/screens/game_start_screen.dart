@@ -128,6 +128,8 @@ class StartBattleView extends StatelessWidget {
     Future.delayed(Duration(seconds: 3), () {
       loadingOverlay.remove();
 
+
+      //This navigate page is what allows the back button to exists on the app bar
       //Navigate to Battle Main Page
       Get.to(() => GamePage());
     });

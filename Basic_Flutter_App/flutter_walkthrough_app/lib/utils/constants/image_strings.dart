@@ -21,9 +21,13 @@ class ImageStrings {
   static const String categoryIcon = "assets/icons/category_icon.png";
   static const String swordIcon = "assets/icons/sword_icon.png";
 
-  
+  //### GAME ASSETS
+
   // -- Backgrounds
   static const String avatarBackground = "assets/images/backgrounds/avatar_background.jpg";
+
+  // -- Components
+  static const String sword = "backgrounds/sword.png";
 
 
   // -- Avatars - SVG

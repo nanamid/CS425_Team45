@@ -1,10 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:get/get.dart';
 import 'package:test_app/features/game/components/bot_avatar.dart';
 import 'package:test_app/features/game/components/bot_chat.dart';
-import 'package:test_app/features/game/play_session/game_page.dart';
+import 'package:test_app/features/game/components/enemy_attack_window.dart';
+import 'package:test_app/features/game/components/user_avatar.dart';
 import 'package:test_app/features/game/screens/game_main_screen.dart';
+import 'package:test_app/features/game/screens/game_over_screen.dart';
+import 'package:test_app/features/game/screens/game_win_screen.dart';
 import 'package:test_app/features/game/screens/trial_screen.dart';
 // other imports as necessary
 
@@ -23,15 +27,17 @@ class TitanGame extends FlameGame {
 
   // GAME COMPONENTS
   late BotAvatar bot;
+  late UserAvatar user;
   //late AttackWindow attackWindow;
-  
 
   // eventually will use a healthBar component instead of text
-  late TextComponent botHealthText; 
+  late TextComponent botHealthText;
   late TextComponent userHealthText;
 
+  //late DefenseWindow defenseWindow;
+
   // Chat component -> will toggle on/off based on turn
-  late BotChat botChat; 
+  late BotChat botChat;
 
   int userHealth = 100;
   int currentTurn = 0; //Means it's the user's turn FIRST
@@ -47,6 +53,9 @@ class TitanGame extends FlameGame {
         routes: {
           'main': Route(GameMainScreen.new),
           'level1': Route(Level1Page.new, transparent: true),
+          'game-win': Route(GameWinScreen.new),
+          'enemy-attack': Route(EnemyAttackWindow.new, transparent: true),
+          'gameover': GameOverRoute(),
           //'gameover': Route(GameOverScreen.new),
           // 'level-selector': Route(LevelSelectorPage.new),
           // 'settings': Route(SettingsPage.new, transparent: true),
@@ -58,7 +67,6 @@ class TitanGame extends FlameGame {
         },
         initialRoute: 'main',
       ),
-      
     );
 
     super.onLoad();
@@ -68,48 +76,110 @@ class TitanGame extends FlameGame {
   void update(double dt) {
     super.update(dt);
 
-    
-    checkGameOver();
-    if (gameOver && !showingGameOverScreen) {
-      router.pushNamed('gameover');
-      showingGameOverScreen = true;
-    }
+    //checkGameOver();
+    // if (gameOver && !showingGameOverScreen) {
+    //   // router.pushNamed('gameover');
+    //   showingGameOverScreen = true;
+    //   //Navigate to Battle Main Page
+    //   //Get.to(() => StartBattleView());
+    // }
+    // if (bot.getHealth() <= 0 || userHealth <= 0) {
+    //   router.pushNamed('gameover');
+    //   showingGameOverScreen = true;
+    // }
     super.update(dt);
   }
 
-  // FUNCTIONS
-  void userAttack() {
-    bot.setHealth(10); // Reducing bot health by a fixed amount
-    botHealthText.text = "Bot Health: ${bot.getHealth()}";
-    checkGameOver();
-    if (bot.getHealth() > 0) {
-      currentTurn = 1; // Switch turn to bot
-      botAttack(); // Directly call for simplification, can be event-driven
-    }
-  }
-
-  void botAttack() {
-    userHealth -= 15;
-    userHealthText.text = "User Health: $userHealth";
-    checkGameOver();
-    if (userHealth > 0) {
-      currentTurn = 0; // Switch turn to user
-    }
-  }
-
   void checkGameOver() {
-    if (userHealth <= 0) {
+    if (user.getHealth() <= 0) {
+      reset();
       gameOverScreen("Bot wins!");
+      gameOver = false;
+      reset();
+
       //gameOver = true;
-    } else if (bot.getHealth() <= 0) {
+    } else if (bot.getBotHealth() <= 0) {
+      reset();
       gameOverScreen("User wins!");
+      gameOver = false;
+      reset();
+
       //gameOver = true;
     }
+  }
+
+  void reset() {
+    user.setHealth(100);
+    bot.setBotHealth(100);
+    currentTurn = 0; //Means it's the user's turn FIRST
+    gameOver = false;
   }
 
   void gameOverScreen(String message) {
-    Get.snackbar("Game Over", message, snackPosition: SnackPosition.BOTTOM);
-    Get.offAll(() => GamePage()); // Restart game or go to main menu
+    
+    // reset();
+    // gameOver = false;
+    router.pushNamed('gameover');
+    
+    //await Future.delayed(Duration(seconds: 5)); // Wait for 1 second
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pop(Get.context!);
+      //router.pushNamed('gameover');
+      //Navigator.pop(Get.context!);
+    });
+    
+
+    //Get.snackbar("Game Over", message, snackPosition: SnackPosition.BOTTOM);
+
+    // await Future.delayed(Duration(seconds: 1)); // Wait for 1 second
+    // //router.pushNamed('gameover');
+    // gameOver = false;
+    // reset();
+    // Navigator.pop(Get.context!);
+
+    // router.pop();
+    // router.pop();
+    //game.router.pop();
+    //Get.offAll(() => StartBattleView());
+    //Navigator.of(context).pop();
+  }
+
+  void showGameOverOverlay(BuildContext context) {
+    OverlayEntry loadingOverlay;
+    loadingOverlay = OverlayEntry(
+      builder: (context) {
+        return Container(
+          //color: Colors.red,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/backgrounds/game_over.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                //CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
+                  'You have earned 50 xP',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    // Insert loading overlay
+    Overlay.of(context).insert(loadingOverlay);
+
+    // Remove loading overlay and navigate to battle start page after 3 seconds
+    Future.delayed(Duration(seconds: 3), () {
+      loadingOverlay.remove();
+      Navigator.pop(Get.context!);
+    });
   }
 }
-

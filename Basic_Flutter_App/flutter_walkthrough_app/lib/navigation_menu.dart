@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:test_app/features/game/trial_game/trial_game_main.dart';
+import 'package:test_app/features/game/trial_game/trial_start.dart';
 import 'package:test_app/features/game/screens/game_start_screen.dart';
 import 'package:test_app/features/task/views/task_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
@@ -57,8 +59,9 @@ class NavigationController extends GetxController {
   final screens = [
     TasksPage(),
     StartBattleView(),
+    TrialStartScreen(),
     Container(color: Colors.yellow),
-    Container(color: Colors.purple),
+    //TrialGameScreen(),
     Container(color: Colors.pink),
   ];
 }
