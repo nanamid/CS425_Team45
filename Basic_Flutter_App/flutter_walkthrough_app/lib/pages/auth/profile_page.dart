@@ -20,15 +20,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   // Firestore Variables
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final String? currentUser = FirebaseAuth.instance.currentUser?.email;
   final CollectionReference firestoreInstance =
       FirebaseFirestore.instance.collection("users");
+  String currentUsername = '';
+  String currentEmail = '';
 
   //TEST VARIABLES
   bool darkMode = false;
-  String currentUsername = '';
-  String currentEmail = '';
   //TEST VARIABLES
 
   // Placeholder function
@@ -36,14 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       darkMode = newValue1;
     });
-  }
-
-  // Function for retrieving the username and email of the current user
-  Future<Map<String, dynamic>> firebaseGet(String docID) async {
-    DocumentSnapshot docSnap =
-        await firebaseFirestore.collection("users").doc(docID).get();
-    Map<String, dynamic> data = docSnap.data() as Map<String, dynamic>;
-    return data;
   }
 
   void loadUserData() async {
@@ -65,27 +56,26 @@ class _ProfilePageState extends State<ProfilePage> {
             return AlertDialog(
               title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
               content: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text("Username:",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w600)),
-                    Text(currentUsername),
+                    Text(currentUsername, style: TextStyle(fontSize: 20)),
                     Divider(height: 20, thickness: 1),
                     Text("Email:",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w600)),
-                    Text(currentEmail),
+                    Text(currentEmail, style: TextStyle(fontSize: 20)),
                   ],
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: () {
-                    loadUserData();
+                    //loadUserData();
                     Navigator.of(context).pop();
                   },
                   child: Text("Close"),
@@ -127,8 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return AlertDialog(
               title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
               content: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -136,22 +125,27 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {},
                       child: Text("English", style: TextStyle(fontSize: 20)),
                     ),
+                    SizedBox(height: 15),
                     TextButton(
                       onPressed: () {},
                       child: Text("Spanish", style: TextStyle(fontSize: 20)),
                     ),
+                    SizedBox(height: 15),
                     TextButton(
                       onPressed: () {},
                       child: Text("French", style: TextStyle(fontSize: 20)),
                     ),
+                    SizedBox(height: 15),
                     TextButton(
                       onPressed: () {},
                       child: Text("Chinese", style: TextStyle(fontSize: 20)),
                     ),
+                    SizedBox(height: 15),
                     TextButton(
                       onPressed: () {},
                       child: Text("Hindi", style: TextStyle(fontSize: 20)),
                     ),
+                    SizedBox(height: 15),
                   ],
                 ),
               ),
@@ -200,15 +194,14 @@ class _ProfilePageState extends State<ProfilePage> {
             return AlertDialog(
               title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
               content: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                        "Made For the 2024 UNR Computer Science & Engineering Senior Project",
+                        "Made For the UNR Computer Science & Engineering 2024 Senior Project",
                         style: TextStyle(
-                            fontSize: 20, fontStyle: FontStyle.italic)),
+                            fontSize: 19, fontStyle: FontStyle.italic)),
                     Divider(height: 20, thickness: 5),
                     SizedBox(height: 15),
                     Text(
@@ -217,20 +210,21 @@ class _ProfilePageState extends State<ProfilePage> {
                           TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
                     ),
                     Text("Nanami Duncan \n Stosh Peterson \n Jazz Radaza",
-                        style: TextStyle(fontSize: 15)),
+                        style: TextStyle(fontSize: 16)),
                     Divider(height: 20, thickness: 2),
                     SizedBox(height: 15),
                     Text("The Teaching Team:",
                         style: TextStyle(
                             fontSize: 20, fontStyle: FontStyle.italic)),
                     Text("Sara Davis \n David Feil-Seifer \n Devrin Lee",
-                        style: TextStyle(fontSize: 15)),
+                        style: TextStyle(fontSize: 16)),
                     Divider(height: 20, thickness: 2),
                     SizedBox(height: 15),
                     Text("Our Advisor:",
                         style: TextStyle(
                             fontSize: 20, fontStyle: FontStyle.italic)),
-                    Text("Erin Keith, CSE Instructor"),
+                    Text("Erin Keith, CSE Instructor",
+                        style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),
@@ -304,6 +298,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    loadUserData();
     return Scaffold(
       appBar: AppBar(
         title: Text(
