@@ -196,6 +196,21 @@ class ReminderManager {
     // We will use the reminder instances in _allReminders as the new 'master' reminders to make everything else line up
     // This is fragile and not at all an elegant solution
     // We know reminders are the same by value if they have the same uuid
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.cancelAll();
+
+    // _taskReminderMap fix tasks
+    for (final tasklist in listOfTaskLists) {
+      for (final newTask in tasklist.list) {
+        _taskReminderMap.forEach((reminder, oldTask) {
+          if (newTask.taskUUID == oldTask.taskUUID) {
+            _taskReminderMap[reminder] = newTask;
+          }
+        });
+      }
+    }
+
     Map<Reminder, Task> tempMap = new Map.from(_taskReminderMap);
     _taskReminderMap.clear();
     for (final newReminder in _allReminders) {
@@ -212,23 +227,13 @@ class ReminderManager {
         _remindersWithAlarms[i] = newReminder;
       }
       // _taskReminderMap fix reminders
-      tempMap.forEach((oldReminder, oldTask) {
+      tempMap.forEach((oldReminder, task) {
         if (oldReminder.reminderUUID == newReminder.reminderUUID) {
-          _taskReminderMap[newReminder] = oldTask;
+          _taskReminderMap[newReminder] = task;
         }
       });
     }
-
-    // _taskReminderMap fix tasks
-    for (final tasklist in listOfTaskLists) {
-      for (final newTask in tasklist.list) {
-        _taskReminderMap.forEach((reminder, oldTask) {
-          if (newTask.taskUUID == oldTask.taskUUID) {
-            _taskReminderMap[reminder] = newTask;
-          }
-        });
-      }
-    }
+    // kill reminders that don't have a task associated with them anymore
   }
 
   Future<void> rebuildNotifications() async {
@@ -334,6 +339,11 @@ class ReminderManager {
   }
 
   void _scheduleEndNotification(Reminder reminder, DateTime deadline) async {
+    // If we're trying to show a reminder for a deadline in the past
+    if (DateTime.now().compareTo(deadline) >= 0) {
+      return;
+    }
+
     // CRITICAL SECTION
     await this._notificationIDMutex.acquire();
     final int newKey = await _findNextAvailableNotificationID();

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/features/task/screens/pomodoro_page.dart';
+import 'package:test_app/features/task/screens/pomodoro_timer_widget.dart';
 import 'package:test_app/features/task/screens/task_page.dart';
-import 'package:test_app/pages/user_page.dart';
+import 'package:test_app/pages/auth/user_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/features/task/screens/task_add_page.dart';
@@ -61,7 +64,7 @@ class NavigationController extends GetxController {
     TasksPage(),
     Container(color: Colors.red),
     AddTaskPage(),
-    Container(color: Colors.purple),
+    PomodoroPage(),
     UserPage(),
   ];
 }
