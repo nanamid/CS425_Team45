@@ -58,20 +58,21 @@ class TaskAdapter extends TypeAdapter<Task> {
     };
     return Task(
       taskName: fields[1] == null ? 'Default Task' : fields[1] as String,
-      taskStatus: fields[2] == null ? TaskStatus.TODO : fields[2] as TaskStatus,
       taskLabel: fields[3] == null ? TaskLabel.Default : fields[3] as TaskLabel,
       taskDescription:
           fields[4] == null ? 'Default Description' : fields[4] as String?,
       taskDeadline: fields[5] as DateTime?,
     )
       .._taskUUID = fields[0] as String?
+      .._taskStatus =
+          fields[2] == null ? TaskStatus.TODO : fields[2] as TaskStatus
       ..clockList = (fields[7] as List)
           .map((dynamic e) => (e as List).cast<DateTime?>())
           .toList()
-      ..totalTime_minutes = fields[8] as int
+      ..totalTime = fields[8] as Duration
       .._clockRunning = fields[9] as bool
-      ..taskSubtasks = (fields[10] as List).cast<Task>()
-      ..taskParentTask = fields[11] as Task?;
+      ..taskParentTask = fields[11] as Task?
+      ..taskStatusBeforeDone = fields[12] as TaskStatus?;
   }
 
   @override
@@ -83,7 +84,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(1)
       ..write(obj.taskName)
       ..writeByte(2)
-      ..write(obj.taskStatus)
+      ..write(obj._taskStatus)
       ..writeByte(3)
       ..write(obj.taskLabel)
       ..writeByte(4)
@@ -93,13 +94,13 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(7)
       ..write(obj.clockList)
       ..writeByte(8)
-      ..write(obj.totalTime_minutes)
+      ..write(obj.totalTime)
       ..writeByte(9)
       ..write(obj._clockRunning)
-      ..writeByte(10)
-      ..write(obj.taskSubtasks)
       ..writeByte(11)
-      ..write(obj.taskParentTask);
+      ..write(obj.taskParentTask)
+      ..writeByte(12)
+      ..write(obj.taskStatusBeforeDone);
   }
 
   @override
