@@ -63,6 +63,5 @@ class NavigationController extends GetxController {
     AddTaskPage(),
     Container(color: Colors.purple),
     UserPage(),
-    //Container(color: Colors.pink),
   ];
 }
