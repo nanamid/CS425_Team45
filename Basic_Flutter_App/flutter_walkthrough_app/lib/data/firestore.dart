@@ -41,6 +41,16 @@ class FirestoreService {
         .catchError((error) => print("Failed to add note: $error"));
   }
 
+  // UPDATED function for adding a new task
+  // Altered to add custom objects
+  Future<void> addTask_v4(Task newTask) async {
+    userTasks
+        .add(newTask)
+        .then((value) =>
+            print("Note Added to ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to add note: $error"));
+  }
+
   // Function for retrieving the task list from the database
   Stream<QuerySnapshot> getTasksStream() {
     final tasksStream =
@@ -59,7 +69,7 @@ class FirestoreService {
   }
 
   // NEW function for updating a task
-  // Altered to accomodate a Task object
+  // Altered to accomodate a Task object (may still need the map)
   // This function is still only for updating the text of the task
   Future<void> updateTask_v2(String docID, Task currTask) async {
     final taskMap = {
@@ -68,14 +78,20 @@ class FirestoreService {
       "taskDesc": currTask.taskDescription,
       "taskName": currTask.taskName,
     };
-    return userTasks.doc(docID).update(taskMap);
+    return userTasks
+        .doc(docID)
+        .update(taskMap)
+        .then((value) => print(
+            "Note Updated for ${FirebaseAuth.instance.currentUser?.email}"))
+        .catchError((error) => print("Failed to update note: $error"));
+    ;
   }
 
   // Function for marking if a task is done
   Future<void> isDone(String docID, int isTaskDone) async {
     userTasks
         .doc(docID)
-        .update({"completed": isTaskDone})
+        .update({"taskStatus": isTaskDone})
         .then((value) => print(
             "Changed task status for ${FirebaseAuth.instance.currentUser?.email}"))
         .catchError((error) => print("Failed to change task status: $error"));

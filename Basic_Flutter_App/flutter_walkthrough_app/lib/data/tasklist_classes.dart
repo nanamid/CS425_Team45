@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'tasklist_classes.g.dart'; // automatic generator, through the magic of dart and hive, this gets built
 // try first a: `dart run build_runner build`
@@ -300,6 +301,32 @@ class Task with ChangeNotifier {
   }) : _taskStatus = taskStatus {
     Uuid uuid = Uuid();
     _taskUUID = uuid.v4();
+  }
+
+  //Allows for Task objects to be stored in Firestore
+  factory Task.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return Task(
+      taskName: data?['taskName'],
+      taskStatus: data?['taskStatus'],
+      taskLabel: data?['taskLabel'],
+      taskDescription: data?['taskDesc'],
+      taskDeadline: data?['taskDeadline'],
+    );
+  }
+
+  //Allows for Task objects to be read from Firestore
+  Map<String, dynamic> toFirestore() {
+    return {
+      "taskName": taskName,
+      "taskStatus": taskStatus,
+      "taskLabel": taskLabel,
+      if (taskDescription != null) "taskDesc": taskDescription,
+      if (taskDeadline != null) "taskDeadline": taskDeadline,
+    };
   }
 }
 
