@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:test_app/data/firestore.dart';
 import 'package:test_app/data/reminders_class.dart';
 import 'package:test_app/features/task/screens/task_tile_view.dart';
 import 'package:test_app/utils/constants/colors.dart';
@@ -27,9 +26,6 @@ class _TaskListViewState extends State<TaskListView> {
   //References the Hive Box
   TodoDatabase db = TodoDatabase();
   final taskListIndex = 0; // hardcoded one tasklist for now
-
-  //Firestore Service
-  final FirestoreService firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -235,28 +231,6 @@ class _TaskListViewState extends State<TaskListView> {
     db.updateDatabase();
   }
 
-  //NEW checkBoxChanged() function w/ Firestore
-  void checkBoxChangedDB(bool value, String? docID) {
-    if (value) {
-      firestoreService.isDone(docID!, 1);
-    } else {
-      firestoreService.isDone(docID!, 0);
-    }
-  }
-
-  TaskStatus taskStatusTranslation(Map<String, dynamic> firebaseTask) {
-    TaskStatus currentStatus = TaskStatus.TODO;
-    if (firebaseTask['completed'] == 0 || firebaseTask['completed'] == Null) {
-      currentStatus = TaskStatus.TODO;
-    } else if (firebaseTask['completed'] == 1) {
-      currentStatus = TaskStatus.DONE;
-    } else if (firebaseTask['completed'] == 2) {
-      currentStatus = TaskStatus.WAIT;
-    }
-    //
-    return currentStatus;
-  }
-
   void deleteTask(int index) {
     setState(() {
       TaskList currentTaskList = db.listOfTaskLists[taskListIndex];
@@ -265,11 +239,6 @@ class _TaskListViewState extends State<TaskListView> {
       db.reminderManager.unregisterAllRemindersOfTask(element);
     });
     db.updateDatabase();
-  }
-
-  //NEW deleteTask() function w/ Firestore
-  void deleteTaskDB(String? docID) {
-    firestoreService.deleteTask(docID!);
   }
 
   @override
