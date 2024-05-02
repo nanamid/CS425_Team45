@@ -2,8 +2,8 @@
 //WEB: https://www.youtube.com/watch?v=Mfa3u3naQew
 
 import 'package:flutter/material.dart';
-import '../login_page.dart';
-import '../register_page.dart';
+import 'package:test_app/pages/auth/login_page.dart';
+import 'package:test_app/pages/auth/register_page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -30,9 +30,9 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     if (showLoginPage) {
-      return LoginPage(showRegisterPage: togglePages);
+      return LoginPage(title: 'Login Page', showRegisterPage: togglePages);
     } else {
-      return RegisterPage(showLoginPage: togglePages);
+      return RegisterPage(title: 'Register Page', showLoginPage: togglePages);
     }
   }
 }
