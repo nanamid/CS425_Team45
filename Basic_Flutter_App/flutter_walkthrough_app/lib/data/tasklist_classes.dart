@@ -25,12 +25,19 @@ class TaskList with ChangeNotifier {
 
   List<Task> _listOfTasksToBeRemoved = <Task>[];
 
+  @HiveField(3)
+  int totalSwordsFromTasks = 0;
+
+  @HiveField(4)
+  int usedSwords = 0;
+
   bool addTask(Task newTask) {
     if (_list.where((task) => task == newTask).isNotEmpty) {
       print("Couldn't add task, child already exists");
       return false;
     }
     _list.add(newTask);
+    updateTotalSwordsFromTasks();
     print("Added Task UUID: ${newTask.taskUUID}");
 
     notifyListeners();
@@ -39,6 +46,7 @@ class TaskList with ChangeNotifier {
 
   void _findTasksToRemove(Task removedTask) {
     _listOfTasksToBeRemoved.add(removedTask);
+    updateTotalSwordsFromTasks();
     for (final child in removedTask.taskSubtasks) {
       _findTasksToRemove(child);
     }
@@ -51,6 +59,18 @@ class TaskList with ChangeNotifier {
     _listOfTasksToBeRemoved = [];
     notifyListeners();
   }
+  void updateTotalSwordsFromTasks() {
+    totalSwordsFromTasks = _list.where((task) => task.taskStatus == TaskStatus.DONE)
+                                .fold(0, (sum, task) => sum + task.taskLabel.baseSwords);
+    notifyListeners();
+  }
+
+  void subtractSwordFromTotal(int swords) {
+    usedSwords += swords;
+    notifyListeners();
+  }
+
+  int get totalSwords => totalSwordsFromTasks - usedSwords;
 
   /// To avoid an infinite loop, Hive needs to only store Task parent field, not parent and subtasks[]
   ///
@@ -105,25 +125,26 @@ enum TaskStatus {
 @HiveType(typeId: 3)
 enum TaskLabel {
   @HiveField(0)
-  Study('Study Hour'),
+  Study('Study Hour', 1),
 
   @HiveField(1)
-  Homework('Homework'),
+  Homework('Homework', 1),
 
   @HiveField(2)
-  Project('Project'),
+  Project('Project', 4),
 
   @HiveField(3)
-  Programming('Programming'),
+  Programming('Programming', 3),
 
   @HiveField(4)
-  Default('Default');
+  Default('Default', 1);
 
-  const TaskLabel(this.label);
+  const TaskLabel(this.label, this.baseSwords);
   final String label;
+  final int baseSwords;
 }
 
-// Task
+// Task Data Model
 @HiveType(typeId: 2)
 class Task with ChangeNotifier {
   // @HiveField(0, defaultValue: "-1")
@@ -138,10 +159,13 @@ class Task with ChangeNotifier {
   TaskStatus _taskStatus;
   TaskStatus get taskStatus => _taskStatus;
   set taskStatus(TaskStatus value) {
-    _taskStatus = value;
-    notifyListeners();
+    if (_taskStatus != value) {
+      _taskStatus = value;
+      notifyListeners();
+    }
   }
-
+  
+  
   // TODO do any other fields need a setter with notifyListeners?
   @HiveField(3, defaultValue: TaskLabel.Default)
   TaskLabel taskLabel;
@@ -301,6 +325,21 @@ class Task with ChangeNotifier {
     Uuid uuid = Uuid();
     _taskUUID = uuid.v4();
   }
+
+  // Task({
+  //   required this.taskName,
+  //   TaskStatus taskStatus = TaskStatus.TODO,
+  //   this.taskLabel = TaskLabel.Default,
+  //   this.taskDescription,
+  //   this.taskDeadline,
+  //   // deadline, reminders, clocklist, subtasks, parenttask set with methods
+  // }) : _taskStatus = taskStatus {
+  //   Uuid uuid = Uuid();
+  //   _taskUUID = uuid.v4();
+  //   computeSwords();
+  // }
+
+  
 }
 
 // TODO instead of a list of lists, how about a timestamp pair class?

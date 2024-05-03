@@ -36,6 +36,7 @@ void main() async {
   // Open the box named 'taskbox'
   // This allows you to use Hive.box('taskbox') elsewhere
   var taskbox = await Hive.openBox('taskbox');
+  
   TodoDatabase db = TodoDatabase();
   if (taskbox.get("TASK_LIST") == null || taskbox.get("TASK_LIST").isEmpty) {
     await db.createInitialTasklist();
