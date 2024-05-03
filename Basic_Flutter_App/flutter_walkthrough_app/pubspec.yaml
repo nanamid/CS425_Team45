@@ -16,7 +16,7 @@ dependencies:
   intl: any
 
   #GAME ENGINER - Flame
-  flame: ^1.17.0
+  flame: ^1.15.0
 
   #LOCAL STORAGE - Hive
   hive: ^2.2.3
