@@ -3,11 +3,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:test_app/navigation_menu.dart';
+import 'package:test_app/pages/auth/verification_page.dart';
+import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({Key? key}) : super(key: key);
+  const EmailVerificationScreen({super.key});
 
   @override
   State<EmailVerificationScreen> createState() =>
@@ -19,7 +20,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? timer;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseAuth.instance.currentUser?.sendEmailVerification();
     timer =
@@ -32,20 +32,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
-  }
 
-  Future returnToProfile() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (ctx) => const NavigationMenu(),
-      ),
-    );
+    if (isEmailVerified) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Email Successfully Verified")));
+      timer?.cancel();
+    }
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     timer?.cancel();
     super.dispose();
   }
@@ -54,32 +51,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.primary,
         body: isEmailVerified
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Email Successfully Verified!",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    MaterialButton(
-                      onPressed: returnToProfile,
-                      color: Colors.deepPurple,
-                      child: Text(
-                        'Return',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
+            ? VerifPage()
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

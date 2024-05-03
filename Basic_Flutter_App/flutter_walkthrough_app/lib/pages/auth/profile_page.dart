@@ -5,11 +5,12 @@
 // landing page for a successful login (that is not the tasks page,
 // as seen in the login solo demo)
 
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-//import 'package:settings_ui/settings_ui.dart';  //Looking into this!
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_app/utils/constants/colors.dart';
+import 'package:test_app/pages/auth/email_validation.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -23,18 +24,38 @@ class _ProfilePageState extends State<ProfilePage> {
   final String? currentUser = FirebaseAuth.instance.currentUser?.email;
   final CollectionReference firestoreInstance =
       FirebaseFirestore.instance.collection("users");
+  bool isEmailVerified = false;
+  Timer? timer;
   String currentUsername = '';
   String currentEmail = '';
 
-  //TEST VARIABLES
-  bool darkMode = false;
-  //TEST VARIABLES
-
-  // Placeholder function
-  onChangeFunction1(bool newValue1) {
+  checkEmailVerified() async {
     setState(() {
-      darkMode = newValue1;
+      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
+
+    if (!isEmailVerified) {
+      // ignore: use_build_context_synchronously
+      Navigator.push(context,
+          MaterialPageRoute(builder: (ctx) => const EmailVerificationScreen()));
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content:
+                Text("Your email is verified!", style: TextStyle(fontSize: 16)),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void loadUserData() async {
@@ -46,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function for building the options in the pop-out dialog under "General"
+  // Function for building the account information
   GestureDetector buildAccountOption(BuildContext context, String title) {
     return GestureDetector(
       onTap: () {
@@ -68,17 +89,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     Text("Email:",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w600)),
-                    Text(currentEmail, style: TextStyle(fontSize: 20)),
+                    Text(currentEmail, style: TextStyle(fontSize: 18)),
                   ],
                 ),
               ),
               actions: [
+                MaterialButton(
+                  onPressed: checkEmailVerified,
+                  child: Text("Email Check", style: TextStyle(fontSize: 16)),
+                ),
                 TextButton(
                   onPressed: () {
                     //loadUserData();
                     Navigator.of(context).pop();
                   },
-                  child: Text("Close"),
+                  child: Text("Close", style: TextStyle(fontSize: 16)),
                 )
               ],
             );
@@ -108,81 +133,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  GestureDetector buildLanguageOption(BuildContext context, String title) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
-              content: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("English", style: TextStyle(fontSize: 20)),
-                    ),
-                    SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("Spanish", style: TextStyle(fontSize: 20)),
-                    ),
-                    SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("French", style: TextStyle(fontSize: 20)),
-                    ),
-                    SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("Chinese", style: TextStyle(fontSize: 20)),
-                    ),
-                    SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("Hindi", style: TextStyle(fontSize: 20)),
-                    ),
-                    SizedBox(height: 15),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Close"),
-                )
-              ],
-            );
-          },
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_outlined,
-              color: Colors.black,
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  // This spot was for a function that controlled the language options
+  // This functionality was not successfully implemented, so it was removed
 
   // Function for building the dialog for project credits
   GestureDetector buildCreditsDialog(BuildContext context, String title) {
@@ -236,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     loadUserData();
                     Navigator.of(context).pop();
                   },
-                  child: Text("Close"),
+                  child: Text("Close", style: TextStyle(fontSize: 16)),
                 )
               ],
             );
@@ -266,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function for building the dialog for project credits
+  // Function for building the short privacy statement
   GestureDetector buildPrivacyPolicyDialog(BuildContext context, String title) {
     return GestureDetector(
       onTap: () {
@@ -287,13 +239,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(fontSize: 15)),
                     SizedBox(height: 10),
                     Text(
-                        "In order to provide the best experience, we collect information from you, such as your email for account creation. We also collect analytics data for Firebase Analytics. Analytics data does not contain information that can directly, but it does contain information unique to your device."),
+                        "In order to provide the best experience, we collect information from you, such as your email for account creation. We also collect analytics data for Firebase Analytics. Analytics data does not contain information that can directly, but it does contain information unique to your device.",
+                        style: TextStyle(fontSize: 15)),
                     SizedBox(height: 10),
                     Text(
-                        "This information will never be sold or shared publicly. We only use this data for Firebase development to track the app's health."),
+                        "This information will never be sold or shared publicly. We only use this data for Firebase development to track the app's health.",
+                        style: TextStyle(fontSize: 15)),
                     SizedBox(height: 10),
                     Text(
-                        "For more information, please contact us at levitatingplasma479@gmail.com"),
+                        "For more information, please contact us at levitatingplasma479@gmail.com",
+                        style: TextStyle(fontSize: 15)),
                   ],
                 ),
               ),
@@ -303,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     loadUserData();
                     Navigator.of(context).pop();
                   },
-                  child: Text("Close"),
+                  child: Text("Close", style: TextStyle(fontSize: 16)),
                 )
               ],
             );
@@ -333,48 +288,19 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function for building the switch for settings below "Notifications" block
-  Padding buildNotificationOption(
-      String title, bool value, Function onChangeMethod) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-          Transform.scale(
-            scale: 0.7,
-            child: CupertinoSwitch(
-              activeColor: Colors.blue,
-              trackColor: Colors.grey,
-              value: value,
-              onChanged: (bool newValue) {
-                onChangeMethod(newValue);
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    //checkEmailVerified();
     loadUserData();
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.primary,
         title: Text(
           "Welcome to Task Titans!",
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
+      backgroundColor: AppColors.primary,
       body: Container(
         padding: const EdgeInsets.all(10),
         child: ListView(
@@ -397,8 +323,6 @@ class _ProfilePageState extends State<ProfilePage> {
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
             buildAccountOption(context, "Account"),
-            buildLanguageOption(context, "Languages"),
-            //buildNotificationOption("Dark Mode", darkMode, onChangeFunction1),
             SizedBox(height: 100),
             Row(
               children: [
