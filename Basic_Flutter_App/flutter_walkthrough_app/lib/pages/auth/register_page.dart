@@ -59,11 +59,6 @@ class _RegisterPageState extends State<RegisterPage> {
             ));
   }
 
-  //
-  Future checkEmailVerified() async {
-    //
-  }
-
   //This function confirms the new account and sends it to the database
   Future signUp() async {
     //Before attempting to confirm the account, we check that...

@@ -8,7 +8,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/pages/auth/auth_page.dart';
-import 'package:test_app/pages/auth/profile_page.dart';
+import 'package:test_app/pages/auth/verification_page.dart';
 
 class UserPage extends StatelessWidget {
   const UserPage({super.key});
@@ -20,7 +20,7 @@ class UserPage extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ProfilePage();
+            return VerifPage();
           } else {
             return AuthPage();
           }

@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/navigation_menu.dart';
+import 'package:test_app/pages/auth/profile_page.dart';
+import 'package:test_app/pages/auth/verification_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 
@@ -33,15 +35,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
-  }
 
-  Future returnToProfile() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (ctx) => const NavigationMenu(),
-      ),
-    );
+    if (isEmailVerified) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Email Successfully Verified")));
+      timer?.cancel();
+    }
   }
 
   @override
@@ -57,33 +57,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       child: Scaffold(
         backgroundColor: AppColors.primary,
         body: isEmailVerified
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Email Successfully Verified!",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                      onPressed: returnToProfile,
-                      color: Colors.deepPurple,
-                      height: 50,
-                      child: Text(
-                        'Return',
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
+            ? VerifPage()
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

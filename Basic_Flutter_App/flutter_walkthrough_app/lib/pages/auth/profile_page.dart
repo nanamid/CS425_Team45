@@ -5,12 +5,14 @@
 // landing page for a successful login (that is not the tasks page,
 // as seen in the login solo demo)
 
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:settings_ui/settings_ui.dart';  //Looking into this!
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_app/utils/constants/colors.dart';
+import 'package:test_app/pages/auth/email_validation.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,18 +26,37 @@ class _ProfilePageState extends State<ProfilePage> {
   final String? currentUser = FirebaseAuth.instance.currentUser?.email;
   final CollectionReference firestoreInstance =
       FirebaseFirestore.instance.collection("users");
+  bool isEmailVerified = false;
+  Timer? timer;
   String currentUsername = '';
   String currentEmail = '';
 
-  //TEST VARIABLES
-  bool darkMode = false;
-  //TEST VARIABLES
-
-  // Placeholder function
-  onChangeFunction1(bool newValue1) {
+  checkEmailVerified() async {
     setState(() {
-      darkMode = newValue1;
+      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
+
+    if (!isEmailVerified) {
+      // ignore: use_build_context_synchronously
+      Navigator.push(context,
+          MaterialPageRoute(builder: (ctx) => const EmailVerificationScreen()));
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text('Your email is verified!'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void loadUserData() async {
@@ -74,6 +95,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               actions: [
+                MaterialButton(
+                  onPressed: checkEmailVerified,
+                  child: Text("Email Check"),
+                ),
                 TextButton(
                   onPressed: () {
                     //loadUserData();
@@ -368,6 +393,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    //checkEmailVerified();
     loadUserData();
     return Scaffold(
       appBar: AppBar(
@@ -400,8 +426,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Divider(height: 20, thickness: 1),
             SizedBox(height: 10),
             buildAccountOption(context, "Account"),
-            buildLanguageOption(context, "Languages"),
-            //buildNotificationOption("Dark Mode", darkMode, onChangeFunction1),
+            //buildLanguageOption(context, "Languages"),
             SizedBox(height: 100),
             Row(
               children: [
