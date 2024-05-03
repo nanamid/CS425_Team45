@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:test_app/data/database.dart';
+import 'package:test_app/data/tasklist_classes.dart';
 import 'package:test_app/features/game/views/game_page.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
 import 'package:test_app/utils/formatters/space_extension.dart';
@@ -11,6 +13,10 @@ class StartBattleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TodoDatabase db = TodoDatabase();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    db.loadData();
+    TaskList taskList = db.listOfTaskLists[taskListIndex];
   //final TaskController controller = Get.find<TaskController>();
     return Scaffold(
       body: Container(
@@ -22,7 +28,11 @@ class StartBattleView extends StatelessWidget {
             alignment: Alignment.topCenter,
           ),
         ),
-        child: Stack(
+        child: ListenableBuilder(
+          listenable: Listenable.merge(<Listenable>[taskList] + taskList.list),
+          // listenable: taskList,
+          builder: (BuildContext context, Widget? child) {
+            return Stack(
           children: [
             Positioned(
               bottom: -20,
@@ -42,9 +52,16 @@ class StartBattleView extends StatelessWidget {
               ),
             ),
             Positioned(
-                    top: 580,
+                    top: 555,
                     left: 250,
-                    child: Text("11", //${controller.totalSwords}
+                    child: Text(taskList.list
+                              .where((element) =>
+                                  element.taskStatus == TaskStatus.DONE)
+                              .fold(
+                                  0,
+                                  (sum, task) =>
+                                      sum + (task.taskLabel.baseSwords ?? 0))
+                              .toString(), //${controller.totalSwords}
                       style: TextStyle(
                           fontSize: 45,
                           color: Colors.white,
@@ -98,6 +115,8 @@ class StartBattleView extends StatelessWidget {
               ),
             ),
           ],
+        );
+          },
         ),
       ),
     );
