@@ -3,14 +3,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:test_app/navigation_menu.dart';
-import 'package:test_app/pages/auth/profile_page.dart';
 import 'package:test_app/pages/auth/verification_page.dart';
 import 'package:test_app/utils/constants/colors.dart';
 import 'package:test_app/utils/constants/text_strings.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({Key? key}) : super(key: key);
+  const EmailVerificationScreen({super.key});
 
   @override
   State<EmailVerificationScreen> createState() =>
@@ -22,7 +20,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? timer;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseAuth.instance.currentUser?.sendEmailVerification();
     timer =
@@ -46,7 +43,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     timer?.cancel();
     super.dispose();
   }

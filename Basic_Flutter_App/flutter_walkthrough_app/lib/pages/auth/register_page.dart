@@ -87,7 +87,8 @@ class _RegisterPageState extends State<RegisterPage> {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  content: Text('No Login Credentials Found!'),
+                  content: Text('No Login Credentials Found!',
+                      style: TextStyle(fontSize: 20)),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'OK'),
@@ -103,7 +104,8 @@ class _RegisterPageState extends State<RegisterPage> {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  content: Text(e.message.toString()),
+                  content: Text(e.message.toString(),
+                      style: TextStyle(fontSize: 20)),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'OK'),
@@ -120,7 +122,8 @@ class _RegisterPageState extends State<RegisterPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              content: Text('Password not strong enough.'),
+              content: Text('Password not strong enough.',
+                  style: TextStyle(fontSize: 16)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
@@ -137,7 +140,8 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: Text('Passwords must match.'),
+            content:
+                Text('Passwords must match.', style: TextStyle(fontSize: 16)),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context, 'OK'),

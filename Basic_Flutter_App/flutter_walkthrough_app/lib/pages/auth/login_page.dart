@@ -42,7 +42,8 @@ class _LoginPageState extends State<LoginPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              content: Text('No Login Credentials Found!'),
+              content: Text('No Login Credentials Found!',
+                  style: TextStyle(fontSize: 16)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
@@ -58,7 +59,8 @@ class _LoginPageState extends State<LoginPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              content: Text(e.message.toString()),
+              content:
+                  Text(e.message.toString(), style: TextStyle(fontSize: 16)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
@@ -197,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Container(
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: Colors.blue[900],
+                        color: AppColors.buttonPrimary,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Center(
