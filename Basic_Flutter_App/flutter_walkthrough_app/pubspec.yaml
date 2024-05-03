@@ -15,6 +15,9 @@ dependencies:
     sdk: flutter
   intl: any
 
+  #GAME ENGINER - Flame
+  flame: ^1.15.0
+
   #LOCAL STORAGE - Hive
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -81,10 +84,20 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  #--------------- LOCAL ASSETS ------------------#
   assets:
     - assets/
     - assets/icons/
-    - assets/images/
-    - assets/images/backgrounds/
     - assets/images/avatars/
+    - assets/images/backgrounds/
+    - assets/images/components/
     - assets/animations/lottie/
+
+  #--------------- LOCAL FONTS ------------------#
+  fonts:
+    - family: Bebas Neue
+      fonts:
+        - asset: assets/fonts/BebasNeue-Bold.otf
+        - asset: assets/fonts/BebasNeue-Book.otf
+        - asset: assets/fonts/BebasNeue-Light.otf
+        - asset: assets/fonts/BebasNeue-Regular.otf

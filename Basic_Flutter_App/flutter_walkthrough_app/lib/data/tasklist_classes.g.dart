@@ -20,19 +20,25 @@ class TaskListAdapter extends TypeAdapter<TaskList> {
       listName: fields[1] as String?,
     )
       .._listUUID = fields[0] as String?
-      .._list = (fields[2] as List).cast<Task>();
+      .._list = (fields[2] as List).cast<Task>()
+      ..totalSwordsFromTasks = fields[3] as int
+      ..usedSwords = fields[4] as int;
   }
 
   @override
   void write(BinaryWriter writer, TaskList obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj._listUUID)
       ..writeByte(1)
       ..write(obj.listName)
       ..writeByte(2)
-      ..write(obj._list);
+      ..write(obj._list)
+      ..writeByte(3)
+      ..write(obj.totalSwordsFromTasks)
+      ..writeByte(4)
+      ..write(obj.usedSwords);
   }
 
   @override

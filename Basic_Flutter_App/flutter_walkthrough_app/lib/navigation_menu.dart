@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_app/data/pomodoro_timer_class.dart';
+import 'package:test_app/features/game/views/game_start_view.dart';
 import 'package:test_app/features/task/screens/pomodoro_page.dart';
 import 'package:test_app/features/task/screens/pomodoro_timer_widget.dart';
 import 'package:test_app/features/task/screens/task_page.dart';
@@ -62,7 +63,7 @@ class NavigationController extends GetxController {
 
   final screens = [
     TasksPage(),
-    Container(color: Colors.red),
+    StartBattleView(),
     AddTaskPage(),
     PomodoroPage(),
     UserPage(),

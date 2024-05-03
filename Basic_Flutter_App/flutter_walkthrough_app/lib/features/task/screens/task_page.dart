@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/features/task/screens/task_avatar_page.dart';
 import 'package:test_app/features/task/screens/task_list_view.dart';
-import 'package:test_app/features/task/screens/task_stats_view.dart';
+import 'package:test_app/features/task/screens/task_info.dart';
 
 class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
@@ -15,13 +15,13 @@ class TasksPage extends StatelessWidget {
       child: Column(
         children: [
           //Avatar View
-          Expanded(flex: 6, child: TaskAvatarView()),
+          Expanded(flex: 20, child: TaskAvatarView()),
 
           //Task Stats
-          Expanded(flex: 1, child: TaskInfoView()),
+          Expanded(flex: 6, child: TaskInfoView()),
 
           //Task List
-          Expanded(flex: 6, child: TaskListView()),
+          Expanded(flex: 20, child: TaskListView()),
         ],
       ),
     ));

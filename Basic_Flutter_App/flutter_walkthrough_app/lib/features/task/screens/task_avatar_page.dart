@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:test_app/common/widgets/build_text.dart';
-import 'package:test_app/features/task/controllers/task_avatar_controller.dart';
+import 'package:test_app/data/database.dart';
+import 'package:test_app/data/tasklist_classes.dart';
+import 'package:test_app/features/task/controllers/task_controller.dart';
 import 'package:test_app/utils/constants/image_strings.dart';
-import 'package:test_app/utils/constants/sizes.dart';
 import 'package:test_app/utils/device/device_utility.dart';
 
 class TaskAvatarView extends StatelessWidget {
@@ -11,6 +11,11 @@ class TaskAvatarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Import all the data
+    TodoDatabase db = TodoDatabase();
+    final taskListIndex = 0; // hardcoded one tasklist for now
+    db.loadData();
+    TaskList taskList = db.listOfTaskLists[taskListIndex];
 
     return Container(
       decoration: BoxDecoration(
@@ -20,33 +25,103 @@ class TaskAvatarView extends StatelessWidget {
         ),
       ),
       //color: Colors.lightGreen,
-      child: Stack(
-        children: [
-          //Avatar
-          Positioned( //Positioned vs Align: Use Positioned for precise formatting on the screen
-              top: 200,
-              left: AppDeviceUtils.getScreenWidth(context) / 2 - 50,
-              child: SvgPicture.asset(
+      child: ListenableBuilder(
+          listenable: Listenable.merge(<Listenable>[taskList] + taskList.list),
+          // listenable: taskList,
+          builder: (BuildContext context, Widget? child) {
+            return Stack(
+              children: [
+                //Task Details Background (Orange Background)
+                Positioned(
+                  top: 80,
+                  left: 50,
+                  child: Image(
+                    image:
+                        AssetImage("assets/images/backgrounds/task_info.png"),
+                  ),
+                ),
 
-                //Create a function that gets the total tasks and remaining tasks
-                TaskAvatarController.getAvatarImagePath(1, 8),
-                height: 120,
-                width: 120,
-              )),
+                //Task Details
+                Positioned(
+                  top: 88,
+                  left: 58,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      //- TASKS COMPLETED
+                      Text(
+                          taskList.list
+                              .where((element) =>
+                                  element.taskStatus == TaskStatus.DONE)
+                              .toList()
+                              .length
+                              .toString(),
+                          style: TextStyle(
+                              fontSize: 28,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      Image(
+                        image: AssetImage("assets/images/backgrounds/line.png"),
+                      ),
+                      //- TASKS TOTAL
+                      Text(taskList.list.length.toString(),
+                          style: TextStyle(
+                              fontSize: 28,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
 
-         
+                //Task Details CheckMark Icon
+                Positioned(
+                  top: 80,
+                  left: 110,
+                  child: Image(
+                    image:
+                        AssetImage("assets/images/backgrounds/completion_icon.png"),
+                  ),
+                ),
+                
+                //STREAK
+                Positioned(
+                  top: 80,
+                  left: 270,
+                  child: Image(
+                    image: AssetImage("assets/images/backgrounds/streak1.png"),
+                  ),
+                ),
 
-          //Task Count
-          Align(
-            alignment: Alignment.bottomCenter,
-            //Task Stats
+                //Avatar
+                Positioned(
+                    //Positioned vs Align: Use Positioned for precise formatting on the screen
+                    top: 160,
+                    left: AppDeviceUtils.getScreenWidth(context) / 2 - 50,
+                    child: SvgPicture.asset(
+                      //TaskAvatarController.getAvatarImagePath(int completedTasks, int totalTasks)
+                      TaskController.getAvatarImagePath(
+                        //Completed Tasks
+                        taskList.list
+                              .where((element) =>
+                                  element.taskStatus == TaskStatus.DONE)
+                              .toList()
+                              .length, 
+                        //Total Tasks
+                        taskList.list.length),
+                      height: 130,
+                      width: 130,
+                    )),
 
-            child: Row(
-              
-            ),
-          ),
-        ],
-      ),
+                //Task Count
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  //Task Stats
+
+                  child: Row(),
+                ),
+              ],
+            );
+          }),
     );
   }
 }

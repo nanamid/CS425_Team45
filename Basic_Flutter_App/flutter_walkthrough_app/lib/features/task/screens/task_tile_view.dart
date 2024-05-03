@@ -140,9 +140,10 @@ class _TaskTileViewState extends State<TaskTileView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          //SWORD NUMBER
+
+                          //SWORD NUMBER -----------------------------------------------------
                           buildText(
-                              '1',
+                              '${widget.task.taskLabel.baseSwords}',
                               AppColors.textWhite,
                               AppSizes.textLarge,
                               FontWeight.normal,

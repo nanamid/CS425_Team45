@@ -109,6 +109,13 @@ class _TaskListViewState extends State<TaskListView> {
     db.updateDatabase();
   }
 
+
+
+  //##################### UI BUILD ###############################
+
+
+
+
   @override
   Widget build(BuildContext context) {
     //TextTheme textTheme = Theme.of(context).textTheme;
@@ -124,8 +131,6 @@ class _TaskListViewState extends State<TaskListView> {
               .toList(); // otherwise it shows parent tasks with their expansion list of children, as well as the children themselves later in the list
           return Container(
             decoration: BoxDecoration(
-              //color: testing.clrLvl2,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               color: AppColors.secondary,
             ),
             child: listOfTopLevelTasks.isNotEmpty
@@ -134,8 +139,7 @@ class _TaskListViewState extends State<TaskListView> {
                 ? ListView.separated(
                     physics: const BouncingScrollPhysics(),
                     padding: EdgeInsets.all(15),
-                    separatorBuilder: (context, index) => 10
-                        .height_space, //use space extenion here "15.height_space"
+                    separatorBuilder: (context, index) => 10.height_space, 
                     itemCount: listOfTopLevelTasks.length,
                     itemBuilder: (context, index) {
                       Task currentTask = listOfTopLevelTasks[index];
